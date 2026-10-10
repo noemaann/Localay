@@ -1,12 +1,22 @@
 import { Route, Routes } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout.jsx";
 import HomePage from "../pages/HomePage.jsx";
+import ContributePage from "../pages/ContributePage.jsx";
+import MyContributionsPage from "../pages/MyContributionsPage.jsx";
+import ModerationPage from "../pages/ModerationPage.jsx";
+import PlaceDetailPage from "../pages/PlaceDetailPage.jsx";
+import AutoFarePage from "../pages/AutoFarePage.jsx";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="autofare" element={<AutoFarePage />} />
+        <Route path="contribute" element={<ContributePage />} />
+        <Route path="my-contributions" element={<MyContributionsPage />} />
+        <Route path="moderation" element={<ModerationPage />} />
+        <Route path="places/:placeId" element={<PlaceDetailPage />} />
       </Route>
     </Routes>
   );

@@ -1,15 +1,18 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
+import { AuthProvider } from "../src/context/AuthContext.jsx";
 import { LocationProvider } from "../src/context/LocationContext.jsx";
 import LocationSelector from "../src/components/LocationSelector.jsx";
 
 function renderSelector() {
   return render(
     <MemoryRouter>
-      <LocationProvider>
-        <LocationSelector />
-      </LocationProvider>
+      <AuthProvider>
+        <LocationProvider>
+          <LocationSelector />
+        </LocationProvider>
+      </AuthProvider>
     </MemoryRouter>
   );
 }

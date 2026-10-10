@@ -1,15 +1,19 @@
 import { useState, useRef, useEffect } from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import LocationSelector from "../components/LocationSelector.jsx";
+import AuthModal from "../components/AuthModal.jsx";
 import { useLocation } from "../context/LocationContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 /**
  * SiteHeader — sticky top navigation with LOCALAY branding, nav links,
- * and the location selector. Collapses into a mobile hamburger menu.
+ * location selector, community contribution links, and user auth control.
  */
 function SiteHeader() {
   const { region } = useLocation();
+  const { user, isModerator, signOut, isDemo } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const navRef = useRef(null);
 
   // Close mobile menu on outside click or route change
@@ -28,12 +32,17 @@ function SiteHeader() {
       "text-sm font-medium transition-colors duration-150 focus-visible:outline",
       "focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded",
       isActive
-        ? "text-monsoon-900"
+        ? "text-monsoon-900 font-bold"
         : "text-monsoon-800 hover:text-monsoon-900",
     ].join(" ");
 
   return (
     <header className="sticky top-0 z-40 border-b border-monsoon-100 bg-monsoon-50/95 backdrop-blur-sm">
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
+
       <nav
         ref={navRef}
         aria-label="Main navigation"
@@ -60,29 +69,61 @@ function SiteHeader() {
             </NavLink>
           </li>
           <li>
-            {/* Discover link — page comes in Step 3, disabled but visible */}
-            <span
-              className="text-sm font-medium text-monsoon-800/40 cursor-not-allowed select-none"
-              title="Coming in Step 3"
-              aria-disabled="true"
-            >
-              Discover
-            </span>
+            <NavLink to="/autofare" className={navLinkClass}>
+              AutoFare
+            </NavLink>
           </li>
           <li>
-            <span
-              className="text-sm font-medium text-monsoon-800/40 cursor-not-allowed select-none"
-              title="Coming later"
-              aria-disabled="true"
-            >
-              AutoFare
-            </span>
+            <NavLink to="/contribute" className={navLinkClass}>
+              Contribute
+            </NavLink>
           </li>
+          {user && (
+            <li>
+              <NavLink to="/my-contributions" className={navLinkClass}>
+                My Contributions
+              </NavLink>
+            </li>
+          )}
+          {isModerator && (
+            <li>
+              <NavLink to="/moderation" className={navLinkClass}>
+                <span className="rounded-md bg-purple-100 px-2 py-0.5 text-xs font-bold text-purple-800">
+                  Moderation
+                </span>
+              </NavLink>
+            </li>
+          )}
         </ul>
 
-        {/* Right side: location + mobile toggle */}
+        {/* Right side: location + Auth + mobile toggle */}
         <div className="flex items-center gap-2">
           <LocationSelector />
+
+          {/* User Auth Pill */}
+          {user ? (
+            <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-monsoon-200">
+              <span className="text-xs font-semibold text-monsoon-900 max-w-[100px] truncate">
+                {user.displayName || user.email?.split("@")[0]}
+              </span>
+              <button
+                type="button"
+                onClick={signOut}
+                title="Sign out"
+                className="text-xs font-medium text-monsoon-800/70 hover:text-rose-600 underline"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAuthModalOpen(true)}
+              className="hidden sm:inline-flex items-center rounded-xl bg-monsoon-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-monsoon-800 transition-colors"
+            >
+              Sign In
+            </button>
+          )}
 
           {/* Mobile menu button */}
           <button
@@ -148,7 +189,7 @@ function SiteHeader() {
                 end
                 className={({ isActive }) =>
                   `block rounded-lg px-3 py-2.5 text-sm font-medium ${
-                    isActive ? "bg-monsoon-100 text-monsoon-900" : "text-monsoon-800 hover:bg-monsoon-100"
+                    isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
                   }`
                 }
                 onClick={() => setMenuOpen(false)}
@@ -157,14 +198,85 @@ function SiteHeader() {
               </NavLink>
             </li>
             <li>
-              <span className="block rounded-lg px-3 py-2.5 text-sm font-medium text-monsoon-800/40 cursor-not-allowed select-none">
-                Discover <span className="ml-1 text-xs">(coming soon)</span>
-              </span>
+              <NavLink
+                to="/autofare"
+                className={({ isActive }) =>
+                  `block rounded-lg px-3 py-2.5 text-sm font-medium ${
+                    isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
+                  }`
+                }
+                onClick={() => setMenuOpen(false)}
+              >
+                AutoFare
+              </NavLink>
             </li>
             <li>
-              <span className="block rounded-lg px-3 py-2.5 text-sm font-medium text-monsoon-800/40 cursor-not-allowed select-none">
-                AutoFare <span className="ml-1 text-xs">(coming soon)</span>
-              </span>
+              <NavLink
+                to="/contribute"
+                className={({ isActive }) =>
+                  `block rounded-lg px-3 py-2.5 text-sm font-medium ${
+                    isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
+                  }`
+                }
+                onClick={() => setMenuOpen(false)}
+              >
+                Contribute
+              </NavLink>
+            </li>
+            {user && (
+              <li>
+                <NavLink
+                  to="/my-contributions"
+                  className={({ isActive }) =>
+                    `block rounded-lg px-3 py-2.5 text-sm font-medium ${
+                      isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
+                    }`
+                  }
+                  onClick={() => setMenuOpen(false)}
+                >
+                  My Contributions
+                </NavLink>
+              </li>
+            )}
+            {isModerator && (
+              <li>
+                <NavLink
+                  to="/moderation"
+                  className={({ isActive }) =>
+                    `block rounded-lg px-3 py-2.5 text-sm font-medium ${
+                      isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
+                    }`
+                  }
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Moderation Dashboard
+                </NavLink>
+              </li>
+            )}
+            <li className="pt-2 border-t border-monsoon-200">
+              {user ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    signOut();
+                    setMenuOpen(false);
+                  }}
+                  className="w-full text-left rounded-lg px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50"
+                >
+                  Sign Out ({user.displayName || user.email})
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthModalOpen(true);
+                    setMenuOpen(false);
+                  }}
+                  className="w-full text-left rounded-lg px-3 py-2 text-sm font-semibold text-monsoon-900 hover:bg-monsoon-100"
+                >
+                  Sign In / Register
+                </button>
+              )}
             </li>
           </ul>
         </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import SearchInput from "../components/SearchInput.jsx";
 import CategoryGrid from "../components/CategoryGrid.jsx";
 import Badge from "../components/Badge.jsx";
@@ -130,8 +131,7 @@ function CategorySection() {
 }
 
 /**
- * CommunityBanner — a simple community-oriented call-to-action strip.
- * Placeholder content only — no real data or links yet.
+ * CommunityBanner — a community-oriented call-to-action strip leading to contributions.
  */
 function CommunityBanner() {
   return (
@@ -146,24 +146,17 @@ function CommunityBanner() {
               Know a hidden gem?
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-monsoon-800/80 max-w-md">
-              LOCALAY is built by the community. Add places, share reviews, and
+              LOCALAY is built by the community. Add places, share reviews, report dish prices, and
               help others discover what makes your town special.
             </p>
           </div>
           <div className="shrink-0">
-            {/* This will link to the submit-place page in a later step */}
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title="Place submission opens in a later release"
-              className={[
-                "rounded-xl bg-monsoon-600 px-5 py-2.5 text-sm font-semibold text-white",
-                "opacity-60 cursor-not-allowed select-none",
-              ].join(" ")}
+            <Link
+              to="/contribute"
+              className="inline-flex items-center rounded-xl bg-monsoon-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-monsoon-700 transition-colors shadow-sm"
             >
-              Add a place <span className="ml-1 text-xs font-normal opacity-80">(coming soon)</span>
-            </button>
+              Add a place & review →
+            </Link>
           </div>
         </div>
       </div>

@@ -1,0 +1,140 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isModerator() {
+      return isSignedIn() && (
+        getUserData().role == 'admin' || getUserData().role == 'moderator'
+      );
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserData().role == 'admin';
+    }
+
+    // 1. REGIONS Collection (Public discovery read, Admin write)
+    match /regions/{regionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 2. PLACES Collection (Public read for discovery; Moderator/Admin write only)
+    match /places/{placeId} {
+      allow read: if resource.data.status == 'approved' || isModerator();
+      allow create, update, delete: if isModerator();
+    }
+
+    // 3. REVIEWS Collection (Public read for approved reviews, Authenticated write with bounds)
+    match /reviews/{reviewId} {
+      allow read: if resource.data.status == 'approved'
+        || (isSignedIn() && resource.data.userId == request.auth.uid)
+        || isModerator();
+
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.placeId is string
+        && request.resource.data.regionId is string
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && (request.resource.data.status == 'pending' || isModerator());
+
+      allow update: if (isOwner(resource.data.userId)
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.status == resource.data.status
+          && request.resource.data.rating >= 1
+          && request.resource.data.rating <= 5)
+        || isModerator();
+
+      allow delete: if isOwner(resource.data.userId) || isModerator();
+    }
+
+    // 4. DISH PRICES Collection (Public read, Authenticated write with numeric bounds)
+    // Historical price records are append-only; updates/deletions restricted to moderators.
+    match /dishPrices/{dishPriceId} {
+      allow read: if true;
+
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.placeId is string
+        && request.resource.data.dishName is string
+        && request.resource.data.dishName.size() > 0
+        && request.resource.data.price is number
+        && request.resource.data.price > 0
+        && request.resource.data.price < 100000;
+
+      allow update, delete: if isModerator();
+    }
+
+    // 5. PLACE UPDATES Collection (Proposed edits for existing places)
+    match /placeUpdates/{updateId} {
+      allow read: if isOwner(resource.data.userId) || isModerator();
+
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.placeId is string
+        && (request.resource.data.status == 'pending' || isModerator());
+
+      allow update, delete: if isModerator();
+    }
+
+    // 6. FARE REPORTS Collection (AutoFare community reports)
+    // Appended historical reports; cannot overwrite historical records or self-verify.
+    match /fareReports/{reportId} {
+      allow read: if true;
+
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.origin is string
+        && request.resource.data.destination is string
+        && request.resource.data.distanceKm is number
+        && request.resource.data.distanceKm > 0
+        && request.resource.data.distanceKm < 500
+        && request.resource.data.fareAmount is number
+        && request.resource.data.fareAmount > 0
+        && request.resource.data.fareAmount < 50000
+        && (request.resource.data.status == 'unverified' || isModerator());
+
+      allow update, delete: if isModerator();
+    }
+
+    // 7. SUBMISSIONS Collection (Unmoderated community new place proposals)
+    match /submissions/{submissionId} {
+      allow read: if isOwner(resource.data.userId) || isModerator();
+
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.type is string
+        && (request.resource.data.status == 'pending' || isModerator());
+
+      allow update, delete: if isModerator();
+    }
+
+    // 8. USERS Collection (User profiles and roles)
+    match /users/{userId} {
+      allow read: if isSignedIn();
+
+      allow create: if isOwner(userId)
+        && (!('role' in request.resource.data) || request.resource.data.role == 'community_member');
+
+      allow update: if isOwner(userId)
+        && request.resource.data.role == resource.data.role // Users cannot alter their own role
+        || isAdmin();
+
+      allow delete: if isAdmin();
+    }
+  }
+}

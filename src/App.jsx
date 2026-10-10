@@ -1,10 +1,13 @@
+import { AuthProvider } from "./context/AuthContext.jsx";
 import { LocationProvider } from "./context/LocationContext.jsx";
 import AppRoutes from "./routes/AppRoutes.jsx";
 
 export default function App() {
   return (
-    <LocationProvider>
-      <AppRoutes />
-    </LocationProvider>
+    <AuthProvider>
+      <LocationProvider>
+        <AppRoutes />
+      </LocationProvider>
+    </AuthProvider>
   );
 }

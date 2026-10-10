@@ -1,123 +1,76 @@
-# LOCALAY
+# LOCALAY — Community-Powered Local Discovery Platform
 
-LOCALAY is a community-powered local discovery platform. It helps people find local food spots, hidden places, nature destinations, and local experiences, backed by community reviews, practical access information, and community-reported auto-rickshaw fares.
+LOCALAY is a community-powered local discovery platform covering hidden food spots, nature destinations, local experiences, community reviews, road access information, and community-reported auto-rickshaw fares (AutoFare).
 
-Malappuram, Kerala is the **launch region**, not a permanent restriction. The app is designed to expand to other towns and districts across Kerala and beyond. Region selection is driven by data (`src/data/regions.js`) with no hard-coded region names in logic or components.
+Malappuram, Kerala is the **initial launch region**, not a permanent application boundary. The platform supports multi-region geographic expansion (district and town-level hierarchy) driven entirely by data (`src/data/regions.js` & Firestore collections).
 
-## Status
+---
 
-Step 2 complete: UI/UX foundation — responsive layout, navigation, branding, hero section, location selector, discovery category grid, and a full set of shared UI components. Firebase, maps, discovery detail pages, and AutoFare remain deferred (see `docs/MVP_ROADMAP.md`).
+## 🚀 Key Features
 
-## Tech stack
+- **Firebase Backend & Demo Mode**: Firebase Authentication, Cloud Firestore, and Cloud Storage integration. Supports an explicit **Demo Mode** fallback with rich in-memory datasets when live Firebase credentials are not supplied.
+- **Multi-Region Expansion**: Dynamic region selection context with town/locality hierarchy (`regionId`, `districtId`, `townId`). Adding a new town or district requires data configuration without UI code changes.
+- **Authenticated Community Contributions**:
+  - Place proposals (`submissions`)
+  - Community reviews & 1–5 star ratings (`reviews`)
+  - Crowd-sourced food & dish prices (`dishPrices` with historical series preservation)
+  - Road access & terrain condition updates (`placeUpdates`)
+  - Place correction requests
+- **Moderation Lifecycle**: Controlled moderation states (`pending`, `community_reported`, `verified`, `rejected`, `needs_recheck`). Prevents unmoderated community submissions from publishing automatically as verified facts.
+- **AutoFare Rickshaw Fare Comparison**: Responsible fare calculation algorithm (`calculateFareSummary`) computing descriptive statistics (min, median, max, 25th-75th percentiles) with neutral status labels (`Within reported range`, `Below reported range`, `Above reported range`, `Insufficient comparable data`).
 
-- React 18 with Vite (JavaScript and JSX)
-- Tailwind CSS 3
-- React Router 6
-- Vitest and React Testing Library
-- Later: Firebase, Leaflet with OpenStreetMap
+---
 
-## Local development
+## 🛠️ Tech Stack
+
+- **Frontend**: React 18, Vite, JavaScript (JSX), Tailwind CSS 3, React Router 6
+- **Backend & Data**: Firebase JS SDK v10 (Auth, Firestore, Cloud Storage), Firestore Rules & Indexes
+- **Testing**: Vitest, React Testing Library, jsdom (56 passing tests)
+
+---
+
+## 📦 Development Setup
 
 Requirements: Node.js 18 or newer.
 
 ```bash
+# 1. Install dependencies
 npm install
-npm run dev      # start the dev server at http://localhost:5173
-npm test         # run all tests once
-npm run build    # production build into dist/
-npm run preview  # serve the production build locally
-npm run test:watch  # run tests in watch mode
+
+# 2. Start local development server
+npm run dev
+
+# 3. Run full unit and integration test suite
+npm test
+
+# 4. Create production build
+npm run build
+
+# 5. Preview production build locally
+npm run preview
 ```
 
-Copy `.env.example` to `.env.local` if you need local environment values. Never commit `.env.local`.
+### Environment Configuration
+Copy `.env.example` to `.env.local` for local Firebase credentials:
 
-## Project structure
-
-```
-src/
-  components/          shared, reusable UI pieces
-    Button.jsx         primary/secondary/ghost button
-    Badge.jsx          label/tag/status badge
-    Card.jsx           surface container with optional hover lift
-    SearchInput.jsx    search field with icon and clear button
-    LoadingState.jsx   spinner with aria-live for screen readers
-    EmptyState.jsx     no-results placeholder with action slot
-    LocationSelector.jsx  dropdown to switch the active region
-    CategoryGrid.jsx   six-tile discovery category grid
-  context/
-    LocationContext.jsx   region selection context + useLocation hook
-  data/
-    categories.js      six discovery categories (food, nature, …)
-    regions.js         region reference data (Malappuram default)
-  features/            feature modules (added in later steps)
-  layouts/
-    MainLayout.jsx     sticky header + nav + footer shell
-  pages/
-    HomePage.jsx       hero, search, community banner, category grid
-  routes/
-    AppRoutes.jsx      route declarations
-  services/            external integrations (Firebase later)
-  styles/
-    index.css          Tailwind entry + base styles + skip link
-  utils/               pure helper functions
-tests/
-  setup.js             Vitest + @testing-library/jest-dom configuration
-  HomePage.test.jsx    landing page integration tests
-  regions.test.js      regions data unit tests
-  categories.test.js   categories data unit tests
-  LocationSelector.test.jsx  component interaction tests
-docs/
-  ARCHITECTURE.md
-  MVP_ROADMAP.md
-  TEAM_WORKFLOW.md
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_USE_DEMO_MODE=false
 ```
 
-## Adding a new region
+---
 
-Open `src/data/regions.js` and add an entry to `REGIONS`:
+## 📚 Documentation Index
 
-```js
-{
-  id: "my-town-kerala",
-  name: "My Town",
-  state: "Kerala",
-  country: "India",
-  label: "My Town, Kerala",
-  available: true,   // set false to show as "Coming soon"
-}
-```
-
-No component or page changes are needed. The LocationSelector picks it up automatically.
-
-## Styling conventions
-
-- Use Tailwind utilities and theme tokens defined in `tailwind.config.js`.
-- Do not add ad-hoc CSS values outside the design system.
-- Colour palette: `monsoon` (greens, full scale 50–900) and `turmeric` (yellows, 100–600).
-- Fonts: `font-display` (Fraunces) for headings, `font-sans` (Inter) for body.
-- Every interactive element must have a visible `:focus-visible` ring using `outline-monsoon-600`.
-
-## GitHub setup
-
-1. Create an empty repository on GitHub (no README, no .gitignore).
-2. From the project folder:
-
-```bash
-git init
-git add .
-git commit -m "chore: initial LOCALAY project foundation"
-git branch -M main
-git remote add origin https://github.com/<your-username>/localay.git
-git push -u origin main
-```
-
-3. In GitHub settings, protect `main`: require a pull request and at least one review before merging.
-4. Invite your teammate as a collaborator.
-
-## Team and workflow
-
-One teammate owns UI/UX; the other owns backend and Firebase. See `docs/TEAM_WORKFLOW.md` for branches, pull requests, and ownership rules.
-
-## Security
-
-Do not commit Firebase credentials, service account files, or any real secrets. Use `.env.local` for local values. `.gitignore` already excludes them.
+- [`docs/ARCHITECTURE.md`](file:///c:/Users/Shinil/Documents/Projects/Layover%202026/Localay/docs/ARCHITECTURE.md) — Layered architecture & region data model
+- [`docs/DATABASE_SCHEMA.md`](file:///c:/Users/Shinil/Documents/Projects/Layover%202026/Localay/docs/DATABASE_SCHEMA.md) — 8 Firestore collections schema definition
+- [`docs/FIREBASE_SETUP.md`](file:///c:/Users/Shinil/Documents/Projects/Layover%202026/Localay/docs/FIREBASE_SETUP.md) — Firebase console setup, security rules, indexes & rules deployment
+- [`docs/SECURITY_AND_MODERATION.md`](file:///c:/Users/Shinil/Documents/Projects/Layover%202026/Localay/docs/SECURITY_AND_MODERATION.md) — Security rules, moderation states & anti-self-approval safeguards
+- [`docs/AUTOFARE_ALGORITHM.md`](file:///c:/Users/Shinil/Documents/Projects/Layover%202026/Localay/docs/AUTOFARE_ALGORITHM.md) — AutoFare calculation methodology & statistical limits
+- [`docs/MVP_ROADMAP.md`](file:///c:/Users/Shinil/Documents/Projects/Layover%202026/Localay/docs/MVP_ROADMAP.md) — Step-by-step progress & release status
+- [`docs/FINAL_IMPLEMENTATION_REPORT.md`](file:///c:/Users/Shinil/Documents/Projects/Layover%202026/Localay/docs/FINAL_IMPLEMENTATION_REPORT.md) — Final integration report & deployment checklist
