@@ -2,11 +2,11 @@
 
 LOCALAY is a community-powered local discovery platform. It helps people find local food spots, hidden places, nature destinations, and local experiences, backed by community reviews, practical access information, and community-reported auto-rickshaw fares.
 
-Malappuram, Kerala is the **launch region**, not a permanent restriction. The app is designed to expand to other towns and districts across Kerala and beyond. Region selection is driven by data (`src/data/regions.js`) with no hard-coded region names in logic or components.
+Malappuram, Kerala is the **launch region**, not a permanent restriction. The app is designed to expand to other towns and districts. Region selection and place data are driven by stable `regionId` references — not hard-coded town names.
 
 ## Status
 
-Step 2 complete: UI/UX foundation — responsive layout, navigation, branding, hero section, location selector, discovery category grid, and a full set of shared UI components. Firebase, maps, discovery detail pages, and AutoFare remain deferred (see `docs/MVP_ROADMAP.md`).
+Step 3 complete: discovery with mock data — place cards, category/search filters, place detail page, map placeholder, service abstraction, and 65 passing tests. Firebase, maps, and community submissions remain deferred (see `docs/MVP_ROADMAP.md`).
 
 ## Tech stack
 
@@ -22,50 +22,76 @@ Requirements: Node.js 18 or newer.
 
 ```bash
 npm install
-npm run dev      # start the dev server at http://localhost:5173
-npm test         # run all tests once
-npm run build    # production build into dist/
-npm run preview  # serve the production build locally
-npm run test:watch  # run tests in watch mode
+npm run dev          # start the dev server at http://localhost:5173
+npm test             # run all tests once (currently 65 tests)
+npm run test:watch   # run tests in watch mode
+npm run build        # production build into dist/
+npm run preview      # serve the production build locally
 ```
 
-Copy `.env.example` to `.env.local` if you need local environment values. Never commit `.env.local`.
+Copy `.env.example` to `.env.local` for local environment values. Never commit `.env.local`.
+
+## Key URLs (dev server)
+
+| Path | Description |
+|---|---|
+| `/` | Home page — hero, search, category grid |
+| `/discover` | Discovery page — search + category filter + place cards |
+| `/discover?q=biriyani` | Pre-filtered search |
+| `/discover?category=food` | Pre-filtered by category |
+| `/place/:placeId` | Place detail — location, access, map placeholder, tags |
 
 ## Project structure
 
 ```
 src/
   components/          shared, reusable UI pieces
-    Button.jsx         primary/secondary/ghost button
-    Badge.jsx          label/tag/status badge
-    Card.jsx           surface container with optional hover lift
-    SearchInput.jsx    search field with icon and clear button
-    LoadingState.jsx   spinner with aria-live for screen readers
-    EmptyState.jsx     no-results placeholder with action slot
-    LocationSelector.jsx  dropdown to switch the active region
-    CategoryGrid.jsx   six-tile discovery category grid
+    Button.jsx
+    Badge.jsx
+    Card.jsx
+    SearchInput.jsx
+    LoadingState.jsx
+    EmptyState.jsx
+    LocationSelector.jsx
+    CategoryGrid.jsx     — navigates to /discover?category=<id>
   context/
-    LocationContext.jsx   region selection context + useLocation hook
+    LocationContext.jsx  — region selection context + useLocation hook
   data/
-    categories.js      six discovery categories (food, nature, …)
-    regions.js         region reference data (Malappuram default)
-  features/            feature modules (added in later steps)
+    categories.js        — six discovery categories
+    regions.js           — region reference data (Malappuram default)
+    mockPlaces.js        — DEMO places (all marked _demo:true)
+  features/
+    discovery/
+      usePlaces.js       — async hook: loads + filters places
+      PlaceCard.jsx      — linked summary card
+      CategoryFilter.jsx — horizontal pill filter strip
+      MapPlaceholder.jsx — clearly labelled map stub
   layouts/
-    MainLayout.jsx     sticky header + nav + footer shell
+    MainLayout.jsx       — sticky header + Discover nav link + footer
   pages/
-    HomePage.jsx       hero, search, community banner, category grid
+    HomePage.jsx         — hero search navigates to /discover
+    DiscoverPage.jsx     — URL-param driven search + filter + results
+    PlaceDetailPage.jsx  — full place detail with all info sections
   routes/
-    AppRoutes.jsx      route declarations
-  services/            external integrations (Firebase later)
+    AppRoutes.jsx        — /, /discover, /place/:placeId
+  services/
+    placeService.js      — getPlaces(filters), getPlaceById(id)
+    regionService.js     — getRegions(), getRegionById(id)
   styles/
-    index.css          Tailwind entry + base styles + skip link
-  utils/               pure helper functions
+    index.css
+  utils/
+    search.js            — normalise, matchesQuery, filterPlaces (pure)
+    format.js            — formatDifficulty, difficultyIcon, etc. (pure)
 tests/
-  setup.js             Vitest + @testing-library/jest-dom configuration
-  HomePage.test.jsx    landing page integration tests
-  regions.test.js      regions data unit tests
-  categories.test.js   categories data unit tests
-  LocationSelector.test.jsx  component interaction tests
+  setup.js
+  HomePage.test.jsx
+  LocationSelector.test.jsx
+  regions.test.js
+  categories.test.js
+  mockPlaces.test.js     — data integrity checks
+  search.test.js         — search utility unit tests
+  format.test.js         — format utility unit tests
+  discovery.test.jsx     — DiscoverPage + PlaceDetailPage integration
 docs/
   ARCHITECTURE.md
   MVP_ROADMAP.md
@@ -83,41 +109,55 @@ Open `src/data/regions.js` and add an entry to `REGIONS`:
   state: "Kerala",
   country: "India",
   label: "My Town, Kerala",
-  available: true,   // set false to show as "Coming soon"
+  available: true,
 }
 ```
 
-No component or page changes are needed. The LocationSelector picks it up automatically.
+Then add places for that region in `src/data/mockPlaces.js` using `regionId: "my-town-kerala"`. No page or component changes needed.
+
+## Mock data rules
+
+- All demo records must carry `_demo: true`.
+- Never invent data and label it verified.
+- No fabricated ratings, reviews, or prices marked as real.
+- Clearly label all illustrative content in the UI.
+- When Firebase lands (Step 4), `placeService.js` and `regionService.js` are the only files that change.
+
+## Service contract
+
+```
+placeService.getPlaces({ query?, categoryId?, regionId? })  → Promise<Place[]>
+placeService.getPlaceById(placeId)                          → Promise<Place | null>
+
+regionService.getRegions({ availableOnly? })                → Promise<Region[]>
+regionService.getRegionById(regionId)                       → Promise<Region | null>
+```
 
 ## Styling conventions
 
-- Use Tailwind utilities and theme tokens defined in `tailwind.config.js`.
-- Do not add ad-hoc CSS values outside the design system.
-- Colour palette: `monsoon` (greens, full scale 50–900) and `turmeric` (yellows, 100–600).
+- Use Tailwind utilities and theme tokens from `tailwind.config.js`.
+- Colour palette: `monsoon` (greens, 50–900) and `turmeric` (yellows, 100–600).
 - Fonts: `font-display` (Fraunces) for headings, `font-sans` (Inter) for body.
-- Every interactive element must have a visible `:focus-visible` ring using `outline-monsoon-600`.
+- Every interactive element must have a visible `:focus-visible` ring.
 
 ## GitHub setup
 
-1. Create an empty repository on GitHub (no README, no .gitignore).
+1. Create an empty repository on GitHub.
 2. From the project folder:
 
 ```bash
 git init
 git add .
-git commit -m "chore: initial LOCALAY project foundation"
+git commit -m "feat: discovery with mock data (step 3)"
 git branch -M main
 git remote add origin https://github.com/<your-username>/localay.git
 git push -u origin main
 ```
 
-3. In GitHub settings, protect `main`: require a pull request and at least one review before merging.
-4. Invite your teammate as a collaborator.
-
 ## Team and workflow
 
-One teammate owns UI/UX; the other owns backend and Firebase. See `docs/TEAM_WORKFLOW.md` for branches, pull requests, and ownership rules.
+See `docs/TEAM_WORKFLOW.md` for branch rules and ownership.
 
 ## Security
 
-Do not commit Firebase credentials, service account files, or any real secrets. Use `.env.local` for local values. `.gitignore` already excludes them.
+Do not commit Firebase credentials or any real secrets. Use `.env.local` for local values.

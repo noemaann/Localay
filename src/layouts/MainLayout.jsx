@@ -60,14 +60,9 @@ function SiteHeader() {
             </NavLink>
           </li>
           <li>
-            {/* Discover link — page comes in Step 3, disabled but visible */}
-            <span
-              className="text-sm font-medium text-monsoon-800/40 cursor-not-allowed select-none"
-              title="Coming in Step 3"
-              aria-disabled="true"
-            >
+            <NavLink to="/discover" className={navLinkClass}>
               Discover
-            </span>
+            </NavLink>
           </li>
           <li>
             <span
@@ -157,9 +152,17 @@ function SiteHeader() {
               </NavLink>
             </li>
             <li>
-              <span className="block rounded-lg px-3 py-2.5 text-sm font-medium text-monsoon-800/40 cursor-not-allowed select-none">
-                Discover <span className="ml-1 text-xs">(coming soon)</span>
-              </span>
+              <NavLink
+                to="/discover"
+                className={({ isActive }) =>
+                  `block rounded-lg px-3 py-2.5 text-sm font-medium ${
+                    isActive ? "bg-monsoon-100 text-monsoon-900" : "text-monsoon-800 hover:bg-monsoon-100"
+                  }`
+                }
+                onClick={() => setMenuOpen(false)}
+              >
+                Discover
+              </NavLink>
             </li>
             <li>
               <span className="block rounded-lg px-3 py-2.5 text-sm font-medium text-monsoon-800/40 cursor-not-allowed select-none">

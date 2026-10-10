@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SearchInput from "../components/SearchInput.jsx";
 import CategoryGrid from "../components/CategoryGrid.jsx";
 import Badge from "../components/Badge.jsx";
@@ -12,9 +13,11 @@ import { useLocation } from "../context/LocationContext.jsx";
  *   searchValue: string,
  *   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
  *   onSearchClear: () => void,
+ *   onSearchSubmit: (e: React.FormEvent) => void,
+ *   onSuggestion: (term: string) => void,
  * }} props
  */
-function HeroSection({ searchValue, onSearchChange, onSearchClear }) {
+function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmit, onSuggestion }) {
   const { region } = useLocation();
 
   return (
@@ -60,16 +63,22 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear }) {
         </p>
 
         {/* Search */}
-        <div className="mt-8 max-w-xl">
+        <form
+          role="search"
+          aria-label="Search places"
+          onSubmit={onSearchSubmit}
+          className="mt-8 max-w-xl"
+        >
           <SearchInput
             label="Search places in your area"
-            placeholder={`Search places in ${region.name}…`}
+            placeholder={`Search in ${region.name}…`}
             value={searchValue}
             onChange={onSearchChange}
             onClear={onSearchClear}
             id="hero-search"
           />
-        </div>
+          <button type="submit" className="sr-only">Search</button>
+        </form>
 
         {/* Quick suggestion pills */}
         <div className="mt-4 flex flex-wrap gap-2">
@@ -82,6 +91,7 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear }) {
                 key={term}
                 type="button"
                 aria-label={`Search for ${term}`}
+                onClick={() => onSuggestion(term)}
                 className={[
                   "rounded-full border border-monsoon-100 bg-white px-3 py-1",
                   "text-xs font-medium text-monsoon-800",
@@ -174,11 +184,25 @@ function CommunityBanner() {
 /**
  * HomePage — the root route screen.
  *
- * Composes the hero, category grid, and community banner. Holds the search
- * state here until a dedicated search/results page exists.
+ * Composes the hero, community banner, and category grid.
+ * Search submits navigate to /discover with the query in the URL.
  */
 export default function HomePage() {
   const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
+
+  function handleSearchSubmit(e) {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      navigate(`/discover?q=${encodeURIComponent(searchValue.trim())}`);
+    } else {
+      navigate("/discover");
+    }
+  }
+
+  function handleSuggestion(term) {
+    navigate(`/discover?q=${encodeURIComponent(term)}`);
+  }
 
   return (
     <>
@@ -186,6 +210,8 @@ export default function HomePage() {
         searchValue={searchValue}
         onSearchChange={(e) => setSearchValue(e.target.value)}
         onSearchClear={() => setSearchValue("")}
+        onSearchSubmit={handleSearchSubmit}
+        onSuggestion={handleSuggestion}
       />
       <CommunityBanner />
       <div className="py-12">

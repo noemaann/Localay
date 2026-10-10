@@ -1,15 +1,15 @@
+import { useNavigate } from "react-router-dom";
 import Card from "./Card.jsx";
 import { CATEGORIES } from "../data/categories.js";
 
 /**
  * CategoryGrid — renders the six discovery category tiles.
  *
- * Each tile shows an icon, label, and short description. The grid is
- * responsive: 2 columns on mobile, 3 on tablet+. The `onSelect` callback
- * is invoked with the category id when a tile is activated.
+ * Each tile now navigates to /discover?category=<id> on activation.
+ * The grid is responsive: 2 columns on mobile, 3 on tablet+.
  *
- * In Step 3 these tiles will become <Link> elements to category pages.
- * For now they are interactive cards with a visual affordance.
+ * An optional `onSelect` callback is still supported for cases where
+ * the parent wants to intercept the navigation (e.g. HomePage hero).
  *
  * @param {{
  *   onSelect?: (id: string) => void,
@@ -17,6 +17,16 @@ import { CATEGORIES } from "../data/categories.js";
  * }} props
  */
 export default function CategoryGrid({ onSelect, className = "" }) {
+  const navigate = useNavigate();
+
+  function handleSelect(id) {
+    if (onSelect) {
+      onSelect(id);
+    } else {
+      navigate(`/discover?category=${encodeURIComponent(id)}`);
+    }
+  }
+
   return (
     <div
       className={`grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 ${className}`}
@@ -30,11 +40,11 @@ export default function CategoryGrid({ onSelect, className = "" }) {
           role="button"
           tabIndex={0}
           aria-label={`Explore ${cat.label}`}
-          onClick={() => onSelect?.(cat.id)}
+          onClick={() => handleSelect(cat.id)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              onSelect?.(cat.id);
+              handleSelect(cat.id);
             }
           }}
         >
