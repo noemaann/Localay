@@ -5,9 +5,48 @@
 @layer base {
   html {
     font-family: "Inter", system-ui, sans-serif;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
+  body {
+    @apply bg-monsoon-50 text-monsoon-900;
+  }
+
+  /* Skip-to-content link for keyboard users */
+  .skip-link {
+    @apply absolute -top-full left-4 z-50 rounded-b-lg bg-monsoon-600 px-4 py-2 text-sm font-semibold text-white;
+    @apply focus:top-0 transition-all duration-150;
+  }
+
   :focus-visible {
     outline: 2px solid #2f6b50;
     outline-offset: 2px;
+  }
+
+  /* Remove default focus ring in favour of :focus-visible */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Smooth scrollbar on Firefox */
+  * {
+    scrollbar-color: #bdd4c7 transparent;
+    scrollbar-width: thin;
+  }
+}
+
+@layer components {
+  /* Animated gradient underline for inline links */
+  .link-underline {
+    @apply relative;
+  }
+  .link-underline::after {
+    content: "";
+    @apply absolute bottom-0 left-0 h-px w-0 bg-monsoon-600 transition-all duration-200;
+  }
+  .link-underline:hover::after {
+    @apply w-full;
   }
 }
