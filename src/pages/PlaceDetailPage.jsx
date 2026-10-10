@@ -1,58 +1,81 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { getPlaceById } from "../services/placeService.js";
+import {
+  placeService,
+  reviewService,
+  dishPriceService,
+  placeUpdateService,
+} from "../services";
 import MapPlaceholder from "../features/discovery/MapPlaceholder.jsx";
 import Badge from "../components/Badge.jsx";
 import LoadingState from "../components/LoadingState.jsx";
+import SubmissionStatusBadge from "../components/SubmissionStatusBadge.jsx";
 import { CATEGORIES } from "../data/categories.js";
 import { difficultyClass, formatDifficulty, difficultyIcon } from "../utils/format.js";
+import AddReviewForm from "../features/contributions/AddReviewForm.jsx";
+import AddDishPriceForm from "../features/contributions/AddDishPriceForm.jsx";
+import AccessUpdateForm from "../features/contributions/AccessUpdateForm.jsx";
+import CorrectionRequestForm from "../features/contributions/CorrectionRequestForm.jsx";
 
 /**
  * PlaceDetailPage — full detail view for a single place.
  *
- * Route: /place/:placeId
- *
- * Shows:
- *  - Name, category, tagline, description
- *  - Location: town, landmark, directions
- *  - Access: difficulty, road type, transport, entry fee, best time
- *  - Coordinates / map placeholder
- *  - Tags
- *  - Clear demo-data disclaimer
- *  - Back navigation
+ * Supports both discovery features (access details, tags, map stub)
+ * and community-contributed features (reviews, dish prices, road updates).
  */
 export default function PlaceDetailPage() {
   const { placeId } = useParams();
   const navigate = useNavigate();
 
   const [place, setPlace] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [dishPrices, setDishPrices] = useState([]);
+  const [updates, setUpdates] = useState([]);
+  const [activeActionTab, setActiveActionTab] = useState("review");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function fetch() {
+    async function loadPlaceData() {
+      if (!placeId) return;
       setLoading(true);
       setError(null);
       try {
-        const result = await getPlaceById(placeId);
+        const placeData = await placeService.getPlaceById(placeId);
+        if (cancelled) return;
+
+        if (!placeData) {
+          setError("not_found");
+          return;
+        }
+
+        setPlace(placeData);
+
+        // Fetch auxiliary community data in parallel safely
+        const [revList, priceList, updList] = await Promise.all([
+          reviewService.getReviewsForPlace(placeId).catch(() => []),
+          dishPriceService.getDishPricesForPlace(placeId).catch(() => []),
+          placeUpdateService.getPlaceUpdates(placeId).catch(() => []),
+        ]);
+
         if (!cancelled) {
-          if (!result) {
-            setError("not_found");
-          } else {
-            setPlace(result);
-          }
+          setReviews(revList || []);
+          setDishPrices(priceList || []);
+          setUpdates(updList || []);
         }
       } catch (err) {
-        if (!cancelled)
+        if (!cancelled) {
+          console.error(`Error loading details for place ${placeId}:`, err);
           setError(err?.message ?? "Failed to load this place.");
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
-    fetch();
+    loadPlaceData();
     return () => {
       cancelled = true;
     };
@@ -60,19 +83,19 @@ export default function PlaceDetailPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
         <LoadingState message="Loading place details…" />
       </div>
     );
   }
 
-  if (error === "not_found") {
+  if (error === "not_found" || !place) {
     return <NotFoundState />;
   }
 
   if (error) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
         <div role="alert" className="rounded-2xl bg-red-50 p-8 text-center">
           <p className="text-2xl mb-3" aria-hidden="true">⚡</p>
           <h1 className="text-lg font-semibold text-red-900">Something went wrong</h1>
@@ -89,15 +112,17 @@ export default function PlaceDetailPage() {
     );
   }
 
-  const category = CATEGORIES.find((c) => c.id === place.categoryId);
+  const category = CATEGORIES.find(
+    (c) => c.id === (place.categoryId || place.category)
+  );
 
   return (
     <article
       aria-labelledby="place-name"
-      className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12"
+      className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 space-y-8"
     >
       {/* Back link */}
-      <nav aria-label="Breadcrumb" className="mb-6">
+      <nav aria-label="Breadcrumb">
         <Link
           to="/discover"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-monsoon-800 hover:text-monsoon-600 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded"
@@ -121,63 +146,74 @@ export default function PlaceDetailPage() {
       </nav>
 
       {/* Demo data banner */}
-      <div className="mb-6 rounded-xl bg-turmeric-100 px-4 py-3 text-xs text-turmeric-600 font-medium flex items-start gap-2">
-        <span aria-hidden="true" className="shrink-0 mt-0.5">⚠️</span>
-        <span>
-          This is <strong>illustrative demo content only</strong>. Details including
-          directions, prices, and access information are not verified and must not be
-          relied upon for planning.
-        </span>
-      </div>
-
-      {/* Name + Category */}
-      <header className="mb-6">
-        <div className="flex flex-wrap items-center gap-2 mb-3">
-          {category && (
-            <Badge className={category.accent}>
-              <span aria-hidden="true">{category.icon}</span>
-              {category.label}
-            </Badge>
-          )}
-          {place._demo && (
-            <span className="rounded-full border border-monsoon-100 px-2.5 py-0.5 text-xs font-medium text-monsoon-800/50 select-none">
-              Demo data
-            </span>
-          )}
+      {place._demo && (
+        <div className="rounded-xl bg-turmeric-100 px-4 py-3 text-xs text-turmeric-600 font-medium flex items-start gap-2">
+          <span aria-hidden="true" className="shrink-0 mt-0.5">⚠️</span>
+          <span>
+            This is <strong>illustrative demo content only</strong>. Details including
+            directions, prices, and access information are not verified and must not be
+            relied upon for planning.
+          </span>
         </div>
+      )}
 
-        <h1
-          id="place-name"
-          className="font-display text-3xl font-bold leading-tight text-monsoon-900 sm:text-4xl"
-        >
-          {place.name}
-        </h1>
-        <p className="mt-2 text-lg text-monsoon-800/80 leading-relaxed">
-          {place.tagline}
-        </p>
+      {/* Hero Header */}
+      <header className="relative rounded-3xl overflow-hidden bg-monsoon-900 text-white p-6 sm:p-10 shadow-lg">
+        {place.coverImage && (
+          <img
+            src={place.coverImage}
+            alt={place.name}
+            className="absolute inset-0 w-full h-full object-cover opacity-30"
+          />
+        )}
+        <div className="relative z-10 max-w-2xl space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {category && (
+              <Badge className={category.accent}>
+                <span aria-hidden="true">{category.icon}</span>
+                {category.label}
+              </Badge>
+            )}
+            {place.status && <SubmissionStatusBadge status={place.status} />}
+            {place._demo && (
+              <span className="rounded-full border border-white/20 px-2.5 py-0.5 text-xs font-medium text-white/80 select-none">
+                Demo data
+              </span>
+            )}
+          </div>
+
+          <h1
+            id="place-name"
+            className="font-display text-3xl sm:text-5xl font-bold tracking-tight"
+          >
+            {place.name}
+          </h1>
+          {place.tagline && (
+            <p className="mt-2 text-base sm:text-lg text-monsoon-100 leading-relaxed">
+              {place.tagline}
+            </p>
+          )}
+          <p className="text-sm text-monsoon-100/90 leading-relaxed pt-1">
+            {place.description}
+          </p>
+          <div className="flex flex-wrap gap-4 text-xs text-monsoon-200 pt-3 border-t border-white/20">
+            {place.location?.town && <span>🏘️ {place.location.town}</span>}
+            {place.address && <span>📍 {place.address}</span>}
+          </div>
+        </div>
       </header>
 
-      {/* Description */}
-      <section aria-labelledby="desc-heading" className="mb-8">
-        <h2
-          id="desc-heading"
-          className="mb-2 text-xs font-semibold uppercase tracking-wider text-monsoon-800/50"
-        >
-          About
-        </h2>
-        <p className="text-base leading-relaxed text-monsoon-800">{place.description}</p>
-      </section>
-
-      {/* Two-column info grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-8">
+      {/* Two-column info grid for Location & Access */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Location */}
         <InfoSection
           icon="📍"
           title="Location"
           items={[
-            { label: "Town", value: place.location?.town },
-            { label: "Near", value: place.location?.landmark },
+            { label: "Town / Locality", value: place.location?.town || place.townId },
+            { label: "Near / Landmark", value: place.location?.landmark },
             { label: "Directions", value: place.location?.directions },
+            { label: "Address", value: place.address },
           ]}
         />
 
@@ -207,7 +243,7 @@ export default function PlaceDetailPage() {
       </div>
 
       {/* Map placeholder */}
-      <section aria-labelledby="map-heading" className="mb-8">
+      <section aria-labelledby="map-heading">
         <h2
           id="map-heading"
           className="mb-3 text-xs font-semibold uppercase tracking-wider text-monsoon-800/50"
@@ -215,14 +251,14 @@ export default function PlaceDetailPage() {
           Location on map
         </h2>
         <MapPlaceholder
-          coordinates={place.coordinates}
+          coordinates={place.coordinates || (place.location?.latitude ? { lat: place.location.latitude, lng: place.location.longitude, accuracy: "approximate" } : null)}
           placeName={place.name}
         />
       </section>
 
       {/* Tags */}
       {place.tags?.length > 0 && (
-        <section aria-label="Tags" className="mb-8">
+        <section aria-label="Tags">
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-monsoon-800/50">
             Tags
           </h2>
@@ -239,6 +275,182 @@ export default function PlaceDetailPage() {
           </div>
         </section>
       )}
+
+      {/* Main Content Grid for Community Contributions */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-4 border-t border-monsoon-100">
+        {/* Left 2 Cols: Road updates, Dish prices, Reviews */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Access & Road Conditions */}
+          <div className="rounded-2xl border border-monsoon-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-monsoon-900 mb-3 flex items-center gap-2">
+              <span>🛣️ Road Access & Terrain</span>
+            </h2>
+            {updates.length === 0 ? (
+              <p className="text-xs text-monsoon-800/70">
+                Paved road access. Help the community by reporting steep inclines or parking details below.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {updates.map((upd) => (
+                  <div
+                    key={upd.id}
+                    className="rounded-xl bg-monsoon-50 p-3 text-xs border border-monsoon-100 space-y-1"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-monsoon-900">
+                        {upd.proposedChanges?.roadCondition || "Road Update"}
+                      </span>
+                      <SubmissionStatusBadge status={upd.status} />
+                    </div>
+                    {upd.proposedChanges?.parkingInfo && (
+                      <p className="text-monsoon-800">
+                        <strong>Parking:</strong> {upd.proposedChanges.parkingInfo}
+                      </p>
+                    )}
+                    {upd.proposedChanges?.accessNotes && (
+                      <p className="text-monsoon-800/80">
+                        "{upd.proposedChanges.accessNotes}"
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Dish & Snack Prices */}
+          <div className="rounded-2xl border border-monsoon-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-monsoon-900 mb-3 flex items-center gap-2">
+              <span>🍛 Crowd-Sourced Food & Dish Prices</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-monsoon-100 text-monsoon-800">
+                {dishPrices.length}
+              </span>
+            </h2>
+            {dishPrices.length === 0 ? (
+              <p className="text-xs text-monsoon-800/70">
+                No dish prices reported yet for this spot.
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {dishPrices.map((dp) => (
+                  <div
+                    key={dp.id}
+                    className="rounded-xl border border-monsoon-100 bg-monsoon-50/50 p-3 flex justify-between items-center"
+                  >
+                    <div>
+                      <h4 className="font-bold text-sm text-monsoon-900">{dp.dishName}</h4>
+                      <span className="text-xs text-monsoon-800/70 capitalize">{dp.category || "Snack"}</span>
+                    </div>
+                    <span className="font-display font-extrabold text-monsoon-700 text-base">
+                      ₹{dp.price}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Community Reviews */}
+          <div className="rounded-2xl border border-monsoon-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-monsoon-900 mb-4 flex items-center gap-2">
+              <span>💬 Reviews & Community Experiences</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-monsoon-100 text-monsoon-800">
+                {reviews.length}
+              </span>
+            </h2>
+
+            {reviews.length === 0 ? (
+              <p className="text-xs text-monsoon-800/70">
+                Be the first local to leave a review for {place.name}!
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {reviews.map((rev) => (
+                  <div
+                    key={rev.id}
+                    className="border-b border-monsoon-100 pb-4 last:border-0 last:pb-0"
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs">{"⭐".repeat(rev.rating)}</span>
+                          <span className="font-bold text-monsoon-900 text-sm">
+                            {rev.title || "Local Review"}
+                          </span>
+                        </div>
+                        <span className="text-xs text-monsoon-800/60 block mt-0.5">
+                          by {rev.authorName || "Community Member"}
+                        </span>
+                      </div>
+                      <SubmissionStatusBadge status={rev.status} />
+                    </div>
+                    <p className="mt-2 text-xs text-monsoon-800 leading-relaxed">
+                      {rev.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Col: Contribution Actions */}
+        <div className="space-y-4">
+          <div className="flex rounded-xl bg-monsoon-100 p-1 text-xs font-semibold">
+            {[
+              { id: "review", label: "💬 Review" },
+              { id: "dish", label: "🍛 Dish Price" },
+              { id: "access", label: "🛣️ Access" },
+              { id: "correct", label: "🛠️ Correct" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveActionTab(tab.id)}
+                className={[
+                  "flex-1 rounded-lg py-1.5 text-center transition-all",
+                  activeActionTab === tab.id
+                    ? "bg-white text-monsoon-900 shadow-sm"
+                    : "text-monsoon-800 hover:text-monsoon-900",
+                ].join(" ")}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div>
+            {activeActionTab === "review" && (
+              <AddReviewForm
+                placeId={place.id}
+                placeName={place.name}
+                onReviewAdded={(newRev) => setReviews((prev) => [newRev, ...prev])}
+              />
+            )}
+            {activeActionTab === "dish" && (
+              <AddDishPriceForm
+                placeId={place.id}
+                placeName={place.name}
+                onPriceAdded={(newPrice) => setDishPrices((prev) => [newPrice, ...prev])}
+              />
+            )}
+            {activeActionTab === "access" && (
+              <AccessUpdateForm
+                placeId={place.id}
+                placeName={place.name}
+                onSubmitted={(newUpd) => setUpdates((prev) => [newUpd, ...prev])}
+              />
+            )}
+            {activeActionTab === "correct" && (
+              <CorrectionRequestForm
+                placeId={place.id}
+                placeName={place.name}
+                onSubmitted={(newUpd) => setUpdates((prev) => [newUpd, ...prev])}
+              />
+            )}
+          </div>
+        </div>
+      </div>
     </article>
   );
 }
@@ -277,7 +489,7 @@ function NotFoundState() {
       <p className="text-5xl mb-4" aria-hidden="true">🗺️</p>
       <h1 className="text-2xl font-bold text-monsoon-900">Place not found</h1>
       <p className="mt-3 text-sm text-monsoon-800/70 max-w-sm mx-auto">
-        This place doesn't exist or may have been removed.
+        The requested place could not be found or has not been published yet.
       </p>
       <Link
         to="/discover"

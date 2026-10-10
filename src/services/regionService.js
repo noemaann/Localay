@@ -1,46 +1,78 @@
 /**
- * regionService.js — service abstraction for region data.
+ * Region Service Contract & Implementation
  *
- * UI code must call this service, not import regions.js directly
- * (with the exception of LocationContext which is the designated owner
- * of region state).
- *
- * Currently backed by static data (src/data/regions.js).
- * To swap in Firebase, replace these implementations only.
+ * Encapsulates data fetching for region definitions.
+ * Delegates to Cloud Firestore `regions` collection when live Firebase config is present,
+ * or to `MOCK_REGIONS` when in Demo Mode.
  *
  * ─────────────────────────────────────────────────────────────────
  * SERVICE CONTRACT
  * ─────────────────────────────────────────────────────────────────
- *
- * getRegions({ availableOnly? })
- *   returns: Promise<Region[]>
- *
- * getRegionById(regionId)
- *   returns: Promise<Region | null>
- *
+ * getRegions({ availableOnly? }) -> Promise<Region[]>
+ * getRegionById(id)              -> Promise<Region | null>
  * ─────────────────────────────────────────────────────────────────
  */
 
-import { REGIONS, getRegionById as _getById } from "../data/regions.js";
+import { db, isDemoMode } from "./config";
+import { MOCK_REGIONS } from "./mockData";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 
 /**
- * Fetch all regions, optionally filtered to only available ones.
- *
+ * Fetch all available regions, optionally filtered to only available ones.
  * @param {{ availableOnly?: boolean }} [opts]
- * @returns {Promise<import('../data/regions.js').Region[]>}
+ * @returns {Promise<Array<Object>>} List of region objects.
  */
 export async function getRegions({ availableOnly = false } = {}) {
-  const list = availableOnly ? REGIONS.filter((r) => r.available) : REGIONS;
-  return Promise.resolve(list);
+  let regions = [];
+  if (isDemoMode || !db) {
+    regions = [...MOCK_REGIONS];
+  } else {
+    try {
+      const regionsRef = collection(db, "regions");
+      const snapshot = await getDocs(regionsRef);
+      if (snapshot.empty) {
+        regions = [...MOCK_REGIONS];
+      } else {
+        regions = snapshot.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...docSnap.data(),
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching regions from Firestore:", error);
+      regions = [...MOCK_REGIONS];
+    }
+  }
+
+  if (availableOnly) {
+    return regions.filter((r) => r.available);
+  }
+  return regions;
 }
 
 /**
- * Fetch a single region by its stable id.
- * Falls back to the default region if not found (mirrors data behaviour).
- *
- * @param {string} regionId
- * @returns {Promise<import('../data/regions.js').Region | null>}
+ * Fetch a single region by its ID.
+ * @param {string} id - Region identifier slug (e.g., 'malappuram-kerala')
+ * @returns {Promise<Object|null>} Region object or null if not found.
  */
-export async function getRegionById(regionId) {
-  return Promise.resolve(_getById(regionId) ?? null);
+export async function getRegionById(id) {
+  if (!id) return null;
+
+  if (isDemoMode || !db) {
+    const found = MOCK_REGIONS.find((r) => r.id === id);
+    return Promise.resolve(found || MOCK_REGIONS[0] || null);
+  }
+
+  try {
+    const docRef = doc(db, "regions", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    }
+    const fallback = MOCK_REGIONS.find((r) => r.id === id);
+    return fallback || null;
+  } catch (error) {
+    console.error(`Error fetching region ${id} from Firestore:`, error);
+    return MOCK_REGIONS.find((r) => r.id === id) || null;
+  }
 }

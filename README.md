@@ -1,35 +1,68 @@
-# LOCALAY
+# LOCALAY — Community-Powered Local Discovery Platform
 
-LOCALAY is a community-powered local discovery platform. It helps people find local food spots, hidden places, nature destinations, and local experiences, backed by community reviews, practical access information, and community-reported auto-rickshaw fares.
+LOCALAY is a community-powered local discovery platform covering hidden food spots, nature destinations, local experiences, community reviews, road access information, and community-reported auto-rickshaw fares (AutoFare).
 
-Malappuram, Kerala is the **launch region**, not a permanent restriction. The app is designed to expand to other towns and districts. Region selection and place data are driven by stable `regionId` references — not hard-coded town names.
+Malappuram, Kerala is the **initial launch region**, not a permanent application boundary. The platform supports multi-region geographic expansion (district and town-level hierarchy) driven entirely by data (`src/data/regions.js` & Firestore collections).
 
-## Status
+---
 
-Step 3 complete: discovery with mock data — place cards, category/search filters, place detail page, map placeholder, service abstraction, and 65 passing tests. Firebase, maps, and community submissions remain deferred (see `docs/MVP_ROADMAP.md`).
+## 🚀 Key Features
 
-## Tech stack
+- **Local Discovery & Exploration**: Search, filter by category (Food, Nature, Viewpoints, Waterfalls, Treks, Experiences), and browse local spot details with practical access details and interactive maps.
+- **Firebase Backend & Demo Mode**: Firebase Authentication, Cloud Firestore, and Cloud Storage integration. Supports an explicit **Demo Mode** fallback with rich in-memory datasets when live Firebase credentials are not supplied.
+- **Multi-Region Expansion**: Dynamic region selection context with town/locality hierarchy (`regionId`, `districtId`, `townId`). Adding a new town or district requires data configuration without UI code changes.
+- **Authenticated Community Contributions**:
+  - Place proposals (`submissions`)
+  - Community reviews & 1–5 star ratings (`reviews`)
+  - Crowd-sourced food & dish prices (`dishPrices` with historical series preservation)
+  - Road access & terrain condition updates (`placeUpdates`)
+  - Place correction requests
+- **Moderation Lifecycle**: Controlled moderation states (`pending`, `community_reported`, `verified`, `rejected`, `needs_recheck`). Prevents unmoderated community submissions from publishing automatically as verified facts.
+- **AutoFare Rickshaw Fare Comparison**: Responsible fare calculation algorithm (`calculateFareSummary`) computing descriptive statistics (min, median, max, 25th-75th percentiles) with neutral status labels (`Within reported range`, `Below reported range`, `Above reported range`, `Insufficient comparable data`).
 
-- React 18 with Vite (JavaScript and JSX)
-- Tailwind CSS 3
-- React Router 6
-- Vitest and React Testing Library
-- Later: Firebase, Leaflet with OpenStreetMap
+---
 
-## Local development
+## 🛠️ Tech Stack
+
+- **Frontend**: React 18, Vite, JavaScript (JSX), Tailwind CSS 3, React Router 6
+- **Backend & Data**: Firebase JS SDK v10 (Auth, Firestore, Cloud Storage), Firestore Rules & Indexes
+- **Testing**: Vitest, React Testing Library, jsdom
+
+---
+
+## 📦 Development Setup
 
 Requirements: Node.js 18 or newer.
 
 ```bash
+# 1. Install dependencies
 npm install
-npm run dev          # start the dev server at http://localhost:5173
-npm test             # run all tests once (currently 65 tests)
-npm run test:watch   # run tests in watch mode
-npm run build        # production build into dist/
-npm run preview      # serve the production build locally
+
+# 2. Start local development server
+npm run dev
+
+# 3. Run full unit and integration test suite
+npm test
+
+# 4. Create production build
+npm run build
+
+# 5. Preview production build locally
+npm run preview
 ```
 
-Copy `.env.example` to `.env.local` for local environment values. Never commit `.env.local`.
+### Environment Configuration
+Copy `.env.example` to `.env.local` for local Firebase credentials:
+
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_USE_DEMO_MODE=true
+```
 
 ## Key URLs (dev server)
 
@@ -40,123 +73,25 @@ Copy `.env.example` to `.env.local` for local environment values. Never commit `
 | `/discover?q=biriyani` | Pre-filtered search |
 | `/discover?category=food` | Pre-filtered by category |
 | `/place/:placeId` | Place detail — location, access, map placeholder, tags |
+| `/places/:placeId` | Place detail with community reviews & updates |
+| `/autofare` | Auto-rickshaw fare comparison & reporting tool |
+| `/contribute` | Propose new places to the community |
+| `/my-contributions` | Personal contribution tracking dashboard |
+| `/moderation` | Moderator dashboard for review queue |
 
-## Project structure
+---
 
-```
-src/
-  components/          shared, reusable UI pieces
-    Button.jsx
-    Badge.jsx
-    Card.jsx
-    SearchInput.jsx
-    LoadingState.jsx
-    EmptyState.jsx
-    LocationSelector.jsx
-    CategoryGrid.jsx     — navigates to /discover?category=<id>
-  context/
-    LocationContext.jsx  — region selection context + useLocation hook
-  data/
-    categories.js        — six discovery categories
-    regions.js           — region reference data (Malappuram default)
-    mockPlaces.js        — DEMO places (all marked _demo:true)
-  features/
-    discovery/
-      usePlaces.js       — async hook: loads + filters places
-      PlaceCard.jsx      — linked summary card
-      CategoryFilter.jsx — horizontal pill filter strip
-      MapPlaceholder.jsx — clearly labelled map stub
-  layouts/
-    MainLayout.jsx       — sticky header + Discover nav link + footer
-  pages/
-    HomePage.jsx         — hero search navigates to /discover
-    DiscoverPage.jsx     — URL-param driven search + filter + results
-    PlaceDetailPage.jsx  — full place detail with all info sections
-  routes/
-    AppRoutes.jsx        — /, /discover, /place/:placeId
-  services/
-    placeService.js      — getPlaces(filters), getPlaceById(id)
-    regionService.js     — getRegions(), getRegionById(id)
-  styles/
-    index.css
-  utils/
-    search.js            — normalise, matchesQuery, filterPlaces (pure)
-    format.js            — formatDifficulty, difficultyIcon, etc. (pure)
-tests/
-  setup.js
-  HomePage.test.jsx
-  LocationSelector.test.jsx
-  regions.test.js
-  categories.test.js
-  mockPlaces.test.js     — data integrity checks
-  search.test.js         — search utility unit tests
-  format.test.js         — format utility unit tests
-  discovery.test.jsx     — DiscoverPage + PlaceDetailPage integration
-docs/
-  ARCHITECTURE.md
-  MVP_ROADMAP.md
-  TEAM_WORKFLOW.md
-```
+## 📚 Documentation Index
 
-## Adding a new region
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — Layered architecture & region data model
+- [`docs/DATABASE_SCHEMA.md`](docs/DATABASE_SCHEMA.md) — 8 Firestore collections schema definition
+- [`docs/FIREBASE_SETUP.md`](docs/FIREBASE_SETUP.md) — Firebase console setup, security rules, indexes & rules deployment
+- [`docs/SECURITY_AND_MODERATION.md`](docs/SECURITY_AND_MODERATION.md) — Security rules, moderation states & anti-self-approval safeguards
+- [`docs/AUTOFARE_ALGORITHM.md`](docs/AUTOFARE_ALGORITHM.md) — AutoFare calculation methodology & statistical limits
+- [`docs/MVP_ROADMAP.md`](docs/MVP_ROADMAP.md) — Step-by-step progress & release status
+- [`docs/FINAL_IMPLEMENTATION_REPORT.md`](docs/FINAL_IMPLEMENTATION_REPORT.md) — Final integration report & deployment checklist
 
-Open `src/data/regions.js` and add an entry to `REGIONS`:
-
-```js
-{
-  id: "my-town-kerala",
-  name: "My Town",
-  state: "Kerala",
-  country: "India",
-  label: "My Town, Kerala",
-  available: true,
-}
-```
-
-Then add places for that region in `src/data/mockPlaces.js` using `regionId: "my-town-kerala"`. No page or component changes needed.
-
-## Mock data rules
-
-- All demo records must carry `_demo: true`.
-- Never invent data and label it verified.
-- No fabricated ratings, reviews, or prices marked as real.
-- Clearly label all illustrative content in the UI.
-- When Firebase lands (Step 4), `placeService.js` and `regionService.js` are the only files that change.
-
-## Service contract
-
-```
-placeService.getPlaces({ query?, categoryId?, regionId? })  → Promise<Place[]>
-placeService.getPlaceById(placeId)                          → Promise<Place | null>
-
-regionService.getRegions({ availableOnly? })                → Promise<Region[]>
-regionService.getRegionById(regionId)                       → Promise<Region | null>
-```
-
-## Styling conventions
-
-- Use Tailwind utilities and theme tokens from `tailwind.config.js`.
-- Colour palette: `monsoon` (greens, 50–900) and `turmeric` (yellows, 100–600).
-- Fonts: `font-display` (Fraunces) for headings, `font-sans` (Inter) for body.
-- Every interactive element must have a visible `:focus-visible` ring.
-
-## GitHub setup
-
-1. Create an empty repository on GitHub.
-2. From the project folder:
-
-```bash
-git init
-git add .
-git commit -m "feat: discovery with mock data (step 3)"
-git branch -M main
-git remote add origin https://github.com/<your-username>/localay.git
-git push -u origin main
-```
-
-## Team and workflow
-
-See `docs/TEAM_WORKFLOW.md` for branch rules and ownership.
+---
 
 ## Security
 

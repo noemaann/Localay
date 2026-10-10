@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
+import { AuthProvider } from "../src/context/AuthContext.jsx";
 import { LocationProvider } from "../src/context/LocationContext.jsx";
 import AppRoutes from "../src/routes/AppRoutes.jsx";
 
@@ -10,9 +11,11 @@ import AppRoutes from "../src/routes/AppRoutes.jsx";
 function renderApp(path = "/") {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <LocationProvider>
-        <AppRoutes />
-      </LocationProvider>
+      <AuthProvider>
+        <LocationProvider>
+          <AppRoutes />
+        </LocationProvider>
+      </AuthProvider>
     </MemoryRouter>
   );
 }
