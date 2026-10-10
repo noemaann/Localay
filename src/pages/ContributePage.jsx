@@ -15,10 +15,16 @@ export default function ContributePage() {
 
   useEffect(() => {
     async function loadPlaces() {
-      const list = await placeService.getPlaces({ regionId: region.id });
-      setPlaces(list);
-      if (list.length > 0) {
+      let list = await placeService.getPlaces({ regionId: region.id });
+      if (!list || list.length === 0) {
+        // Fallback to all approved places so review & dish price tabs remain functional
+        list = await placeService.getPlaces();
+      }
+      setPlaces(list || []);
+      if (list && list.length > 0) {
         setSelectedPlaceId(list[0].id);
+      } else {
+        setSelectedPlaceId("");
       }
     }
     loadPlaces();

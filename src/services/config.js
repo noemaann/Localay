@@ -22,7 +22,8 @@ export const firebaseConfig = {
   appId: env.VITE_FIREBASE_APP_ID || "",
 };
 
-const forceDemoMode = String(env.VITE_USE_DEMO_MODE).toLowerCase() === "true";
+const isTestEnv = env.MODE === "test";
+const forceDemoMode = String(env.VITE_USE_DEMO_MODE).toLowerCase() === "true" || isTestEnv;
 
 const isConfigMissing =
   !firebaseConfig.apiKey ||

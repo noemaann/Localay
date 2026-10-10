@@ -1,20 +1,28 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation } from "../context/LocationContext.jsx";
 import { REGIONS } from "../data/regions.js";
+import {
+  searchLocationsFromInternet,
+  reverseGeocodeFromInternet,
+} from "../services/locationSearchService.js";
 import Badge from "./Badge.jsx";
 
 /**
- * LocationSelector — a dropdown that shows the active region and lets the
- * user switch to another available region.
- *
- * Unavailable regions are shown as "Coming soon" and are not selectable.
- * The entire selector is keyboard-navigable.
+ * LocationSelector — allows searching any town, city, or district worldwide/across India
+ * using OpenStreetMap location data from the internet, plus one-tap GPS geolocation.
  */
 export default function LocationSelector() {
-  const { region, setRegionId } = useLocation();
+  const { region, setRegion, setRegionId } = useLocation();
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [searchError, setSearchError] = useState("");
+
   const containerRef = useRef(null);
   const buttonRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   // Close on outside click or Escape
   useEffect(() => {
@@ -37,9 +45,102 @@ export default function LocationSelector() {
     };
   }, []);
 
+  // Focus search input when opened
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 50);
+    } else {
+      setSearchQuery("");
+      setSearchResults([]);
+      setSearchError("");
+    }
+  }, [open]);
+
+  // Debounced search from internet (OpenStreetMap / Photon)
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      setSearching(false);
+      setSearchError("");
+      return;
+    }
+
+    const abortController = new AbortController();
+    setSearching(true);
+    setSearchError("");
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const results = await searchLocationsFromInternet(
+          searchQuery,
+          abortController.signal
+        );
+        setSearchResults(results);
+        if (results.length === 0) {
+          setSearchError("No locations found matching your search.");
+        }
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Location search error:", err);
+          setSearchError("Could not connect to map search. Please try again.");
+        }
+      } finally {
+        setSearching(false);
+      }
+    }, 280);
+
+    return () => {
+      clearTimeout(timeoutId);
+      abortController.abort();
+    };
+  }, [searchQuery]);
+
+  // Geolocation trigger
+  function handleUseMyLocation() {
+    if (!navigator.geolocation) {
+      setSearchError("Geolocation is not supported by your browser.");
+      return;
+    }
+    setGpsLoading(true);
+    setSearchError("");
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const detected = await reverseGeocodeFromInternet(latitude, longitude);
+          if (detected) {
+            setRegion(detected);
+            setOpen(false);
+          } else {
+            setSearchError("Could not resolve location name from coordinates.");
+          }
+        } catch (err) {
+          console.error("GPS detection error:", err);
+          setSearchError("Failed to fetch location details.");
+        } finally {
+          setGpsLoading(false);
+        }
+      },
+      (err) => {
+        console.warn("Geolocation denied or error:", err);
+        setSearchError("Location permission was denied or unavailable.");
+        setGpsLoading(false);
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  }
+
+  function handleSelectCustomLocation(loc) {
+    setRegion(loc);
+    setOpen(false);
+  }
+
   return (
     <div ref={containerRef} className="relative">
-      {/* Trigger */}
+      {/* Trigger Button */}
       <button
         ref={buttonRef}
         id="location-selector-trigger"
@@ -90,75 +191,176 @@ export default function LocationSelector() {
         </svg>
       </button>
 
-      {/* Dropdown */}
+      {/* Popover Menu with Live Internet Search */}
       {open && (
         <div
           role="listbox"
           aria-label="Select a location"
           className={[
-            "absolute right-0 top-full z-50 mt-2 min-w-[220px]",
-            "rounded-xl border border-monsoon-100 bg-white shadow-lg",
-            "overflow-hidden",
+            "absolute right-0 top-full z-50 mt-2 w-80 sm:w-96",
+            "rounded-2xl border border-monsoon-200 bg-white shadow-2xl",
+            "overflow-hidden animate-in fade-in zoom-in-95 duration-100",
           ].join(" ")}
         >
-          <p className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-monsoon-800/60">
-            Select location
-          </p>
-          <ul className="py-2">
-            {REGIONS.map((r) => (
-              <li key={r.id} role="option" aria-selected={r.id === region.id}>
+          {/* Header & Search Bar */}
+          <div className="p-3 border-b border-monsoon-100 bg-monsoon-50/50 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-monsoon-900 flex items-center gap-1.5">
+                <span>📍</span> Find Location
+              </span>
+              <button
+                type="button"
+                onClick={handleUseMyLocation}
+                disabled={gpsLoading}
+                className="text-[11px] font-semibold text-monsoon-700 hover:text-monsoon-900 flex items-center gap-1 bg-white px-2 py-0.5 rounded-full border border-monsoon-200 shadow-2xs hover:bg-monsoon-50 transition-colors disabled:opacity-50"
+              >
+                <span>{gpsLoading ? "⏳" : "🎯"}</span>
+                <span>{gpsLoading ? "Locating…" : "Current location"}</span>
+              </button>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative">
+              <input
+                ref={searchInputRef}
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search any town, city, or district…"
+                className="w-full rounded-xl border border-monsoon-200 bg-white pl-9 pr-8 py-2 text-xs font-medium text-monsoon-900 placeholder:text-monsoon-800/50 focus:border-monsoon-600 focus:outline-none shadow-2xs"
+              />
+              <svg
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="absolute left-3 top-2.5 text-monsoon-800/40"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              {searchQuery && (
                 <button
                   type="button"
-                  disabled={!r.available}
-                  onClick={() => {
-                    if (r.available) {
-                      setRegionId(r.id);
-                      setOpen(false);
-                    }
-                  }}
-                  className={[
-                    "flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm",
-                    r.id === region.id
-                      ? "font-semibold text-monsoon-900 bg-monsoon-50"
-                      : "text-monsoon-800",
-                    r.available
-                      ? "hover:bg-monsoon-50 focus-visible:bg-monsoon-50 cursor-pointer"
-                      : "cursor-default opacity-50",
-                    "focus-visible:outline-none",
-                  ].join(" ")}
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-2 text-xs text-monsoon-800/50 hover:text-monsoon-800"
                 >
-                  <span>
-                    {r.name}
-                    <span className="block text-xs font-normal text-monsoon-800/60">
-                      {r.state}
-                    </span>
-                  </span>
-                  {r.id === region.id && (
-                    <svg
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="shrink-0 text-monsoon-600"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  )}
-                  {!r.available && (
-                    <Badge variant="outline" className="shrink-0">
-                      Soon
-                    </Badge>
-                  )}
+                  ✕
                 </button>
-              </li>
-            ))}
-          </ul>
+              )}
+            </div>
+          </div>
+
+          {/* Results Area */}
+          <div className="max-h-72 overflow-y-auto divide-y divide-monsoon-50">
+            {searching && (
+              <div className="px-4 py-6 text-center text-xs text-monsoon-800/70 space-y-1">
+                <div className="animate-spin inline-block w-4 h-4 border-2 border-monsoon-600 border-t-transparent rounded-full mb-1" />
+                <p>Searching locations on map…</p>
+              </div>
+            )}
+
+            {!searching && searchError && (
+              <div className="px-4 py-4 text-center text-xs text-rose-600 bg-rose-50/50">
+                {searchError}
+              </div>
+            )}
+
+            {/* Internet Search Results */}
+            {!searching && searchResults.length > 0 && (
+              <div>
+                <p className="px-3 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-monsoon-800/50">
+                  Search Results ({searchResults.length})
+                </p>
+                <ul>
+                  {searchResults.map((loc) => {
+                    const isSelected = region.id === loc.id;
+                    return (
+                      <li key={loc.id} role="option" aria-selected={isSelected}>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectCustomLocation(loc)}
+                          className={[
+                            "w-full px-3 py-2 text-left transition-colors flex items-center justify-between gap-2 group",
+                            isSelected
+                              ? "bg-monsoon-100/70 text-monsoon-900 font-semibold"
+                              : "hover:bg-monsoon-50 text-monsoon-800",
+                          ].join(" ")}
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs font-bold text-monsoon-900 group-hover:text-monsoon-700 truncate">
+                              {loc.name}
+                            </div>
+                            <div className="text-[11px] text-monsoon-800/60 truncate">
+                              {loc.state ? `${loc.state}, ` : ""}{loc.country}
+                            </div>
+                          </div>
+                          {loc.coordinates?.lat && (
+                            <span className="shrink-0 text-[10px] font-mono text-monsoon-800/40 bg-monsoon-100/50 px-1.5 py-0.5 rounded">
+                              {loc.coordinates.lat.toFixed(2)}, {loc.coordinates.lng.toFixed(2)}
+                            </span>
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+
+            {/* Pre-configured & Popular Locations (shown when not searching) */}
+            {!searching && searchResults.length === 0 && !searchError && (
+              <div>
+                <p className="px-3 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-monsoon-800/50">
+                  Popular Regions
+                </p>
+                <ul>
+                  {REGIONS.map((r) => {
+                    const isSelected = r.id === region.id;
+                    return (
+                      <li key={r.id} role="option" aria-selected={isSelected}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRegionId(r.id);
+                            setOpen(false);
+                          }}
+                          className={[
+                            "flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-xs transition-colors",
+                            isSelected
+                              ? "font-semibold text-monsoon-900 bg-monsoon-50"
+                              : "text-monsoon-800 hover:bg-monsoon-50/80",
+                          ].join(" ")}
+                        >
+                          <div>
+                            <span className="font-bold text-monsoon-900">{r.name}</span>
+                            <span className="block text-[11px] text-monsoon-800/60">
+                              {r.state}, {r.country}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <span className="text-monsoon-600 text-xs font-bold">✓ Active</span>
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Footer note */}
+          <div className="px-3 py-2 bg-monsoon-50/80 border-t border-monsoon-100 flex items-center justify-between text-[10px] text-monsoon-800/60">
+            <span>Powered by OpenStreetMap</span>
+            <span>Worldwide Coverage</span>
+          </div>
         </div>
       )}
     </div>

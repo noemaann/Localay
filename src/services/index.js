@@ -15,3 +15,4 @@ export * as fareService from "./fareService";
 export * as submissionService from "./submissionService";
 export * as authService from "./authService";
 export * as storageService from "./storageService";
+export * as locationSearchService from "./locationSearchService";

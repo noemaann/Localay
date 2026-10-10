@@ -69,11 +69,20 @@ export function onAuthStateChanged(callback) {
       callback(null);
       return;
     }
+    let role = "community_member";
+    try {
+      const profile = await getUserProfile(firebaseUser.uid);
+      if (profile?.role) {
+        role = profile.role;
+      }
+    } catch (_) {}
+
     const formattedUser = {
       uid: firebaseUser.uid,
       displayName: firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "User",
       email: firebaseUser.email,
       photoURL: firebaseUser.photoURL || "",
+      role,
       isDemo: false,
     };
     callback(formattedUser);
@@ -100,14 +109,15 @@ export async function signInWithGoogle() {
 
   try {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     await syncUserProfileDoc(user);
     return {
       uid: user.uid,
-      displayName: user.displayName,
+      displayName: user.displayName || user.email?.split("@")[0] || "User",
       email: user.email,
-      photoURL: user.photoURL,
+      photoURL: user.photoURL || "",
       isDemo: false,
     };
   } catch (error) {

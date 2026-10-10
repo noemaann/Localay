@@ -7,7 +7,7 @@ import EmptyState from "../components/EmptyState.jsx";
 import Button from "../components/Button.jsx";
 
 export default function ModerationPage() {
-  const { user, isModerator } = useAuth();
+  const { user, isModerator, toggleDevRole } = useAuth();
   const [loading, setLoading] = useState(true);
   const [submissions, setSubmissions] = useState([]);
   const [filterStatus, setFilterStatus] = useState("pending");
@@ -61,6 +61,21 @@ export default function ModerationPage() {
           title="Access Restricted"
           description="Only authorized moderators can access the moderation panel."
         />
+        <div className="mt-6 max-w-md mx-auto p-4 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-900 text-left space-y-2">
+          <p className="font-bold">🔑 How to get Moderator Access:</p>
+          <p>
+            In production, set <code>role: "admin"</code> or <code>role: "moderator"</code> on your user document in the Firestore <code>users</code> collection.
+          </p>
+          <div className="pt-2 flex justify-center">
+            <button
+              type="button"
+              onClick={() => toggleDevRole("admin")}
+              className="px-4 py-2 rounded-lg bg-purple-700 text-white font-bold hover:bg-purple-800 transition-colors shadow-sm"
+            >
+              ⚡ Enable Moderator Role (Dev Mode)
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
