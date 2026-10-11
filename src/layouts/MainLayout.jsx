@@ -51,9 +51,14 @@ function SiteHeader() {
         <NavLink
           to="/"
           aria-label="LOCALAY home"
-          className="shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded-xl group flex items-center gap-1"
+          className="shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded-xl group flex items-center gap-2"
           onClick={() => setMenuOpen(false)}
         >
+          <img
+            src="/favicon.png"
+            alt=""
+            className="h-7 w-7 rounded-lg object-contain shadow-xs transition-transform group-hover:scale-105"
+          />
           <span className="font-display text-xl font-extrabold tracking-tight text-monsoon-900">
             LOCAL<span className="text-monsoon-600">AY</span>
           </span>
@@ -311,10 +316,17 @@ function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
           <div>
-            <span className="font-display text-lg font-extrabold tracking-tight text-monsoon-900">
-              LOCAL<span className="text-monsoon-600">AY</span>
-            </span>
-            <p className="mt-1 text-xs text-monsoon-800/70 max-w-sm leading-relaxed">
+            <div className="flex items-center gap-2">
+              <img
+                src="/favicon.png"
+                alt=""
+                className="h-6 w-6 rounded-md object-contain"
+              />
+              <span className="font-display text-lg font-extrabold tracking-tight text-monsoon-900">
+                LOCAL<span className="text-monsoon-600">AY</span>
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-monsoon-800/70 max-w-sm leading-relaxed">
               A community-powered guide built by and for the people who actually
               live there. Currently active in{" "}
               <strong className="text-monsoon-900">{region.label}</strong>.
