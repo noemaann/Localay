@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1b4332"/>
+      <stop offset="100%" stop-color="#2d6a4f"/>
+    </linearGradient>
+    <linearGradient id="pinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e9c46a"/>
+      <stop offset="100%" stop-color="#f4a261"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded Base Background -->
+  <rect width="64" height="64" rx="16" fill="url(#grad)"/>
+  
+  <!-- Location Pin Emblem -->
+  <path d="M32 12C23.16 12 16 19.16 16 28C16 38.5 29.5 49.5 30.8 50.5C31.5 51.1 32.5 51.1 33.2 50.5C34.5 49.5 48 38.5 48 28C48 19.16 40.84 12 32 12Z" fill="url(#pinGrad)"/>
+  
+  <!-- Inner Compass/Pin Core -->
+  <circle cx="32" cy="27" r="6" fill="#1b4332"/>
+  <circle cx="32" cy="27" r="2.5" fill="#ffffff"/>
+</svg>
