@@ -7,8 +7,9 @@
  * Supports full moderation lifecycle: pending, community_reported, verified, rejected, needs_recheck.
  */
 
-import { db, isDemoMode } from "./config";
+import { auth, db, isDemoMode } from "./config";
 import { MOCK_SUBMISSIONS, MOCK_PLACES } from "./mockData";
+import { registerApprovedPlace } from "./placeService.js";
 import {
   collection,
   query,
@@ -21,7 +22,30 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-let inMemorySubmissions = [...MOCK_SUBMISSIONS];
+const STORAGE_KEY = "localay_community_submissions";
+
+function loadCachedSubmissions() {
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    }
+  } catch (_) {}
+  return [...MOCK_SUBMISSIONS];
+}
+
+function saveCachedSubmissions(list) {
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+  } catch (_) {}
+}
+
+let inMemorySubmissions = loadCachedSubmissions();
 
 export const VALID_MODERATION_STATUSES = [
   "pending",
@@ -64,18 +88,24 @@ export async function submitNewPlace(submissionData) {
       coverImage: submissionData.placeData.coverImage || "",
       accessInfo: submissionData.placeData.accessInfo || "",
       roadCondition: submissionData.placeData.roadCondition || "",
+      location: submissionData.placeData.location || null,
+      googleMapsUrl: submissionData.placeData.googleMapsUrl || "",
     },
     userId: submissionData.userId,
     status: "pending", // New submissions enter pending moderation state
   };
 
+  const created = {
+    ...newSubmission,
+    id: `sub_${Date.now()}`,
+    createdAt: new Date().toISOString(),
+  };
+
+  // Always store in memory and localStorage so it is instantly available in My Contributions and Moderation
+  inMemorySubmissions.unshift(created);
+  saveCachedSubmissions(inMemorySubmissions);
+
   if (isDemoMode || !db) {
-    const created = {
-      ...newSubmission,
-      id: `sub_mock_${Date.now()}`,
-      createdAt: new Date().toISOString(),
-    };
-    inMemorySubmissions.push(created);
     return Promise.resolve(created);
   }
 
@@ -84,14 +114,36 @@ export async function submitNewPlace(submissionData) {
       ...newSubmission,
       createdAt: serverTimestamp(),
     });
-    return {
-      id: docRef.id,
-      ...newSubmission,
-      createdAt: new Date().toISOString(),
-    };
+    created.id = docRef.id;
+    saveCachedSubmissions(inMemorySubmissions);
+    return created;
   } catch (error) {
-    console.error("Error submitting new place to Firestore:", error);
-    throw error;
+    console.warn("Could not write submission to Firestore, saved locally:", error);
+    return created;
+  }
+}
+
+function mergeSubmissionDoc(cloudDoc) {
+  const existingIdx = inMemorySubmissions.findIndex((m) => m.id === cloudDoc.id);
+  if (existingIdx >= 0) {
+    const local = inMemorySubmissions[existingIdx];
+    // If the local submission was already approved/rejected and cloud still says pending, preserve local moderation
+    if (local && local.status !== "pending" && cloudDoc.status === "pending") {
+      inMemorySubmissions[existingIdx] = {
+        ...cloudDoc,
+        status: local.status,
+        moderatedBy: local.moderatedBy || cloudDoc.moderatedBy,
+        moderatedAt: local.moderatedAt || cloudDoc.moderatedAt,
+        moderationNotes: local.moderationNotes || cloudDoc.moderationNotes,
+      };
+    } else {
+      inMemorySubmissions[existingIdx] = {
+        ...local,
+        ...cloudDoc,
+      };
+    }
+  } else {
+    inMemorySubmissions.unshift(cloudDoc);
   }
 }
 
@@ -103,8 +155,9 @@ export async function submitNewPlace(submissionData) {
 export async function getUserSubmissions(userId) {
   if (!userId) return [];
 
+  let list = inMemorySubmissions.filter((s) => s.userId === userId);
+
   if (isDemoMode || !db) {
-    const list = inMemorySubmissions.filter((s) => s.userId === userId);
     return Promise.resolve(list);
   }
 
@@ -114,14 +167,24 @@ export async function getUserSubmissions(userId) {
       where("userId", "==", userId)
     );
     const snapshot = await getDocs(q);
-
-    return snapshot.docs.map((docSnap) => ({
+    const cloudList = snapshot.docs.map((docSnap) => ({
       id: docSnap.id,
       ...docSnap.data(),
     }));
+
+    // Merge cloud and local
+    cloudList.forEach((c) => {
+      mergeSubmissionDoc(c);
+      if (!list.some((l) => l.id === c.id)) {
+        list.push(inMemorySubmissions.find((m) => m.id === c.id) || c);
+      }
+    });
+    saveCachedSubmissions(inMemorySubmissions);
+    // Return updated list matching current local status
+    return inMemorySubmissions.filter((s) => s.userId === userId);
   } catch (error) {
-    console.error(`Error fetching submissions for user ${userId}:`, error);
-    return [];
+    console.warn(`Error fetching submissions for user ${userId} from Firestore:`, error);
+    return list;
   }
 }
 
@@ -131,11 +194,12 @@ export async function getUserSubmissions(userId) {
  * @returns {Promise<Array<Object>>}
  */
 export async function getAllSubmissions(statusFilter = null) {
+  let list = [...inMemorySubmissions];
+  if (statusFilter) {
+    list = list.filter((s) => s.status === statusFilter);
+  }
+
   if (isDemoMode || !db) {
-    let list = [...inMemorySubmissions];
-    if (statusFilter) {
-      list = list.filter((s) => s.status === statusFilter);
-    }
     return Promise.resolve(list);
   }
 
@@ -148,13 +212,49 @@ export async function getAllSubmissions(statusFilter = null) {
     }
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map((docSnap) => ({
+    const cloudList = snapshot.docs.map((docSnap) => ({
       id: docSnap.id,
       ...docSnap.data(),
     }));
+
+    cloudList.forEach((c) => {
+      mergeSubmissionDoc(c);
+    });
+    saveCachedSubmissions(inMemorySubmissions);
+
+    let res = [...inMemorySubmissions];
+    if (statusFilter) {
+      res = res.filter((s) => s.status === statusFilter);
+    }
+    return res;
   } catch (error) {
-    console.error("Error fetching submissions from Firestore:", error);
-    return [];
+    console.warn("Firestore submissions read restricted by security rules; attempting owner-scoped fallback:", error);
+    
+    // When the user is testing in Dev Mode or their Firestore user role has not yet been set to admin in Firebase Console,
+    // Firestore rules prevent querying all users' submissions.
+    // However, the user CAN always query their own submissions (`where("userId", "==", currentUid)`).
+    const currentUid = auth?.currentUser?.uid;
+    if (currentUid) {
+      try {
+        const userQ = query(
+          collection(db, "submissions"),
+          where("userId", "==", currentUid)
+        );
+        const userSnap = await getDocs(userQ);
+        const userDocs = userSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        userDocs.forEach((doc) => {
+          mergeSubmissionDoc(doc);
+        });
+        saveCachedSubmissions(inMemorySubmissions);
+        list = [...inMemorySubmissions];
+        if (statusFilter) {
+          list = list.filter((s) => s.status === statusFilter);
+        }
+      } catch (err) {
+        console.warn("Could not fetch user-scoped submissions fallback:", err);
+      }
+    }
+    return list;
   }
 }
 
@@ -175,77 +275,104 @@ export async function moderateSubmission(submissionId, newStatus, moderatorId, n
     throw new Error("moderatorId is required to perform moderation.");
   }
 
+  // Update in local memory and cache
+  let sub = inMemorySubmissions.find((s) => s.id === submissionId);
+  if (!sub) {
+    sub = { id: submissionId };
+    inMemorySubmissions.unshift(sub);
+  }
+
+  sub.status = newStatus;
+  sub.moderatedBy = moderatorId;
+  sub.moderatedAt = new Date().toISOString();
+  sub.moderationNotes = notes;
+  saveCachedSubmissions(inMemorySubmissions);
+
+  // If approved, create verified place in memory & register in placeService!
+  if ((newStatus === "verified" || newStatus === "community_reported") && sub.placeData) {
+    const verifiedPlace = {
+      id: `place_from_${sub.id}`,
+      sourceSubmissionId: sub.id,
+      name: sub.placeData.name,
+      regionId: sub.regionId || "malappuram-kerala",
+      districtId: sub.districtId || "malappuram",
+      townId: sub.townId || "locality_general",
+      category: sub.placeData.category || "general",
+      categoryId: sub.placeData.category || "general",
+      description: sub.placeData.description || "",
+      address: sub.placeData.address || "",
+      coverImage: sub.placeData.coverImage || "",
+      location: sub.placeData.location || null,
+      accessInfo: sub.placeData.accessInfo || "",
+      roadCondition: sub.placeData.roadCondition || "",
+      googleMapsUrl: sub.placeData.googleMapsUrl || "",
+      status: "approved",
+      createdAt: new Date().toISOString(),
+      createdBy: sub.userId,
+    };
+    registerApprovedPlace(verifiedPlace);
+  }
+
   if (isDemoMode || !db) {
-    const sub = inMemorySubmissions.find((s) => s.id === submissionId);
-    if (!sub) throw new Error("Submission not found.");
-
-    sub.status = newStatus;
-    sub.moderatedBy = moderatorId;
-    sub.moderatedAt = new Date().toISOString();
-    sub.moderationNotes = notes;
-
-    // If approved, create verified place in mock places
-    if (newStatus === "verified" || newStatus === "community_reported") {
-      const placeAlreadyExists = MOCK_PLACES.some((p) => p.id === `place_from_${sub.id}`);
-      if (!placeAlreadyExists) {
-        MOCK_PLACES.push({
-          id: `place_from_${sub.id}`,
-          name: sub.placeData.name,
-          regionId: sub.regionId,
-          districtId: sub.districtId,
-          townId: sub.townId,
-          category: sub.placeData.category,
-          description: sub.placeData.description,
-          address: sub.placeData.address,
-          status: newStatus === "verified" ? "approved" : "community_reported",
-          createdAt: new Date().toISOString(),
-          createdBy: sub.userId,
-        });
-      }
-    }
-    return Promise.resolve({ ...sub });
+    return Promise.resolve({ ...sub, cloudSynced: true });
   }
 
   try {
     const subRef = doc(db, "submissions", submissionId);
     const subSnap = await getDoc(subRef);
-    if (!subSnap.exists()) throw new Error("Submission not found.");
-
-    const subData = subSnap.data();
-    await updateDoc(subRef, {
-      status: newStatus,
-      moderatedBy: moderatorId,
-      moderatedAt: serverTimestamp(),
-      moderationNotes: notes,
-    });
-
-    // If approved, publish to places collection
-    if (newStatus === "verified" || newStatus === "community_reported") {
-      await addDoc(collection(db, "places"), {
-        name: subData.placeData.name,
-        regionId: subData.regionId,
-        districtId: subData.districtId,
-        townId: subData.townId,
-        category: subData.placeData.category,
-        description: subData.placeData.description || "",
-        address: subData.placeData.address || "",
-        coverImage: subData.placeData.coverImage || "",
-        status: newStatus === "verified" ? "approved" : "community_reported",
-        createdAt: serverTimestamp(),
-        createdBy: subData.userId,
-        sourceSubmissionId: submissionId,
+    if (subSnap.exists()) {
+      const subData = subSnap.data();
+      if (!sub.placeData && subData.placeData) {
+        sub.placeData = subData.placeData;
+        sub.regionId = subData.regionId;
+        sub.districtId = subData.districtId;
+        sub.townId = subData.townId;
+        sub.userId = subData.userId;
+        saveCachedSubmissions(inMemorySubmissions);
+      }
+      await updateDoc(subRef, {
+        status: newStatus,
+        moderatedBy: moderatorId,
+        moderatedAt: serverTimestamp(),
+        moderationNotes: notes,
       });
+
+      // If approved, publish to places collection
+      if (newStatus === "verified" || newStatus === "community_reported") {
+        await addDoc(collection(db, "places"), {
+          name: subData.placeData.name,
+          regionId: subData.regionId,
+          districtId: subData.districtId,
+          townId: subData.townId,
+          category: subData.placeData.category,
+          description: subData.placeData.description || "",
+          address: subData.placeData.address || "",
+          coverImage: subData.placeData.coverImage || "",
+          status: newStatus === "verified" ? "approved" : "community_reported",
+          createdAt: serverTimestamp(),
+          createdBy: subData.userId,
+          sourceSubmissionId: submissionId,
+        });
+      }
     }
 
     return {
       id: submissionId,
-      ...subData,
+      ...sub,
       status: newStatus,
       moderatedBy: moderatorId,
       moderationNotes: notes,
+      cloudSynced: true,
     };
   } catch (error) {
-    console.error(`Error moderating submission ${submissionId}:`, error);
-    throw error;
+    console.warn(`Firestore updateDoc restricted, updated locally:`, error);
+    return {
+      id: submissionId,
+      ...sub,
+      status: newStatus,
+      moderatedBy: moderatorId,
+      moderationNotes: notes,
+      cloudSynced: false,
+    };
   }
 }

@@ -30,6 +30,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
     accessInfo: "",
     roadCondition: "Paved Road",
     coordinates: null,
+    gmapsUrl: "",
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -255,6 +256,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
           accessInfo: formData.accessInfo.trim(),
           roadCondition: formData.roadCondition,
           location: formData.coordinates || null,
+          googleMapsUrl: formData.gmapsUrl?.trim() || "",
         },
       });
 
@@ -583,6 +585,73 @@ export default function SubmitPlaceForm({ onSubmitted }) {
             placeholder="e.g. Near KSRTC Stand, opposite Juma Masjid, Hilltop road"
             className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none"
           />
+        </div>
+
+        {/* Accurate Google Maps Location */}
+        <div className="rounded-xl border border-monsoon-200 bg-monsoon-50/50 p-3.5 space-y-2">
+          <div className="flex items-center justify-between">
+            <label htmlFor="place-gmaps-input" className="text-xs font-bold text-monsoon-900 flex items-center gap-1.5">
+              <span>🗺️ Google Maps Location</span>
+              <span className="text-[10px] font-normal text-monsoon-600">(URL / Link or Coordinates)</span>
+            </label>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                formData.name
+                  ? `${formData.name}, ${formData.townId || formData.regionName}`
+                  : formData.townId || formData.regionName || "Malappuram Kerala"
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-semibold text-monsoon-700 hover:text-monsoon-900 flex items-center gap-1 underline"
+              title="Open Google Maps in a new tab to find this place"
+            >
+              <span>📍 Pinpoint on GMaps ↗</span>
+            </a>
+          </div>
+
+          <div className="relative">
+            <input
+              id="place-gmaps-input"
+              type="text"
+              value={formData.gmapsUrl}
+              onChange={(e) => {
+                const val = e.target.value;
+                const parsed = locationSearchService.parseGoogleMapsCoordinates(val);
+                setFormData((prev) => ({
+                  ...prev,
+                  gmapsUrl: val,
+                  coordinates: parsed || prev.coordinates,
+                }));
+              }}
+              placeholder="Paste Google Maps link (e.g. https://maps.app.goo.gl/... or 11.052, 76.074)..."
+              className="w-full rounded-lg border border-monsoon-200 pl-8 pr-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none bg-white font-mono"
+            />
+            <span className="absolute left-2.5 top-2 text-xs">🔗</span>
+          </div>
+
+          {/* Coordinate Preview & Status */}
+          {formData.coordinates?.lat ? (
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-semibold text-[11px]">
+                <span>✓ GPS Location Acquired:</span>
+                <span className="font-mono">
+                  {formData.coordinates.lat.toFixed(5)}° N, {formData.coordinates.lng.toFixed(5)}° E
+                </span>
+              </span>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${formData.coordinates.lat},${formData.coordinates.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-monsoon-600 hover:underline"
+              >
+                Verify Pinpoint on Map ↗
+              </a>
+            </div>
+          ) : (
+            <p className="text-[11px] text-monsoon-800/60 leading-tight">
+              Tip: Paste any Google Maps share link, or coordinates from Google Maps (right-click on map &rarr; copy coordinates).
+            </p>
+          )}
         </div>
 
         {/* Road Condition & Image */}

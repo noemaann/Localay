@@ -166,3 +166,91 @@ export async function reverseGeocodeFromInternet(lat, lng, signal) {
   }
   return null;
 }
+
+/**
+ * Parses coordinates from Google Maps URLs, share links, or raw coordinate strings.
+ * Supports:
+ * - Raw: "11.052, 76.074" or "11.052 76.074"
+ * - Standard web URLs: /@11.052,76.074,15z
+ * - Query URLs: ?q=11.052,76.074, ?ll=11.052,76.074
+ * - Protobuf embedded data: !3d11.052!4d76.074
+ * @param {string} input
+ * @returns {{ lat: number, lng: number }|null}
+ */
+export function parseGoogleMapsCoordinates(input) {
+  if (!input || typeof input !== "string") return null;
+  const str = input.trim();
+
+  // 1. Raw coordinates: "11.052, 76.074"
+  const rawMatch = str.match(/^(-?\d+(\.\d+)?)[,\s]+(-?\d+(\.\d+)?)$/);
+  if (rawMatch) {
+    const lat = parseFloat(rawMatch[1]);
+    const lng = parseFloat(rawMatch[3]);
+    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      return { lat, lng };
+    }
+  }
+
+  // 2. Google Maps /@lat,lng format
+  const atMatch = str.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (atMatch) {
+    const lat = parseFloat(atMatch[1]);
+    const lng = parseFloat(atMatch[2]);
+    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      return { lat, lng };
+    }
+  }
+
+  // 3. Query string ?q=lat,lng or ?ll=lat,lng or ?destination=lat,lng
+  const queryMatch = str.match(
+    /[?&](?:q|ll|query|destination|origin)=(?:loc:)?(-?\d+\.\d+)[,+ ](-?\d+\.\d+)/i
+  );
+  if (queryMatch) {
+    const lat = parseFloat(queryMatch[1]);
+    const lng = parseFloat(queryMatch[2]);
+    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      return { lat, lng };
+    }
+  }
+
+  // 4. Protobuf encoded !3dlat!4dlng in Google Maps URLs
+  const dataMatch = str.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+  if (dataMatch) {
+    const lat = parseFloat(dataMatch[1]);
+    const lng = parseFloat(dataMatch[2]);
+    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      return { lat, lng };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Builds a Google Maps Directions URL connecting multiple waypoint coordinates in order.
+ * @param {Array<{ lat: number, lng: number }>} points
+ * @returns {string}
+ */
+export function buildGoogleMapsDirectionsUrl(points = []) {
+  if (!points || points.length === 0) {
+    return "https://www.google.com/maps";
+  }
+  if (points.length === 1) {
+    return `https://www.google.com/maps/search/?api=1&query=${points[0].lat},${points[0].lng}`;
+  }
+
+  const origin = `${points[0].lat},${points[0].lng}`;
+  const destination = `${points[points.length - 1].lat},${points[points.length - 1].lng}`;
+  const waypoints = points
+    .slice(1, points.length - 1)
+    .map((p) => `${p.lat},${p.lng}`)
+    .join("|");
+
+  let url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
+    origin
+  )}&destination=${encodeURIComponent(destination)}`;
+  if (waypoints) {
+    url += `&waypoints=${encodeURIComponent(waypoints)}`;
+  }
+  return url;
+}

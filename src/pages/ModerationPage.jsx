@@ -13,6 +13,7 @@ export default function ModerationPage() {
   const [filterStatus, setFilterStatus] = useState("pending");
   const [modifyingId, setModifyingId] = useState(null);
   const [notes, setNotes] = useState({});
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     async function loadSubmissions() {
@@ -36,9 +37,10 @@ export default function ModerationPage() {
   async function handleModerate(submissionId, newStatus) {
     if (!user) return;
     setModifyingId(submissionId);
+    setNotification(null);
     try {
       const noteText = notes[submissionId] || "";
-      await submissionService.moderateSubmission(
+      const result = await submissionService.moderateSubmission(
         submissionId,
         newStatus,
         user.uid,
@@ -47,6 +49,18 @@ export default function ModerationPage() {
       // Refresh list
       const updatedList = await submissionService.getAllSubmissions(filterStatus || null);
       setSubmissions(updatedList);
+
+      const statusLabels = {
+        verified: "approved & verified",
+        rejected: "rejected",
+        needs_recheck: "flagged for recheck",
+        community_reported: "marked as community reported",
+      };
+      setNotification({
+        type: newStatus === "rejected" ? "error" : "success",
+        message: `Contribution successfully ${statusLabels[newStatus] || newStatus}! It is now in the "${newStatus === 'verified' ? '✓ Verified' : newStatus}" tab.`,
+        cloudSynced: result?.cloudSynced,
+      });
     } catch (err) {
       alert(`Moderation failed: ${err.message}`);
     } finally {
@@ -91,29 +105,72 @@ export default function ModerationPage() {
         </p>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-monsoon-200 pb-3 mb-6">
-        {[
-          { id: "pending", label: "⏳ Pending Review" },
-          { id: "community_reported", label: "💬 Community Reported" },
-          { id: "verified", label: "✓ Verified" },
-          { id: "needs_recheck", label: "⚠️ Needs Rechecking" },
-          { id: "rejected", label: "✕ Rejected" },
-        ].map((tab) => (
+      {notification && (
+        <div
+          className={`mb-6 p-4 rounded-xl text-sm font-medium border flex items-center justify-between ${
+            notification.type === "error"
+              ? "bg-red-50 border-red-200 text-red-900"
+              : "bg-emerald-50 border-emerald-200 text-emerald-900"
+          }`}
+        >
+          <div>
+            <p className="font-semibold">{notification.message}</p>
+            {notification.cloudSynced === false && (
+              <p className="mt-1 text-xs text-monsoon-700 font-normal">
+                💡 <span className="font-semibold">Dev Mode:</span> Moderated locally. To persist moderation directly in your cloud Firebase database, set <code>role: &quot;admin&quot;</code> on your user document in the Firebase Console Firestore <code>users</code> collection.
+              </p>
+            )}
+          </div>
           <button
-            key={tab.id}
             type="button"
-            onClick={() => setFilterStatus(tab.id)}
-            className={[
-              "rounded-xl px-3 py-1.5 text-xs font-semibold transition-all duration-150",
-              filterStatus === tab.id
-                ? "bg-monsoon-900 text-white shadow-sm"
-                : "bg-white border border-monsoon-200 text-monsoon-800 hover:bg-monsoon-100",
-            ].join(" ")}
+            onClick={() => setNotification(null)}
+            className="ml-4 text-xs font-bold opacity-60 hover:opacity-100"
           >
-            {tab.label}
+            ✕
           </button>
-        ))}
+        </div>
+      )}
+
+      {/* Filter Tabs */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-monsoon-200 pb-3 mb-6">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { id: "pending", label: "⏳ Pending Review" },
+            { id: "community_reported", label: "💬 Community Reported" },
+            { id: "verified", label: "✓ Verified" },
+            { id: "needs_recheck", label: "⚠️ Needs Rechecking" },
+            { id: "rejected", label: "✕ Rejected" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setFilterStatus(tab.id)}
+              className={[
+                "rounded-xl px-3 py-1.5 text-xs font-semibold transition-all duration-150",
+                filterStatus === tab.id
+                  ? "bg-monsoon-900 text-white shadow-sm"
+                  : "bg-white border border-monsoon-200 text-monsoon-800 hover:bg-monsoon-100",
+              ].join(" ")}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={async () => {
+            setLoading(true);
+            try {
+              const list = await submissionService.getAllSubmissions(filterStatus || null);
+              setSubmissions(list);
+            } finally {
+              setLoading(false);
+            }
+          }}
+          className="text-xs px-3 py-1.5 rounded-lg border border-monsoon-300 bg-white text-monsoon-800 hover:bg-monsoon-50 font-medium transition-colors shadow-sm"
+        >
+          🔄 Refresh Queue
+        </button>
       </div>
 
       {loading ? (
