@@ -205,8 +205,8 @@ export default function LocationSelector() {
           {/* Header & Search Bar */}
           <div className="p-3 border-b border-monsoon-100 bg-monsoon-50/50 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-monsoon-900 flex items-center gap-1.5">
-                <span>📍</span> Find Location
+              <span className="text-xs font-bold text-monsoon-900">
+                Find Location
               </span>
               <button
                 type="button"
@@ -214,7 +214,6 @@ export default function LocationSelector() {
                 disabled={gpsLoading}
                 className="text-[11px] font-semibold text-monsoon-700 hover:text-monsoon-900 flex items-center gap-1 bg-white px-2 py-0.5 rounded-full border border-monsoon-200 shadow-2xs hover:bg-monsoon-50 transition-colors disabled:opacity-50"
               >
-                <span>{gpsLoading ? "⏳" : "🎯"}</span>
                 <span>{gpsLoading ? "Locating…" : "Current location"}</span>
               </button>
             </div>
@@ -249,9 +248,11 @@ export default function LocationSelector() {
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-2.5 top-2 text-xs text-monsoon-800/50 hover:text-monsoon-800"
+                  className="absolute right-2.5 top-2.5 text-monsoon-400 hover:text-monsoon-800"
                 >
-                  ✕
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                  </svg>
                 </button>
               )}
             </div>
@@ -345,7 +346,7 @@ export default function LocationSelector() {
                             </span>
                           </div>
                           {isSelected && (
-                            <span className="text-monsoon-600 text-xs font-bold">✓ Active</span>
+                            <span className="text-monsoon-600 text-xs font-bold">Active</span>
                           )}
                         </button>
                       </li>

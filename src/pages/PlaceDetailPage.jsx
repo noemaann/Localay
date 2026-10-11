@@ -96,14 +96,18 @@ export default function PlaceDetailPage() {
   if (error) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-        <div role="alert" className="rounded-2xl bg-red-50 p-8 text-center">
-          <p className="text-2xl mb-3" aria-hidden="true">⚡</p>
+        <div role="alert" className="rounded-2xl bg-red-50 p-8 text-center border border-red-200">
+          <svg aria-hidden="true" className="w-8 h-8 text-red-600 mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
           <h1 className="text-lg font-semibold text-red-900">Something went wrong</h1>
           <p className="mt-2 text-sm text-red-800/80">{error}</p>
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="mt-6 rounded-lg border-2 border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 transition-colors"
+            className="mt-6 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 transition-colors"
           >
             Go back
           </button>
@@ -147,8 +151,12 @@ export default function PlaceDetailPage() {
 
       {/* Demo data banner */}
       {place._demo && (
-        <div className="rounded-xl bg-turmeric-100 px-4 py-3 text-xs text-turmeric-600 font-medium flex items-start gap-2">
-          <span aria-hidden="true" className="shrink-0 mt-0.5">⚠️</span>
+        <div className="rounded-2xl border border-turmeric-200 bg-turmeric-100/60 px-4 py-3 text-xs text-turmeric-600 font-medium flex items-start gap-2.5">
+          <svg aria-hidden="true" className="w-4 h-4 shrink-0 text-turmeric-600 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
           <span>
             This is <strong>illustrative demo content only</strong>. Details including
             directions, prices, and access information are not verified and must not be
@@ -158,15 +166,15 @@ export default function PlaceDetailPage() {
       )}
 
       {/* Hero Header */}
-      <header className="relative rounded-3xl overflow-hidden bg-monsoon-900 text-white p-6 sm:p-10 shadow-lg">
+      <header className="relative rounded-3xl overflow-hidden bg-monsoon-900 text-white p-7 sm:p-12 shadow-md">
         {place.coverImage && (
           <img
             src={place.coverImage}
             alt={place.name}
-            className="absolute inset-0 w-full h-full object-cover opacity-30"
+            className="absolute inset-0 w-full h-full object-cover opacity-25"
           />
         )}
-        <div className="relative z-10 max-w-2xl space-y-3">
+        <div className="relative z-10 max-w-2xl space-y-3.5">
           <div className="flex flex-wrap items-center gap-2">
             {category && (
               <Badge className={category.accent}>
@@ -176,7 +184,7 @@ export default function PlaceDetailPage() {
             )}
             {place.status && <SubmissionStatusBadge status={place.status} />}
             {place._demo && (
-              <span className="rounded-full border border-white/20 px-2.5 py-0.5 text-xs font-medium text-white/80 select-none">
+              <span className="rounded-full border border-white/20 px-2.5 py-0.5 text-xs font-semibold text-white/80 select-none">
                 Demo data
               </span>
             )}
@@ -184,21 +192,21 @@ export default function PlaceDetailPage() {
 
           <h1
             id="place-name"
-            className="font-display text-3xl sm:text-5xl font-bold tracking-tight"
+            className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight"
           >
             {place.name}
           </h1>
           {place.tagline && (
-            <p className="mt-2 text-base sm:text-lg text-monsoon-100 leading-relaxed">
+            <p className="mt-2 text-base sm:text-lg text-monsoon-100/90 leading-relaxed">
               {place.tagline}
             </p>
           )}
-          <p className="text-sm text-monsoon-100/90 leading-relaxed pt-1">
+          <p className="text-sm text-monsoon-200/90 leading-relaxed pt-1">
             {place.description}
           </p>
-          <div className="flex flex-wrap gap-4 text-xs text-monsoon-200 pt-3 border-t border-white/20">
-            {place.location?.town && <span>🏘️ {place.location.town}</span>}
-            {place.address && <span>📍 {place.address}</span>}
+          <div className="flex flex-wrap gap-4 text-xs font-medium text-monsoon-200/80 pt-3 border-t border-white/15">
+            {place.location?.town && <span>Town: {place.location.town}</span>}
+            {place.address && <span>Address: {place.address}</span>}
           </div>
         </div>
       </header>
@@ -207,7 +215,6 @@ export default function PlaceDetailPage() {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Location */}
         <InfoSection
-          icon="📍"
           title="Location"
           items={[
             { label: "Town / Locality", value: place.location?.town || place.townId },
@@ -219,16 +226,15 @@ export default function PlaceDetailPage() {
 
         {/* Access */}
         <InfoSection
-          icon="🚶"
           title="Access"
           items={[
             {
               label: "Difficulty",
               value: place.access?.difficulty
-                ? `${difficultyIcon(place.access.difficulty)} ${formatDifficulty(place.access.difficulty)}`
+                ? formatDifficulty(place.access.difficulty)
                 : null,
               valueClass: place.access?.difficulty
-                ? `inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${difficultyClass(place.access.difficulty)}`
+                ? `inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${difficultyClass(place.access.difficulty)}`
                 : undefined,
             },
             { label: "Road", value: place.access?.road },
@@ -283,7 +289,7 @@ export default function PlaceDetailPage() {
           {/* Access & Road Conditions */}
           <div className="rounded-2xl border border-monsoon-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-bold text-monsoon-900 mb-3 flex items-center gap-2">
-              <span>🛣️ Road Access & Terrain</span>
+              <span>Road Access & Terrain</span>
             </h2>
             {updates.length === 0 ? (
               <p className="text-xs text-monsoon-800/70">
@@ -321,7 +327,7 @@ export default function PlaceDetailPage() {
           {/* Dish & Snack Prices */}
           <div className="rounded-2xl border border-monsoon-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-bold text-monsoon-900 mb-3 flex items-center gap-2">
-              <span>🍛 Crowd-Sourced Food & Dish Prices</span>
+              <span>Crowd-Sourced Food & Dish Prices</span>
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-monsoon-100 text-monsoon-800">
                 {dishPrices.length}
               </span>
@@ -353,7 +359,7 @@ export default function PlaceDetailPage() {
           {/* Community Reviews */}
           <div className="rounded-2xl border border-monsoon-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-bold text-monsoon-900 mb-4 flex items-center gap-2">
-              <span>💬 Reviews & Community Experiences</span>
+              <span>Reviews & Community Experiences</span>
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-monsoon-100 text-monsoon-800">
                 {reviews.length}
               </span>
@@ -398,10 +404,10 @@ export default function PlaceDetailPage() {
         <div className="space-y-4">
           <div className="flex rounded-xl bg-monsoon-100 p-1 text-xs font-semibold">
             {[
-              { id: "review", label: "💬 Review" },
-              { id: "dish", label: "🍛 Dish Price" },
-              { id: "access", label: "🛣️ Access" },
-              { id: "correct", label: "🛠️ Correct" },
+              { id: "review", label: "Review" },
+              { id: "dish", label: "Dish Price" },
+              { id: "access", label: "Road Access" },
+              { id: "correct", label: "Correction" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -461,15 +467,14 @@ function InfoSection({ icon, title, items }) {
   if (validItems.length === 0) return null;
 
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-monsoon-100">
-      <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-monsoon-900">
-        <span aria-hidden="true">{icon}</span>
+    <div className="rounded-2xl bg-white p-5 border border-monsoon-200/70 shadow-xs">
+      <h2 className="mb-4 text-sm font-bold text-monsoon-900">
         {title}
       </h2>
       <dl className="flex flex-col gap-3">
         {validItems.map((item) => (
           <div key={item.label}>
-            <dt className="text-[10px] font-semibold uppercase tracking-wider text-monsoon-800/50">
+            <dt className="text-[10px] font-mono font-semibold uppercase tracking-wider text-monsoon-800/60">
               {item.label}
             </dt>
             <dd className={`mt-0.5 text-sm text-monsoon-900 ${item.valueClass ?? ""}`}>
@@ -486,7 +491,6 @@ function InfoSection({ icon, title, items }) {
 function NotFoundState() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6 text-center">
-      <p className="text-5xl mb-4" aria-hidden="true">🗺️</p>
       <h1 className="text-2xl font-bold text-monsoon-900">Place not found</h1>
       <p className="mt-3 text-sm text-monsoon-800/70 max-w-sm mx-auto">
         The requested place could not be found or has not been published yet.

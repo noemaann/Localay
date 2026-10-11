@@ -23,40 +23,23 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
   return (
     <section
       aria-labelledby="hero-heading"
-      className="relative overflow-hidden"
+      className="relative bg-white border-b border-monsoon-200/60"
     >
-      {/* Decorative gradient backdrop */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-monsoon-600/8 via-transparent to-turmeric-400/10"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-turmeric-400/10 blur-3xl -z-10"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-monsoon-600/8 blur-3xl -z-10"
-      />
-
-      <div className="mx-auto max-w-5xl px-4 pt-14 pb-16 sm:px-6 sm:pt-20 sm:pb-24">
-        {/* Launch badge */}
-        <div className="mb-6">
-          <Badge variant="accent" className="text-xs">
-            🌿 Now in {region.label}
-          </Badge>
-        </div>
+      <div className="mx-auto max-w-5xl px-4 pt-16 pb-16 sm:px-6 sm:pt-24 sm:pb-24">
+        {/* Subtle regional label */}
+        <p className="mb-4 text-xs font-mono font-semibold uppercase tracking-widest text-monsoon-600">
+          Now in {region.label}
+        </p>
 
         {/* Heading */}
         <h1
           id="hero-heading"
-          className="font-display text-4xl font-bold leading-tight tracking-tight text-monsoon-900 sm:text-5xl lg:text-6xl max-w-2xl"
+          className="font-display text-4xl font-extrabold leading-[1.12] tracking-tight text-monsoon-900 sm:text-6xl lg:text-7xl max-w-3xl"
         >
-          Find the places{" "}
-          <span className="text-monsoon-600">locals actually love.</span>
+          Find the places locals actually love.
         </h1>
 
-        <p className="mt-5 max-w-xl text-base leading-relaxed text-monsoon-800 sm:text-lg">
+        <p className="mt-5 max-w-2xl text-base leading-relaxed text-monsoon-800/80 sm:text-lg font-normal">
           LOCALAY is a community guide to local food spots, hidden places, nature
           destinations, and everyday experiences — with honest reviews and
           practical access information from people who live there.
@@ -81,10 +64,10 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
         </form>
 
         {/* Quick suggestion pills */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          <p className="w-full text-xs text-monsoon-800/60 mb-0.5">
-            Popular searches
-          </p>
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-monsoon-800/60 mr-1">
+            Popular:
+          </span>
           {["Biriyani", "Waterfalls", "Sunset viewpoints", "Local treks"].map(
             (term) => (
               <button
@@ -93,11 +76,11 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
                 aria-label={`Search for ${term}`}
                 onClick={() => onSuggestion(term)}
                 className={[
-                  "rounded-full border border-monsoon-100 bg-white px-3 py-1",
+                  "rounded-lg border border-monsoon-200 bg-monsoon-50 px-3 py-1",
                   "text-xs font-medium text-monsoon-800",
-                  "hover:border-monsoon-600 hover:text-monsoon-600",
+                  "hover:border-monsoon-900 hover:text-monsoon-900 hover:bg-white",
                   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600",
-                  "transition-all duration-150 shadow-sm",
+                  "transition-all duration-150",
                 ].join(" ")}
               >
                 {term}
@@ -121,11 +104,11 @@ function CategorySection() {
       aria-labelledby="categories-heading"
       className="mx-auto max-w-5xl px-4 pb-20 sm:px-6"
     >
-      <div className="mb-6 flex items-end justify-between">
+      <div className="mb-8 flex items-end justify-between">
         <div>
           <h2
             id="categories-heading"
-            className="text-xl font-bold text-monsoon-900 sm:text-2xl"
+            className="font-display text-2xl font-bold tracking-tight text-monsoon-900 sm:text-3xl"
           >
             Explore {region.name}
           </h2>
@@ -146,15 +129,15 @@ function CommunityBanner() {
   return (
     <section
       aria-label="Community contribution"
-      className="border-y border-monsoon-100 bg-white"
+      className="border-b border-monsoon-200/60 bg-monsoon-50/50"
     >
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-bold text-monsoon-900">
+            <h2 className="text-xl font-bold tracking-tight text-monsoon-900">
               Know a hidden gem?
             </h2>
-            <p className="mt-1 text-sm leading-relaxed text-monsoon-800/80 max-w-md">
+            <p className="mt-1 text-sm leading-relaxed text-monsoon-800/70 max-w-lg">
               LOCALAY is built by the community. Add places, share reviews, report dish prices, and
               help others discover what makes your town special.
             </p>
@@ -162,7 +145,7 @@ function CommunityBanner() {
           <div className="shrink-0">
             <Link
               to="/contribute"
-              className="inline-flex items-center rounded-xl bg-monsoon-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-monsoon-700 transition-colors shadow-sm"
+              className="inline-flex items-center rounded-xl bg-monsoon-900 px-5 py-2.5 text-xs font-semibold tracking-wide text-white hover:bg-monsoon-800 transition-all shadow-xs active:scale-[0.98]"
             >
               Add a place & review →
             </Link>

@@ -82,8 +82,8 @@ export default function MyContributionsPage() {
           {/* Submitted Places */}
           {submissions.length > 0 && (
             <div>
-              <h2 className="text-lg font-bold text-monsoon-900 mb-3 flex items-center gap-2">
-                <span>📍 Proposed Places</span>
+              <h2 className="text-base font-bold text-monsoon-900 mb-3 flex items-center gap-2">
+                <span>Proposed Places</span>
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-monsoon-100 text-monsoon-800">
                   {submissions.length}
                 </span>
@@ -119,8 +119,8 @@ export default function MyContributionsPage() {
           {/* Submitted Reviews */}
           {reviews.length > 0 && (
             <div>
-              <h2 className="text-lg font-bold text-monsoon-900 mb-3 flex items-center gap-2">
-                <span>💬 Community Reviews</span>
+              <h2 className="text-base font-bold text-monsoon-900 mb-3 flex items-center gap-2">
+                <span>Community Reviews</span>
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-monsoon-100 text-monsoon-800">
                   {reviews.length}
                 </span>
@@ -133,7 +133,7 @@ export default function MyContributionsPage() {
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs">{"⭐".repeat(rev.rating)}</span>
+                        <span className="text-xs font-bold text-monsoon-900">{rev.rating}/5 rating</span>
                         <h3 className="font-semibold text-monsoon-900 text-sm">
                           {rev.title || "Review"}
                         </h3>
@@ -154,8 +154,8 @@ export default function MyContributionsPage() {
           {/* Place Updates */}
           {updates.length > 0 && (
             <div>
-              <h2 className="text-lg font-bold text-monsoon-900 mb-3 flex items-center gap-2">
-                <span>🛠️ Road Access & Corrections</span>
+              <h2 className="text-base font-bold text-monsoon-900 mb-3 flex items-center gap-2">
+                <span>Road Access & Corrections</span>
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-monsoon-100 text-monsoon-800">
                   {updates.length}
                 </span>

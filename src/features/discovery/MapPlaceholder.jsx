@@ -59,25 +59,36 @@ export default function MapPlaceholder({ coordinates, placeName, className = "" 
         </div>
       )}
 
-      <div className="relative z-10 flex flex-col items-center gap-2 px-6">
+      <div className="relative z-10 flex flex-col items-center gap-2 px-6 text-center">
         {hasCoords ? (
           <>
             {/* Pin icon */}
-            <span aria-hidden="true" className="text-3xl">📍</span>
+            <div className="w-10 h-10 rounded-full bg-monsoon-900 text-white flex items-center justify-center shadow-md mb-1">
+              <svg aria-hidden="true" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
             <p className="text-sm font-semibold text-monsoon-900">{placeName}</p>
             <p className="text-xs text-monsoon-800/70">{accuracyLabel}</p>
-            <p className="mt-1 rounded-lg bg-turmeric-100 px-3 py-1.5 text-xs font-medium text-turmeric-600">
-              Interactive map coming in Step 6
+            <p className="mt-1 rounded-md border border-turmeric-200 bg-turmeric-50 px-2.5 py-1 text-xs font-mono text-turmeric-700">
+              Interactive map view
             </p>
             {coordinates && (
-              <p className="text-[10px] text-monsoon-800/40 font-mono mt-1">
+              <p className="text-[10px] text-monsoon-800/50 font-mono mt-0.5">
                 {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)}
               </p>
             )}
           </>
         ) : (
           <>
-            <span aria-hidden="true" className="text-3xl opacity-40">🗺️</span>
+            <div className="w-10 h-10 rounded-full bg-monsoon-100 text-monsoon-400 flex items-center justify-center mb-1">
+              <svg aria-hidden="true" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+                <line x1="8" y1="2" x2="8" y2="18" />
+                <line x1="16" y1="6" x2="16" y2="22" />
+              </svg>
+            </div>
             <p className="text-sm font-semibold text-monsoon-900/60">
               Location not confirmed
             </p>

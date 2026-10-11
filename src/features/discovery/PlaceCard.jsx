@@ -24,15 +24,15 @@ export default function PlaceCard({ place }) {
     >
       <Card
         interactive
-        className="h-full flex flex-col overflow-hidden"
+        className="h-full flex flex-col overflow-hidden border border-monsoon-200/70 hover:border-monsoon-900 transition-all duration-200"
       >
-        {/* Category colour band */}
+        {/* Thin category color accent */}
         <div
           aria-hidden="true"
-          className={`h-1.5 w-full ${category ? getCategoryBandClass(category.id) : "bg-monsoon-100"}`}
+          className={`h-1 w-full ${category ? getCategoryBandClass(category.id) : "bg-monsoon-200"}`}
         />
 
-        <div className="flex flex-col gap-3 p-4 sm:p-5 flex-1">
+        <div className="flex flex-col gap-3.5 p-5 flex-1">
           {/* Top row: category badge + demo badge */}
           <div className="flex items-center justify-between gap-2 flex-wrap">
             {category && (
@@ -42,7 +42,7 @@ export default function PlaceCard({ place }) {
               </Badge>
             )}
             {place._demo && (
-              <span className="shrink-0 rounded-full border border-monsoon-100 px-2 py-0.5 text-[10px] font-medium text-monsoon-800/50 select-none">
+              <span className="shrink-0 rounded-full border border-monsoon-200 px-2 py-0.5 text-[10px] font-medium text-monsoon-800/50 select-none">
                 Demo
               </span>
             )}
@@ -53,23 +53,23 @@ export default function PlaceCard({ place }) {
             <h3 className="text-base font-bold leading-snug text-monsoon-900 group-hover:text-monsoon-600 transition-colors duration-150">
               {place.name}
             </h3>
-            <p className="mt-1 text-sm leading-relaxed text-monsoon-800/80 line-clamp-2">
+            <p className="mt-1.5 text-xs leading-relaxed text-monsoon-800/70 line-clamp-2">
               {place.tagline}
             </p>
           </div>
 
           {/* Footer: location + difficulty */}
-          <div className="mt-auto flex items-center justify-between gap-2 pt-3 border-t border-monsoon-100">
-            <div className="flex items-center gap-1 min-w-0">
+          <div className="mt-auto flex items-center justify-between gap-2 pt-3.5 border-t border-monsoon-100/80">
+            <div className="flex items-center gap-1.5 min-w-0">
               <svg
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
-                width="12"
-                height="12"
+                width="13"
+                height="13"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.5"
+                strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="shrink-0 text-monsoon-600"
@@ -77,14 +77,14 @@ export default function PlaceCard({ place }) {
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
                 <circle cx="12" cy="9" r="2.5" />
               </svg>
-              <span className="text-xs text-monsoon-800 truncate">
+              <span className="text-xs font-medium text-monsoon-800/80 truncate">
                 {place.location?.town ?? "Unknown location"}
               </span>
             </div>
 
             {place.access?.difficulty && (
               <span
-                className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${difficultyClass(place.access.difficulty)}`}
+                className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${difficultyClass(place.access.difficulty)}`}
               >
                 {formatDifficulty(place.access.difficulty)}
               </span>

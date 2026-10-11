@@ -87,15 +87,15 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
   return (
     <div className="rounded-2xl border border-monsoon-200 bg-white shadow-xl overflow-hidden transition-all duration-300">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-monsoon-900 via-monsoon-800 to-monsoon-900 px-6 py-5 text-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-monsoon-900 px-6 py-5 text-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-monsoon-800">
         <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-white/10 text-turmeric-300 text-xs font-semibold mb-2">
-            <span>✨ Smart Trip & Day Planner</span>
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-monsoon-800 text-monsoon-200 text-xs font-semibold mb-2 border border-monsoon-700">
+            <span>Smart Trip & Day Planner</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
             Custom Itinerary for {regionName}
           </h2>
-          <p className="text-xs text-white/80 mt-1">
+          <p className="text-xs text-monsoon-200/90 mt-1">
             Choose your preferred spot types, budget, and time. We calculate accurate GPS travel times and sequence the stops for you.
           </p>
         </div>
@@ -103,10 +103,10 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
           <button
             type="button"
             onClick={onClose}
-            className="self-start sm:self-center rounded-lg p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            className="self-start sm:self-center rounded-lg px-2.5 py-1 text-xs font-medium text-monsoon-200 hover:text-white hover:bg-monsoon-800 transition-colors"
             title="Close planner"
           >
-            ✕
+            Close
           </button>
         )}
       </div>
@@ -116,7 +116,7 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6 border-b border-monsoon-100">
           {/* 1. Types of Spots */}
           <div>
-            <label className="block text-xs font-bold text-monsoon-900 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-mono font-bold text-monsoon-900 uppercase tracking-wider mb-2">
               1. Types of Spots ({selectedCategories.length})
             </label>
             <div className="flex flex-wrap gap-1.5">
@@ -129,11 +129,10 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
                     onClick={() => toggleCategory(cat.id)}
                     className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all duration-150 flex items-center gap-1.5 ${
                       isSelected
-                        ? "bg-monsoon-900 text-white shadow-sm ring-1 ring-monsoon-900"
+                        ? "bg-monsoon-900 text-white shadow-xs ring-1 ring-monsoon-900"
                         : "bg-monsoon-50 text-monsoon-800 hover:bg-monsoon-100 border border-monsoon-200"
                     }`}
                   >
-                    <span>{cat.icon}</span>
                     <span>{cat.label}</span>
                   </button>
                 );
@@ -146,24 +145,24 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
 
           {/* 2. Budget Level */}
           <div>
-            <label className="block text-xs font-bold text-monsoon-900 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-mono font-bold text-monsoon-900 uppercase tracking-wider mb-2">
               2. Budget Preference
             </label>
             <div className="grid grid-cols-1 gap-2">
               {[
                 {
                   id: "budget",
-                  title: "🪙 Budget-Friendly",
+                  title: "Budget-Friendly",
                   desc: "Under ₹300 / person (Tea, street snacks & open spots)",
                 },
                 {
                   id: "moderate",
-                  title: "💳 Moderate Balance",
+                  title: "Moderate Balance",
                   desc: "₹300 – ₹800 / person (Authentic meals & entry tickets)",
                 },
                 {
                   id: "splurge",
-                  title: "💎 Splurge & Premium",
+                  title: "Splurge & Premium",
                   desc: "₹800+ / person (Full dining, private viewpoints & experiences)",
                 },
               ].map((b) => (
@@ -186,15 +185,15 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
 
           {/* 3. Time Allocated */}
           <div>
-            <label className="block text-xs font-bold text-monsoon-900 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-mono font-bold text-monsoon-900 uppercase tracking-wider mb-2">
               3. Time to Spend: {maxHours} Hours
             </label>
             <div className="space-y-3">
               <div className="flex gap-2">
                 {[
-                  { hours: 3, label: "⚡ 3h Quick" },
-                  { hours: 5, label: "☀️ 5h Half Day" },
-                  { hours: 8, label: "🌅 8h Full Day" },
+                  { hours: 3, label: "3h Quick" },
+                  { hours: 5, label: "5h Half Day" },
+                  { hours: 8, label: "8h Full Day" },
                 ].map((opt) => (
                   <button
                     key={opt.hours}
@@ -202,7 +201,7 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
                     onClick={() => setMaxHours(opt.hours)}
                     className={`flex-1 rounded-lg py-1.5 text-xs font-semibold border transition-all ${
                       maxHours === opt.hours
-                        ? "bg-monsoon-900 text-white border-monsoon-900 shadow-sm"
+                        ? "bg-monsoon-900 text-white border-monsoon-900 shadow-xs"
                         : "bg-white border-monsoon-200 text-monsoon-800 hover:bg-monsoon-50"
                     }`}
                   >
@@ -241,7 +240,6 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
                       : "bg-monsoon-50 border-monsoon-200 text-monsoon-800 hover:bg-monsoon-100"
                   }`}
                 >
-                  <span>{detectingGps ? "⏳" : userLocation ? "✓" : "🎯"}</span>
                   <span>
                     {detectingGps
                       ? "Detecting location…"
@@ -260,9 +258,8 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
           <Button
             type="button"
             onClick={handleGenerate}
-            className="px-8 py-3 text-sm font-bold shadow-md bg-monsoon-900 hover:bg-monsoon-800 text-white flex items-center gap-2"
+            className="px-8 py-3 text-xs font-bold shadow-xs bg-monsoon-900 hover:bg-monsoon-800 text-white flex items-center gap-2"
           >
-            <span>🧭</span>
             <span>{hasGenerated ? "Re-generate Optimized Itinerary" : "Generate Optimized Itinerary"}</span>
           </Button>
         </div>
@@ -271,9 +268,8 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
         {hasGenerated && itineraryResult && (
           <div className="mt-8 pt-6 border-t border-monsoon-200 space-y-6 animate-fadeIn">
             {itineraryResult.stops.length === 0 ? (
-              <div className="text-center py-8 text-sm text-monsoon-800/70">
-                <p className="text-2xl mb-2">🗺️</p>
-                <p className="font-semibold text-monsoon-900">No matching spots found</p>
+              <div className="text-center py-8 text-xs text-monsoon-800/70">
+                <p className="font-bold text-monsoon-900">No matching spots found</p>
                 <p className="text-xs mt-1">
                   Try selecting more spot categories or extending your time allowance.
                 </p>
@@ -318,10 +314,10 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
                 </div>
 
                 {/* Google Maps Master Action */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-xl bg-emerald-50/60 border border-emerald-200">
                   <div>
                     <h4 className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
-                      <span>🚗 Accurate Google Maps Turn-by-Turn Route</span>
+                      <span>Google Maps Turn-by-Turn Route</span>
                     </h4>
                     <p className="text-[11px] text-emerald-900/80 mt-0.5">
                       Open this multi-stop itinerary directly in Google Maps for live driving navigation.
@@ -334,7 +330,7 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
                       rel="noopener noreferrer"
                       className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition-colors shadow-sm flex items-center gap-1.5 shrink-0"
                     >
-                      <span>🗺️ Open Full Route in Google Maps ↗</span>
+                      <span>Open Full Route in Google Maps ↗</span>
                     </a>
                   )}
                 </div>
@@ -354,7 +350,11 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
                         {idx > 0 && stop.distanceFromPrevKm > 0 && (
                           <div className="sm:pl-12 flex items-center gap-2 py-1 text-xs text-monsoon-700">
                             <span className="px-2.5 py-1 rounded-full bg-monsoon-100 font-semibold text-[11px] flex items-center gap-1.5 border border-monsoon-200">
-                              <span>🚗</span>
+                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 3C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/>
+                                <circle cx="7" cy="17" r="2"/>
+                                <circle cx="17" cy="17" r="2"/>
+                              </svg>
                               <span>
                                 {stop.travelTimeFromPrevMinutes} min drive ({stop.distanceFromPrevKm} km)
                               </span>
@@ -384,7 +384,7 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <div className="flex items-center gap-2">
                                 <span className="text-xs font-semibold px-2 py-0.5 rounded bg-monsoon-100 text-monsoon-800">
-                                  {catObj?.icon} {catObj?.label || place.category}
+                                  {catObj?.label || place.category}
                                 </span>
                                 <h3 className="text-base font-bold text-monsoon-900 truncate">
                                   {place.name}
@@ -393,7 +393,7 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
 
                               <div className="flex items-center gap-2 text-xs">
                                 <span className="px-2 py-0.5 rounded-full bg-turmeric-100 text-turmeric-800 font-semibold text-[11px]">
-                                  ⏱️ Spend ~{formatMinutes(stop.dwellTimeMinutes)}
+                                  Spend ~{formatMinutes(stop.dwellTimeMinutes)}
                                 </span>
                                 <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-semibold text-[11px]">
                                   ₹{stop.estimatedCost} est.
@@ -406,8 +406,11 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
                             </p>
 
                             <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-monsoon-100 text-[11px] text-monsoon-800/60">
-                              <span className="flex items-center gap-1 truncate">
-                                <span>📍</span>
+                              <span className="flex items-center gap-1.5 truncate">
+                                <svg className="w-3 h-3 text-monsoon-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                  <circle cx="12" cy="10" r="3"/>
+                                </svg>
                                 <span>
                                   {place.address ||
                                     (typeof place.location === "object" ? place.location?.town : place.location) ||

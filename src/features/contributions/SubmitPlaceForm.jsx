@@ -274,7 +274,11 @@ export default function SubmitPlaceForm({ onSubmitted }) {
     return (
       <div className="rounded-2xl border border-monsoon-200 bg-white p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-3 text-emerald-700">
-          <span className="text-2xl">🎉</span>
+          <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
           <h3 className="text-lg font-bold">Place Proposed Successfully!</h3>
         </div>
         <p className="text-sm text-monsoon-800 mb-4 leading-relaxed">
@@ -295,7 +299,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
             <span className="text-monsoon-900">{successSubmission.townId}, {formData.regionName}</span>
           </div>
           <p className="pt-2 text-monsoon-800/70 border-t border-monsoon-200/60">
-            🔒 All new community place proposals enter <strong>Pending Review</strong> and are reviewed by moderators before publication as verified spots.
+            All new community place proposals enter <strong>Pending Review</strong> and are reviewed by moderators before publication as verified spots.
           </p>
         </div>
 
@@ -345,7 +349,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
 
       {!user && (
         <div className="mb-6 rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 flex justify-between items-center">
-          <span>🔒 Please sign in before submitting so your contribution is credited to you.</span>
+          <span>Please sign in before submitting so your contribution is credited to you.</span>
           <button
             type="button"
             onClick={() => setAuthModalOpen(true)}
@@ -426,11 +430,10 @@ export default function SubmitPlaceForm({ onSubmitted }) {
                   setShowRegionResults(true);
                 }}
                 placeholder="Type district or city (e.g. Malappuram, Wayanad)..."
-                className="w-full rounded-lg border border-monsoon-200 pl-8 pr-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none bg-white"
+                className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none bg-white"
               />
-              <span className="absolute left-2.5 top-2.5 text-xs text-monsoon-600">📍</span>
               {searchingRegion && (
-                <span className="absolute right-2.5 top-2.5 text-xs animate-spin">⏳</span>
+                <span className="absolute right-2.5 top-2.5 text-xs animate-spin text-monsoon-600">…</span>
               )}
             </div>
 
@@ -493,7 +496,6 @@ export default function SubmitPlaceForm({ onSubmitted }) {
               disabled={detectingGps}
               className="text-[11px] font-semibold text-monsoon-700 hover:text-monsoon-900 flex items-center gap-1"
             >
-              <span>{detectingGps ? "⏳" : "🎯"}</span>
               <span>{detectingGps ? "Detecting…" : "Auto-detect via GPS"}</span>
             </button>
           </div>
@@ -512,11 +514,10 @@ export default function SubmitPlaceForm({ onSubmitted }) {
                 setShowTownResults(true);
               }}
               placeholder="Search town, junction, or village (e.g. Kottakkal, Nilambur, Tirur)..."
-              className="w-full rounded-lg border border-monsoon-200 pl-8 pr-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none"
+              className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none"
             />
-            <span className="absolute left-2.5 top-2.5 text-xs text-monsoon-600">🏘️</span>
             {searchingTown && (
-              <span className="absolute right-2.5 top-2.5 text-xs animate-spin">⏳</span>
+              <span className="absolute right-2.5 top-2.5 text-xs animate-spin text-monsoon-600">…</span>
             )}
           </div>
 
@@ -543,7 +544,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
                   </div>
                   {loc.coordinates?.lat && (
                     <span className="text-[10px] font-mono text-monsoon-800/40 bg-monsoon-100/50 px-1 py-0.5 rounded shrink-0">
-                      📍 {loc.coordinates.lat.toFixed(2)}, {loc.coordinates.lng.toFixed(2)}
+                      {loc.coordinates.lat.toFixed(2)}, {loc.coordinates.lng.toFixed(2)}
                     </span>
                   )}
                 </button>
@@ -591,7 +592,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
         <div className="rounded-xl border border-monsoon-200 bg-monsoon-50/50 p-3.5 space-y-2">
           <div className="flex items-center justify-between">
             <label htmlFor="place-gmaps-input" className="text-xs font-bold text-monsoon-900 flex items-center gap-1.5">
-              <span>🗺️ Google Maps Location</span>
+              <span>Google Maps Location</span>
               <span className="text-[10px] font-normal text-monsoon-600">(URL / Link or Coordinates)</span>
             </label>
             <a
@@ -605,7 +606,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
               className="text-[11px] font-semibold text-monsoon-700 hover:text-monsoon-900 flex items-center gap-1 underline"
               title="Open Google Maps in a new tab to find this place"
             >
-              <span>📍 Pinpoint on GMaps ↗</span>
+              <span>Pinpoint on GMaps ↗</span>
             </a>
           </div>
 
@@ -624,16 +625,15 @@ export default function SubmitPlaceForm({ onSubmitted }) {
                 }));
               }}
               placeholder="Paste Google Maps link (e.g. https://maps.app.goo.gl/... or 11.052, 76.074)..."
-              className="w-full rounded-lg border border-monsoon-200 pl-8 pr-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none bg-white font-mono"
+              className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none bg-white font-mono"
             />
-            <span className="absolute left-2.5 top-2 text-xs">🔗</span>
           </div>
 
           {/* Coordinate Preview & Status */}
           {formData.coordinates?.lat ? (
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-semibold text-[11px]">
-                <span>✓ GPS Location Acquired:</span>
+                <span>GPS Location Acquired:</span>
                 <span className="font-mono">
                   {formData.coordinates.lat.toFixed(5)}° N, {formData.coordinates.lng.toFixed(5)}° E
                 </span>

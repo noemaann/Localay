@@ -61,11 +61,11 @@ export default function SearchInput({
           placeholder={placeholder}
           autoComplete="off"
           className={[
-            "w-full rounded-2xl border-2 border-monsoon-100 bg-white py-3.5 pl-12 pr-12",
-            "text-base text-monsoon-900 placeholder:text-monsoon-800/50",
-            "shadow-sm transition-all duration-150",
-            "focus:border-monsoon-600 focus:outline-none focus:ring-2 focus:ring-monsoon-600/20",
-            "hover:border-monsoon-100",
+            "w-full rounded-2xl border border-monsoon-200 bg-white py-3.5 pl-12 pr-12",
+            "text-sm text-monsoon-900 placeholder:text-monsoon-800/40 font-medium",
+            "shadow-[0_2px_8px_-2px_rgba(15,23,42,0.04)] transition-all duration-200",
+            "focus:border-monsoon-900 focus:outline-none focus:ring-1 focus:ring-monsoon-900",
+            "hover:border-monsoon-300",
           ].join(" ")}
         />
 

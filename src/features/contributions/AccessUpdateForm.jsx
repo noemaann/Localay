@@ -93,7 +93,7 @@ export default function AccessUpdateForm({ placeId, placeName, onSubmitted }) {
 
       {!user && (
         <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800 flex justify-between items-center">
-          <span>🔒 Sign in to submit access updates.</span>
+          <span>Sign in to submit access updates.</span>
           <button
             type="button"
             onClick={() => setAuthModalOpen(true)}
