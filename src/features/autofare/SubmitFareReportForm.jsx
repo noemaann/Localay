@@ -98,7 +98,7 @@ export default function SubmitFareReportForm({ onReportSubmitted }) {
       <div className="rounded-2xl border border-monsoon-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-bold text-monsoon-900 flex items-center gap-2">
-            <span>🚕 Auto Fare Report Logged</span>
+            <span>Auto Fare Report Logged</span>
           </h3>
           <SubmissionStatusBadge status={success.status} />
         </div>
@@ -150,7 +150,7 @@ export default function SubmitFareReportForm({ onReportSubmitted }) {
 
       {!user && (
         <div className="mb-6 rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 flex justify-between items-center">
-          <span>🔒 Please sign in to contribute fare reports.</span>
+          <span>Please sign in to contribute fare reports.</span>
           <button
             type="button"
             onClick={() => setAuthModalOpen(true)}

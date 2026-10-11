@@ -58,7 +58,7 @@ export default function ModerationPage() {
       };
       setNotification({
         type: newStatus === "rejected" ? "error" : "success",
-        message: `Contribution successfully ${statusLabels[newStatus] || newStatus}! It is now in the "${newStatus === 'verified' ? '✓ Verified' : newStatus}" tab.`,
+        message: `Contribution successfully ${statusLabels[newStatus] || newStatus}! It is now in the "${newStatus === 'verified' ? 'Verified' : newStatus}" tab.`,
         cloudSynced: result?.cloudSynced,
       });
     } catch (err) {
@@ -76,7 +76,7 @@ export default function ModerationPage() {
           description="Only authorized moderators can access the moderation panel."
         />
         <div className="mt-6 max-w-md mx-auto p-4 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-900 text-left space-y-2">
-          <p className="font-bold">🔑 How to get Moderator Access:</p>
+          <p className="font-bold">How to get Moderator Access:</p>
           <p>
             In production, set <code>role: "admin"</code> or <code>role: "moderator"</code> on your user document in the Firestore <code>users</code> collection.
           </p>
@@ -86,7 +86,7 @@ export default function ModerationPage() {
               onClick={() => toggleDevRole("admin")}
               className="px-4 py-2 rounded-lg bg-purple-700 text-white font-bold hover:bg-purple-800 transition-colors shadow-sm"
             >
-              ⚡ Enable Moderator Role (Dev Mode)
+              Enable Moderator Role (Dev Mode)
             </button>
           </div>
         </div>
@@ -117,16 +117,19 @@ export default function ModerationPage() {
             <p className="font-semibold">{notification.message}</p>
             {notification.cloudSynced === false && (
               <p className="mt-1 text-xs text-monsoon-700 font-normal">
-                💡 <span className="font-semibold">Dev Mode:</span> Moderated locally. To persist moderation directly in your cloud Firebase database, set <code>role: &quot;admin&quot;</code> on your user document in the Firebase Console Firestore <code>users</code> collection.
+                <span className="font-semibold">Dev Mode:</span> Moderated locally. To persist moderation directly in your cloud Firebase database, set <code>role: &quot;admin&quot;</code> on your user document in the Firebase Console Firestore <code>users</code> collection.
               </p>
             )}
           </div>
           <button
             type="button"
             onClick={() => setNotification(null)}
-            className="ml-4 text-xs font-bold opacity-60 hover:opacity-100"
+            className="ml-4 p-1 text-monsoon-500 hover:text-monsoon-900 transition-colors"
+            aria-label="Dismiss message"
           >
-            ✕
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
           </button>
         </div>
       )}
@@ -135,21 +138,21 @@ export default function ModerationPage() {
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-monsoon-200 pb-3 mb-6">
         <div className="flex flex-wrap gap-2">
           {[
-            { id: "pending", label: "⏳ Pending Review" },
-            { id: "community_reported", label: "💬 Community Reported" },
-            { id: "verified", label: "✓ Verified" },
-            { id: "needs_recheck", label: "⚠️ Needs Rechecking" },
-            { id: "rejected", label: "✕ Rejected" },
+            { id: "pending", label: "Pending Review" },
+            { id: "community_reported", label: "Community Reported" },
+            { id: "verified", label: "Verified" },
+            { id: "needs_recheck", label: "Needs Recheck" },
+            { id: "rejected", label: "Rejected" },
           ].map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setFilterStatus(tab.id)}
               className={[
-                "rounded-xl px-3 py-1.5 text-xs font-semibold transition-all duration-150",
+                "rounded-xl px-3.5 py-1.5 text-xs font-semibold tracking-wide transition-all duration-150",
                 filterStatus === tab.id
-                  ? "bg-monsoon-900 text-white shadow-sm"
-                  : "bg-white border border-monsoon-200 text-monsoon-800 hover:bg-monsoon-100",
+                  ? "bg-monsoon-900 text-white shadow-xs border border-monsoon-900"
+                  : "bg-white border border-monsoon-200 text-monsoon-800 hover:border-monsoon-900 hover:text-monsoon-900",
               ].join(" ")}
             >
               {tab.label}
@@ -167,9 +170,9 @@ export default function ModerationPage() {
               setLoading(false);
             }
           }}
-          className="text-xs px-3 py-1.5 rounded-lg border border-monsoon-300 bg-white text-monsoon-800 hover:bg-monsoon-50 font-medium transition-colors shadow-sm"
+          className="text-xs px-3.5 py-1.5 rounded-xl border border-monsoon-200 bg-white text-monsoon-800 hover:bg-monsoon-100 font-semibold transition-colors"
         >
-          🔄 Refresh Queue
+          Refresh Queue
         </button>
       </div>
 
@@ -233,7 +236,7 @@ export default function ModerationPage() {
                   disabled={modifyingId === sub.id}
                   onClick={() => handleModerate(sub.id, "verified")}
                 >
-                  ✓ Approve & Verify
+                  Approve & Verify
                 </Button>
 
                 <Button
@@ -242,7 +245,7 @@ export default function ModerationPage() {
                   disabled={modifyingId === sub.id}
                   onClick={() => handleModerate(sub.id, "community_reported")}
                 >
-                  💬 Publish as Community Reported
+                  Publish as Community Reported
                 </Button>
 
                 <button
@@ -251,7 +254,7 @@ export default function ModerationPage() {
                   onClick={() => handleModerate(sub.id, "needs_recheck")}
                   className="rounded-xl border border-purple-200 bg-purple-50 px-3 py-1.5 text-xs font-semibold text-purple-800 hover:bg-purple-100"
                 >
-                  ⚠️ Needs Recheck
+                  Needs Recheck
                 </button>
 
                 <button
@@ -260,7 +263,7 @@ export default function ModerationPage() {
                   onClick={() => handleModerate(sub.id, "rejected")}
                   className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100"
                 >
-                  ✕ Reject
+                  Reject
                 </button>
               </div>
             </div>

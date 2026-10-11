@@ -14,8 +14,8 @@ import { CATEGORIES } from "../../data/categories.js";
  */
 export default function CategoryFilter({ selected, onChange, resultCounts = {} }) {
   const all = [
-    { id: "", label: "All", icon: "✦" },
-    ...CATEGORIES.map((c) => ({ id: c.id, label: c.label, icon: c.icon })),
+    { id: "", label: "All" },
+    ...CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
   ];
 
   return (
@@ -36,15 +36,14 @@ export default function CategoryFilter({ selected, onChange, resultCounts = {} }
             aria-label={`${cat.label}${count !== undefined ? `, ${count} results` : ""}`}
             onClick={() => onChange(cat.id)}
             className={[
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2",
-              "text-sm font-medium transition-all duration-150 select-none",
+              "inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2",
+              "text-xs font-semibold tracking-wide transition-all duration-150 select-none",
               "focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600",
               isSelected
-                ? "bg-monsoon-600 text-white shadow-sm"
-                : "bg-white text-monsoon-800 border border-monsoon-100 hover:border-monsoon-300 hover:text-monsoon-900",
+                ? "bg-monsoon-900 text-white shadow-xs border border-monsoon-900"
+                : "bg-white text-monsoon-800 border border-monsoon-200/80 hover:border-monsoon-900 hover:text-monsoon-900",
             ].join(" ")}
           >
-            <span aria-hidden="true">{cat.icon}</span>
             <span>{cat.label}</span>
             {count !== undefined && (
               <span

@@ -97,7 +97,7 @@ export default function AddDishPriceForm({ placeId, placeName, onPriceAdded }) {
 
       {!user && (
         <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800 flex justify-between items-center">
-          <span>🔒 Sign in to contribute dish prices.</span>
+          <span>Sign in to contribute dish prices.</span>
           <button
             type="button"
             onClick={() => setAuthModalOpen(true)}

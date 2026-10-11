@@ -36,7 +36,7 @@ export default function CategoryGrid({ onSelect, className = "" }) {
         <Card
           key={cat.id}
           interactive
-          className="group"
+          className="group relative overflow-hidden transition-all border border-monsoon-200/70 hover:border-monsoon-900"
           role="button"
           tabIndex={0}
           aria-label={`Explore ${cat.label}`}
@@ -48,20 +48,38 @@ export default function CategoryGrid({ onSelect, className = "" }) {
             }
           }}
         >
-          <div className="flex flex-col gap-3 p-4 sm:p-5">
+          <div className="flex flex-col gap-3 p-5">
             {/* Icon tile */}
-            <span
-              aria-hidden="true"
-              className={`flex h-11 w-11 items-center justify-center rounded-xl text-2xl ${cat.accent}`}
-            >
-              {cat.icon}
-            </span>
+            <div className="flex items-center justify-between">
+              <span
+                aria-hidden="true"
+                className={`flex h-10 w-10 items-center justify-center rounded-xl text-xl ${cat.accent} transition-transform duration-200 group-hover:scale-105`}
+              >
+                {cat.icon}
+              </span>
+              <svg
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-monsoon-800/30 group-hover:text-monsoon-900 group-hover:translate-x-0.5 transition-all"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </div>
 
             <div>
-              <p className="text-sm font-semibold text-monsoon-900 group-hover:text-monsoon-600 transition-colors duration-150">
+              <p className="text-sm font-bold text-monsoon-900 group-hover:text-monsoon-600 transition-colors duration-150">
                 {cat.label}
               </p>
-              <p className="mt-0.5 text-xs leading-snug text-monsoon-800/70 hidden sm:block">
+              <p className="mt-1 text-xs leading-relaxed text-monsoon-800/70 hidden sm:block">
                 {cat.description}
               </p>
             </div>

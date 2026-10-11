@@ -17,10 +17,10 @@ export default function Card({ interactive = false, className = "", children, ..
   return (
     <div
       className={[
-        "rounded-2xl bg-white shadow-sm ring-1 ring-monsoon-100",
+        "rounded-2xl bg-white border border-monsoon-200/70 shadow-[0_1px_3px_0_rgba(15,23,42,0.03)]",
         interactive &&
-          "cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 " +
-          "hover:ring-monsoon-100 focus-within:ring-2 focus-within:ring-monsoon-600",
+          "cursor-pointer transition-all duration-200 hover:shadow-[0_10px_24px_-4px_rgba(15,23,42,0.07)] hover:-translate-y-0.5 " +
+          "hover:border-monsoon-300 focus-within:ring-2 focus-within:ring-monsoon-600 focus-within:ring-offset-2",
         className,
       ]
         .filter(Boolean)

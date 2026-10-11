@@ -11,12 +11,11 @@ import { useAuth } from "../context/AuthContext.jsx";
  */
 function SiteHeader() {
   const { region } = useLocation();
-  const { user, isModerator, signOut, isDemo } = useAuth();
+  const { user, isModerator, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const navRef = useRef(null);
 
-  // Close mobile menu on outside click or route change
   useEffect(() => {
     function onOutside(e) {
       if (navRef.current && !navRef.current.contains(e.target)) {
@@ -29,15 +28,15 @@ function SiteHeader() {
 
   const navLinkClass = ({ isActive }) =>
     [
-      "text-sm font-medium transition-colors duration-150 focus-visible:outline",
-      "focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded",
+      "text-xs font-semibold tracking-wide transition-all duration-150 focus-visible:outline",
+      "focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded-lg px-2.5 py-1",
       isActive
-        ? "text-monsoon-900 font-bold"
-        : "text-monsoon-800 hover:text-monsoon-900",
+        ? "text-monsoon-900 font-bold underline underline-offset-4 decoration-2 decoration-monsoon-900"
+        : "text-monsoon-800/80 hover:text-monsoon-900",
     ].join(" ");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-monsoon-100 bg-monsoon-50/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-monsoon-200/60 bg-white/80 backdrop-blur-md transition-all">
       <AuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
@@ -46,18 +45,17 @@ function SiteHeader() {
       <nav
         ref={navRef}
         aria-label="Main navigation"
-        className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6"
+        className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6"
       >
         {/* Brand */}
         <NavLink
           to="/"
           aria-label="LOCALAY home"
-          className="shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded"
+          className="shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded-xl group flex items-center gap-1"
           onClick={() => setMenuOpen(false)}
         >
-          <span className="font-display text-xl font-bold tracking-tight text-monsoon-900">
-            LOCAL
-            <span className="text-monsoon-600">AY</span>
+          <span className="font-display text-xl font-extrabold tracking-tight text-monsoon-900">
+            LOCAL<span className="text-monsoon-600">AY</span>
           </span>
         </NavLink>
 
@@ -93,7 +91,7 @@ function SiteHeader() {
           {isModerator && (
             <li>
               <NavLink to="/moderation" className={navLinkClass}>
-                <span className="rounded-md bg-purple-100 px-2 py-0.5 text-xs font-bold text-purple-800">
+                <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-[11px] font-bold text-purple-900 border border-purple-200">
                   Moderation
                 </span>
               </NavLink>
@@ -107,7 +105,7 @@ function SiteHeader() {
 
           {/* User Auth Pill */}
           {user ? (
-            <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-monsoon-200">
+            <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-monsoon-200/70">
               <span className="text-xs font-semibold text-monsoon-900 max-w-[100px] truncate">
                 {user.displayName || user.email?.split("@")[0]}
               </span>
@@ -115,7 +113,7 @@ function SiteHeader() {
                 type="button"
                 onClick={signOut}
                 title="Sign out"
-                className="text-xs font-medium text-monsoon-800/70 hover:text-rose-600 underline"
+                className="text-xs font-medium text-monsoon-800/70 hover:text-rose-600 transition-colors"
               >
                 Sign out
               </button>
@@ -124,7 +122,7 @@ function SiteHeader() {
             <button
               type="button"
               onClick={() => setAuthModalOpen(true)}
-              className="hidden sm:inline-flex items-center rounded-xl bg-monsoon-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-monsoon-800 transition-colors"
+              className="hidden sm:inline-flex items-center rounded-full bg-monsoon-900 px-4 py-1.5 text-xs font-semibold text-white hover:bg-monsoon-800 transition-all shadow-xs active:scale-95"
             >
               Sign In
             </button>
@@ -138,7 +136,7 @@ function SiteHeader() {
             aria-controls="mobile-menu"
             onClick={() => setMenuOpen((o) => !o)}
             className={[
-              "sm:hidden rounded-lg p-2 transition-colors duration-150",
+              "sm:hidden rounded-xl p-2 transition-colors duration-150",
               "text-monsoon-800 hover:bg-monsoon-100",
               "focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600",
             ].join(" ")}
@@ -185,16 +183,16 @@ function SiteHeader() {
       {menuOpen && (
         <div
           id="mobile-menu"
-          className="sm:hidden border-t border-monsoon-100 bg-monsoon-50 px-4 pb-4 pt-2"
+          className="sm:hidden border-t border-monsoon-200/60 bg-white px-4 pb-5 pt-3 animate-fade-in"
         >
-          <ul className="flex flex-col gap-1" role="list">
+          <ul className="flex flex-col gap-1.5" role="list">
             <li>
               <NavLink
                 to="/"
                 end
                 className={({ isActive }) =>
-                  `block rounded-lg px-3 py-2.5 text-sm font-medium ${
-                    isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
+                  `block rounded-xl px-3.5 py-2.5 text-sm font-medium ${
+                    isActive ? "bg-monsoon-900 text-white font-semibold" : "text-monsoon-800 hover:bg-monsoon-100"
                   }`
                 }
                 onClick={() => setMenuOpen(false)}
@@ -206,8 +204,8 @@ function SiteHeader() {
               <NavLink
                 to="/discover"
                 className={({ isActive }) =>
-                  `block rounded-lg px-3 py-2.5 text-sm font-medium ${
-                    isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
+                  `block rounded-xl px-3.5 py-2.5 text-sm font-medium ${
+                    isActive ? "bg-monsoon-900 text-white font-semibold" : "text-monsoon-800 hover:bg-monsoon-100"
                   }`
                 }
                 onClick={() => setMenuOpen(false)}
@@ -219,8 +217,8 @@ function SiteHeader() {
               <NavLink
                 to="/autofare"
                 className={({ isActive }) =>
-                  `block rounded-lg px-3 py-2.5 text-sm font-medium ${
-                    isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
+                  `block rounded-xl px-3.5 py-2.5 text-sm font-medium ${
+                    isActive ? "bg-monsoon-900 text-white font-semibold" : "text-monsoon-800 hover:bg-monsoon-100"
                   }`
                 }
                 onClick={() => setMenuOpen(false)}
@@ -232,8 +230,8 @@ function SiteHeader() {
               <NavLink
                 to="/contribute"
                 className={({ isActive }) =>
-                  `block rounded-lg px-3 py-2.5 text-sm font-medium ${
-                    isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
+                  `block rounded-xl px-3.5 py-2.5 text-sm font-medium ${
+                    isActive ? "bg-monsoon-900 text-white font-semibold" : "text-monsoon-800 hover:bg-monsoon-100"
                   }`
                 }
                 onClick={() => setMenuOpen(false)}
@@ -246,8 +244,8 @@ function SiteHeader() {
                 <NavLink
                   to="/my-contributions"
                   className={({ isActive }) =>
-                    `block rounded-lg px-3 py-2.5 text-sm font-medium ${
-                      isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
+                    `block rounded-xl px-3.5 py-2.5 text-sm font-medium ${
+                      isActive ? "bg-monsoon-900 text-white font-semibold" : "text-monsoon-800 hover:bg-monsoon-100"
                     }`
                   }
                   onClick={() => setMenuOpen(false)}
@@ -261,8 +259,8 @@ function SiteHeader() {
                 <NavLink
                   to="/moderation"
                   className={({ isActive }) =>
-                    `block rounded-lg px-3 py-2.5 text-sm font-medium ${
-                      isActive ? "bg-monsoon-100 text-monsoon-900 font-bold" : "text-monsoon-800 hover:bg-monsoon-100"
+                    `block rounded-xl px-3.5 py-2.5 text-sm font-medium ${
+                      isActive ? "bg-monsoon-900 text-white font-semibold" : "text-monsoon-800 hover:bg-monsoon-100"
                     }`
                   }
                   onClick={() => setMenuOpen(false)}
@@ -279,7 +277,7 @@ function SiteHeader() {
                     signOut();
                     setMenuOpen(false);
                   }}
-                  className="w-full text-left rounded-lg px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50"
+                  className="w-full text-left rounded-xl px-3.5 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50"
                 >
                   Sign Out ({user.displayName || user.email})
                 </button>
@@ -290,7 +288,7 @@ function SiteHeader() {
                     setAuthModalOpen(true);
                     setMenuOpen(false);
                   }}
-                  className="w-full text-left rounded-lg px-3 py-2 text-sm font-semibold text-monsoon-900 hover:bg-monsoon-100"
+                  className="w-full text-left rounded-xl px-3.5 py-2 text-sm font-semibold text-monsoon-900 hover:bg-monsoon-100"
                 >
                   Sign In / Register
                 </button>
@@ -309,22 +307,22 @@ function SiteHeader() {
 function SiteFooter() {
   const { region } = useLocation();
   return (
-    <footer className="border-t border-monsoon-100 bg-monsoon-50">
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+    <footer className="border-t border-monsoon-200/60 bg-white">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
           <div>
-            <span className="font-display text-lg font-bold text-monsoon-900">
+            <span className="font-display text-lg font-extrabold tracking-tight text-monsoon-900">
               LOCAL<span className="text-monsoon-600">AY</span>
             </span>
-            <p className="mt-1 text-xs text-monsoon-800/70 max-w-xs leading-relaxed">
+            <p className="mt-1 text-xs text-monsoon-800/70 max-w-sm leading-relaxed">
               A community-powered guide built by and for the people who actually
               live there. Currently active in{" "}
-              <strong>{region.label}</strong>.
+              <strong className="text-monsoon-900">{region.label}</strong>.
             </p>
           </div>
 
-          <p className="text-xs text-monsoon-800/50">
-            &copy; {new Date().getFullYear()} LOCALAY
+          <p className="text-xs font-medium text-monsoon-800/40">
+            &copy; {new Date().getFullYear()} LOCALAY • Minimal Discovery
           </p>
         </div>
       </div>
@@ -338,7 +336,7 @@ function SiteFooter() {
  */
 export default function MainLayout() {
   return (
-    <div className="flex min-h-screen flex-col bg-monsoon-50 text-monsoon-900">
+    <div className="flex min-h-screen flex-col bg-monsoon-50 text-monsoon-900 font-sans">
       <SiteHeader />
       <main id="main-content" className="flex-1" tabIndex={-1}>
         <Outlet />

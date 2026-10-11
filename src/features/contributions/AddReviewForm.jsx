@@ -93,7 +93,7 @@ export default function AddReviewForm({ placeId, placeName, onReviewAdded }) {
 
       {!user && (
         <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800 flex justify-between items-center">
-          <span>🔒 Please sign in to write a review.</span>
+          <span>Please sign in to write a review.</span>
           <button
             type="button"
             onClick={() => setAuthModalOpen(true)}
@@ -116,16 +116,24 @@ export default function AddReviewForm({ placeId, placeName, onReviewAdded }) {
           <label className="block text-xs font-semibold text-monsoon-800 mb-1">
             Rating
           </label>
-          <div className="flex gap-1">
+          <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 type="button"
                 onClick={() => setRating(star)}
-                className="text-xl focus:outline-none transition-transform hover:scale-110"
+                className="p-1 focus:outline-none transition-transform hover:scale-110 text-turmeric-500"
                 aria-label={`Rate ${star} out of 5 stars`}
               >
-                {star <= rating ? "⭐" : "☆"}
+                <svg
+                  className="w-5 h-5"
+                  fill={star <= rating ? "currentColor" : "none"}
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  viewBox="0 0 24 24"
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
               </button>
             ))}
             <span className="ml-2 text-xs font-medium text-monsoon-800 self-center">

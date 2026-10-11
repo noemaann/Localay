@@ -35,7 +35,7 @@ export default function ContributePage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       <div className="mb-8 text-center sm:text-left">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-monsoon-900 sm:text-4xl">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-monsoon-900 sm:text-5xl">
           Community Contributions
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-monsoon-800/80 max-w-xl">
@@ -44,23 +44,23 @@ export default function ContributePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-monsoon-200 pb-3 mb-6">
+      <div className="flex flex-wrap gap-2 border-b border-monsoon-200/70 pb-3 mb-6">
         {[
-          { id: "new_place", label: "📍 Propose New Place", icon: "✨" },
-          { id: "review", label: "💬 Write Review", icon: "⭐" },
-          { id: "dish_price", label: "🍛 Dish Price", icon: "₹" },
-          { id: "access", label: "🛣️ Road & Access Update", icon: "🌿" },
-          { id: "correction", label: "✏️ Suggest Correction", icon: "🛠️" },
+          { id: "new_place", label: "Propose New Place" },
+          { id: "review", label: "Write Review" },
+          { id: "dish_price", label: "Dish Price" },
+          { id: "access", label: "Road & Access Update" },
+          { id: "correction", label: "Suggest Correction" },
         ].map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
             className={[
-              "rounded-xl px-4 py-2 text-xs font-semibold transition-all duration-150",
+              "rounded-xl px-4 py-2 text-xs font-semibold tracking-wide transition-all duration-150",
               activeTab === tab.id
-                ? "bg-monsoon-900 text-white shadow-sm"
-                : "bg-white border border-monsoon-200 text-monsoon-800 hover:bg-monsoon-100",
+                ? "bg-monsoon-900 text-white shadow-xs border border-monsoon-900"
+                : "bg-white border border-monsoon-200 text-monsoon-800 hover:border-monsoon-900 hover:text-monsoon-900",
             ].join(" ")}
           >
             {tab.label}
