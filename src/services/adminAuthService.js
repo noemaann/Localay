@@ -1,14 +1,26 @@
 /**
  * Admin Authentication & Credentials Service
  * Supports Super Admin (superadmin / Admin@123) and administrator account provisioning.
+ * Fully synchronized with Firebase Firestore cloud database (`adminAccounts` collection)
+ * and locally cached for instant performance and offline resiliency.
  */
 
+import { db, isDemoMode } from "./config.js";
 import { adminAuditService } from "./adminAuditService.js";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 
 const ACCOUNTS_STORAGE_KEY = "localay_admin_accounts";
 const SESSION_STORAGE_KEY = "localay_active_admin_session";
 
-// Root Super Admin seeded account
+// Root Super Admin default account
 const DEFAULT_SUPER_ADMIN = {
   username: "superadmin",
   password: "Admin@123",
@@ -19,20 +31,19 @@ const DEFAULT_SUPER_ADMIN = {
   lastLogin: null,
 };
 
-function loadAdminAccounts() {
+function loadCachedAdminAccounts() {
   try {
     if (typeof window !== "undefined" && window.localStorage) {
       const stored = localStorage.getItem(ACCOUNTS_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Ensure root superadmin is always present and active
           const hasSuper = parsed.find(
             (a) => a.username.toLowerCase() === "superadmin"
           );
           if (!hasSuper) {
             parsed.unshift(DEFAULT_SUPER_ADMIN);
-            saveAdminAccounts(parsed);
+            saveCachedAdminAccounts(parsed);
           }
           return parsed;
         }
@@ -42,7 +53,7 @@ function loadAdminAccounts() {
   return [DEFAULT_SUPER_ADMIN];
 }
 
-function saveAdminAccounts(accounts) {
+function saveCachedAdminAccounts(accounts) {
   try {
     if (typeof window !== "undefined" && window.localStorage) {
       localStorage.setItem(ACCOUNTS_STORAGE_KEY, JSON.stringify(accounts));
@@ -75,8 +86,7 @@ function saveActiveSession(session) {
 export const adminAuthService = {
   /**
    * Attempt admin login
-   * @param {string} username
-   * @param {string} password
+   * Reads from Firestore server when available, falling back to cached registry.
    */
   async login(username, password) {
     if (!username || !password) {
@@ -84,12 +94,35 @@ export const adminAuthService = {
     }
 
     const cleanUsername = username.trim().toLowerCase();
-    const accounts = loadAdminAccounts();
-    const match = accounts.find(
-      (a) => a.username.toLowerCase() === cleanUsername
-    );
+    let account = null;
 
-    if (!match) {
+    // 1. Check Cloud Firestore Server
+    if (db && !isDemoMode) {
+      try {
+        const adminDocRef = doc(db, "adminAccounts", cleanUsername);
+        const docSnap = await getDoc(adminDocRef);
+
+        if (docSnap.exists()) {
+          account = docSnap.data();
+        } else if (cleanUsername === "superadmin") {
+          // Auto-seed root superadmin into Firestore if not yet present
+          account = { ...DEFAULT_SUPER_ADMIN };
+          await setDoc(adminDocRef, account);
+        }
+      } catch (err) {
+        console.warn("Could not query Firestore for admin login, checking local cache:", err);
+      }
+    }
+
+    // 2. Fallback to local cache if server is offline or in demo mode
+    if (!account) {
+      const localAccounts = loadCachedAdminAccounts();
+      account = localAccounts.find(
+        (a) => a.username.toLowerCase() === cleanUsername
+      );
+    }
+
+    if (!account) {
       adminAuditService.logAction({
         action: "Failed Admin Login Attempt",
         category: "AUTH",
@@ -99,7 +132,7 @@ export const adminAuthService = {
       throw new Error("Invalid Admin ID or Password.");
     }
 
-    if (match.status !== "active") {
+    if (account.status !== "active") {
       adminAuditService.logAction({
         action: "Suspended Admin Login Attempt",
         category: "AUTH",
@@ -109,7 +142,7 @@ export const adminAuthService = {
       throw new Error("This admin account has been deactivated. Please contact the Super Admin.");
     }
 
-    if (match.password !== password) {
+    if (account.password !== password) {
       adminAuditService.logAction({
         action: "Failed Admin Login Attempt",
         category: "AUTH",
@@ -119,15 +152,27 @@ export const adminAuthService = {
       throw new Error("Invalid Admin ID or Password.");
     }
 
-    // Update lastLogin
-    match.lastLogin = new Date().toISOString();
-    saveAdminAccounts(accounts);
+    // Update lastLogin locally and on Cloud Server
+    account.lastLogin = new Date().toISOString();
+    const localAccounts = loadCachedAdminAccounts();
+    const idx = localAccounts.findIndex((a) => a.username.toLowerCase() === cleanUsername);
+    if (idx >= 0) localAccounts[idx] = account;
+    else localAccounts.push(account);
+    saveCachedAdminAccounts(localAccounts);
+
+    if (db && !isDemoMode) {
+      try {
+        await updateDoc(doc(db, "adminAccounts", cleanUsername), {
+          lastLogin: account.lastLogin,
+        });
+      } catch (_) {}
+    }
 
     const sessionUser = {
-      username: match.username,
-      name: match.name,
-      role: match.role,
-      status: match.status,
+      username: account.username,
+      name: account.name,
+      role: account.role,
+      status: account.status,
       loginTimestamp: new Date().toISOString(),
     };
 
@@ -136,8 +181,8 @@ export const adminAuthService = {
     adminAuditService.logAction({
       action: "Admin Logged In",
       category: "AUTH",
-      performedBy: match.username,
-      details: `Successful session started for role: ${match.role}`,
+      performedBy: account.username,
+      details: `Successful session started for role: ${account.role}`,
     });
 
     return sessionUser;
@@ -167,21 +212,48 @@ export const adminAuthService = {
   },
 
   /**
-   * Get all registered admin accounts (excluding sensitive passwords in output if needed, but included for super admin management)
+   * Get all registered admin accounts from Cloud Firestore & local cache
    */
-  getAllAdmins() {
-    return loadAdminAccounts();
+  async getAllAdmins() {
+    let accounts = loadCachedAdminAccounts();
+
+    if (db && !isDemoMode) {
+      try {
+        const querySnapshot = await getDocs(collection(db, "adminAccounts"));
+        if (!querySnapshot.empty) {
+          const serverAccounts = [];
+          querySnapshot.forEach((docSnap) => {
+            serverAccounts.push(docSnap.data());
+          });
+
+          // Ensure superadmin is in the list
+          if (!serverAccounts.some((a) => a.username.toLowerCase() === "superadmin")) {
+            serverAccounts.unshift(DEFAULT_SUPER_ADMIN);
+            // Save superadmin to Firestore
+            setDoc(doc(db, "adminAccounts", "superadmin"), DEFAULT_SUPER_ADMIN).catch(() => {});
+          }
+
+          saveCachedAdminAccounts(serverAccounts);
+          return serverAccounts;
+        } else {
+          // If Firestore collection is empty, upload default superadmin and cached accounts
+          for (const acc of accounts) {
+            setDoc(doc(db, "adminAccounts", acc.username.toLowerCase()), acc).catch(() => {});
+          }
+        }
+      } catch (err) {
+        console.warn("Error fetching admins from Firestore, using cached list:", err);
+      }
+    }
+
+    return accounts;
   },
 
   /**
    * Super Admin operation: Add a new Admin account
-   * @param {Object} adminData
-   * @param {string} adminData.username
-   * @param {string} adminData.password
-   * @param {string} adminData.name
-   * @param {string} adminData.role
+   * Saves to Cloud Firestore server and updates local cache.
    */
-  addAdmin({ username, password, name, role = "admin" }) {
+  async addAdmin({ username, password, name, role = "admin" }) {
     const current = loadActiveSession();
     if (!current || current.role !== "super_admin") {
       throw new Error("Unauthorized: Only the Super Admin can create new admin accounts.");
@@ -195,7 +267,7 @@ export const adminAuthService = {
     }
 
     const cleanUsername = username.trim().toLowerCase();
-    const accounts = loadAdminAccounts();
+    const accounts = loadCachedAdminAccounts();
 
     if (accounts.some((a) => a.username.toLowerCase() === cleanUsername)) {
       throw new Error(`An admin account with ID "${cleanUsername}" already exists.`);
@@ -212,14 +284,30 @@ export const adminAuthService = {
       lastLogin: null,
     };
 
+    // 1. Update local cache immediately
     accounts.push(newAdmin);
-    saveAdminAccounts(accounts);
+    saveCachedAdminAccounts(accounts);
+
+    // 2. Upload to Cloud Firestore Server
+    if (db && !isDemoMode) {
+      try {
+        await setDoc(doc(db, "adminAccounts", cleanUsername), newAdmin);
+        // Also ensure superadmin document exists on server
+        const superDoc = await getDoc(doc(db, "adminAccounts", "superadmin"));
+        if (!superDoc.exists()) {
+          await setDoc(doc(db, "adminAccounts", "superadmin"), DEFAULT_SUPER_ADMIN);
+        }
+      } catch (err) {
+        console.error("Failed to sync new admin to Cloud Firestore server:", err);
+        throw new Error(`Saved locally, but server sync failed: ${err.message}`);
+      }
+    }
 
     adminAuditService.logAction({
       action: "New Admin Account Created",
       category: "ADMIN_MGMT",
       performedBy: current.username,
-      details: `Created admin ID "${cleanUsername}" (${newAdmin.name}) with role "${newAdmin.role}"`,
+      details: `Created admin ID "${cleanUsername}" (${newAdmin.name}) synced with server.`,
     });
 
     return newAdmin;
@@ -228,7 +316,7 @@ export const adminAuthService = {
   /**
    * Super Admin operation: Change password for an admin account
    */
-  updateAdminPassword(targetUsername, newPassword) {
+  async updateAdminPassword(targetUsername, newPassword) {
     const current = loadActiveSession();
     if (!current) throw new Error("Authentication required.");
 
@@ -241,14 +329,25 @@ export const adminAuthService = {
       throw new Error("New password must be at least 6 characters long.");
     }
 
-    const accounts = loadAdminAccounts();
-    const target = accounts.find((a) => a.username.toLowerCase() === targetUsername.toLowerCase());
-    if (!target) {
-      throw new Error("Admin account not found.");
-    }
+    const cleanUsername = targetUsername.toLowerCase();
+    const accounts = loadCachedAdminAccounts();
+    const target = accounts.find((a) => a.username.toLowerCase() === cleanUsername);
+    if (!target) throw new Error("Admin account not found.");
 
     target.password = newPassword.trim();
-    saveAdminAccounts(accounts);
+    saveCachedAdminAccounts(accounts);
+
+    // Update on Cloud Firestore server
+    if (db && !isDemoMode) {
+      try {
+        await updateDoc(doc(db, "adminAccounts", cleanUsername), {
+          password: newPassword.trim(),
+          updatedAt: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.error("Failed to update password on server:", err);
+      }
+    }
 
     adminAuditService.logAction({
       action: "Admin Password Updated",
@@ -263,7 +362,7 @@ export const adminAuthService = {
   /**
    * Super Admin operation: Toggle status (active/suspended)
    */
-  toggleAdminStatus(targetUsername) {
+  async toggleAdminStatus(targetUsername) {
     const current = loadActiveSession();
     if (!current || current.role !== "super_admin") {
       throw new Error("Unauthorized: Only the Super Admin can change admin account status.");
@@ -273,12 +372,25 @@ export const adminAuthService = {
       throw new Error("Cannot deactivate the primary Super Admin account.");
     }
 
-    const accounts = loadAdminAccounts();
-    const target = accounts.find((a) => a.username.toLowerCase() === targetUsername.toLowerCase());
+    const cleanUsername = targetUsername.toLowerCase();
+    const accounts = loadCachedAdminAccounts();
+    const target = accounts.find((a) => a.username.toLowerCase() === cleanUsername);
     if (!target) throw new Error("Admin account not found.");
 
     target.status = target.status === "active" ? "deactivated" : "active";
-    saveAdminAccounts(accounts);
+    saveCachedAdminAccounts(accounts);
+
+    // Update on Cloud Firestore server
+    if (db && !isDemoMode) {
+      try {
+        await updateDoc(doc(db, "adminAccounts", cleanUsername), {
+          status: target.status,
+          updatedAt: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.error("Failed to update admin status on server:", err);
+      }
+    }
 
     adminAuditService.logAction({
       action: `Admin Account ${target.status === "active" ? "Reactivated" : "Deactivated"}`,
@@ -293,7 +405,7 @@ export const adminAuthService = {
   /**
    * Super Admin operation: Delete an admin account
    */
-  deleteAdmin(targetUsername) {
+  async deleteAdmin(targetUsername) {
     const current = loadActiveSession();
     if (!current || current.role !== "super_admin") {
       throw new Error("Unauthorized: Only the Super Admin can delete admin accounts.");
@@ -303,21 +415,31 @@ export const adminAuthService = {
       throw new Error("Cannot delete the root Super Admin account.");
     }
 
-    let accounts = loadAdminAccounts();
+    const cleanUsername = targetUsername.toLowerCase();
+    let accounts = loadCachedAdminAccounts();
     const initialLen = accounts.length;
-    accounts = accounts.filter((a) => a.username.toLowerCase() !== targetUsername.toLowerCase());
+    accounts = accounts.filter((a) => a.username.toLowerCase() !== cleanUsername);
 
     if (accounts.length === initialLen) {
       throw new Error("Admin account not found.");
     }
 
-    saveAdminAccounts(accounts);
+    saveCachedAdminAccounts(accounts);
+
+    // Delete from Cloud Firestore server
+    if (db && !isDemoMode) {
+      try {
+        await deleteDoc(doc(db, "adminAccounts", cleanUsername));
+      } catch (err) {
+        console.error("Failed to delete admin from server:", err);
+      }
+    }
 
     adminAuditService.logAction({
       action: "Admin Account Deleted",
       category: "ADMIN_MGMT",
       performedBy: current.username,
-      details: `Removed admin ID "${targetUsername}" from registry.`,
+      details: `Removed admin ID "${targetUsername}" from server and registry.`,
     });
 
     return true;

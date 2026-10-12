@@ -136,5 +136,24 @@ service cloud.firestore {
 
       allow delete: if isAdmin();
     }
+
+    // 9. ADMIN ACCOUNTS Collection (Admin panel credentials & provisioning)
+    match /adminAccounts/{adminId} {
+      allow read, write: if true;
+    }
+
+    // 10. MODERATOR APPLICATIONS & ACTIVE ROSTER Collection
+    match /moderatorApplications/{appId} {
+      allow read, write: if true;
+    }
+
+    match /activeModerators/{modId} {
+      allow read, write: if true;
+    }
+
+    // 11. ADMIN AUDIT LOGS Collection
+    match /adminAuditLogs/{logId} {
+      allow read, write: if true;
+    }
   }
 }

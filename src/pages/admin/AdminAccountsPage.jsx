@@ -13,14 +13,20 @@ export default function AdminAccountsPage({ currentAdmin }) {
   const [selectedAdminForPassword, setSelectedAdminForPassword] = useState(null);
   const [changedPassword, setChangedPassword] = useState("");
 
+  const [submitting, setSubmitting] = useState(false);
+  const [loadingList, setLoadingList] = useState(false);
+
   const isSuperAdmin = currentAdmin?.role === "super_admin";
 
-  function refreshAdmins() {
+  async function refreshAdmins() {
+    setLoadingList(true);
     try {
-      const list = adminAuthService.getAllAdmins();
+      const list = await adminAuthService.getAllAdmins();
       setAdmins(list);
     } catch (err) {
       console.error("Error loading admins:", err);
+    } finally {
+      setLoadingList(false);
     }
   }
 
@@ -28,70 +34,76 @@ export default function AdminAccountsPage({ currentAdmin }) {
     refreshAdmins();
   }, []);
 
-  function handleCreateAdmin(e) {
+  async function handleCreateAdmin(e) {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setSubmitting(true);
 
     try {
-      adminAuthService.addAdmin({
+      await adminAuthService.addAdmin({
         username: newUsername,
         password: newPassword,
         name: newName,
         role: newRole,
       });
 
-      setSuccess(`Admin account "${newUsername}" created successfully!`);
+      setSuccess(`Admin account "${newUsername}" created and synchronized with cloud database!`);
       setNewUsername("");
       setNewPassword("");
       setNewName("");
       setNewRole("admin");
       setShowAddModal(false);
-      refreshAdmins();
+      await refreshAdmins();
     } catch (err) {
       setError(err.message || "Failed to create admin account.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  function handleToggleStatus(username) {
+  async function handleToggleStatus(username) {
     setError("");
     setSuccess("");
     try {
-      const updated = adminAuthService.toggleAdminStatus(username);
-      setSuccess(`Admin "${username}" is now ${updated.status}.`);
-      refreshAdmins();
+      const updated = await adminAuthService.toggleAdminStatus(username);
+      setSuccess(`Admin "${username}" is now ${updated.status} on server.`);
+      await refreshAdmins();
     } catch (err) {
       setError(err.message);
     }
   }
 
-  function handleDelete(username) {
+  async function handleDelete(username) {
     if (!window.confirm(`Are you sure you want to delete admin "${username}"? This action cannot be undone.`)) {
       return;
     }
     setError("");
     setSuccess("");
     try {
-      adminAuthService.deleteAdmin(username);
-      setSuccess(`Admin "${username}" has been removed.`);
-      refreshAdmins();
+      await adminAuthService.deleteAdmin(username);
+      setSuccess(`Admin "${username}" has been removed from server.`);
+      await refreshAdmins();
     } catch (err) {
       setError(err.message);
     }
   }
 
-  function handleUpdatePassword(e) {
+  async function handleUpdatePassword(e) {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setSubmitting(true);
     try {
-      adminAuthService.updateAdminPassword(selectedAdminForPassword.username, changedPassword);
-      setSuccess(`Password updated for admin "${selectedAdminForPassword.username}".`);
+      await adminAuthService.updateAdminPassword(selectedAdminForPassword.username, changedPassword);
+      setSuccess(`Password updated on server for admin "${selectedAdminForPassword.username}".`);
       setSelectedAdminForPassword(null);
       setChangedPassword("");
-      refreshAdmins();
+      await refreshAdmins();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setSubmitting(false);
     }
   }
 

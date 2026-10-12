@@ -24,12 +24,6 @@ export default function AdminLoginPage({ onLoginSuccess }) {
     }
   }
 
-  function handleQuickFillSuperAdmin() {
-    setUsername("superadmin");
-    setPassword("Admin@123");
-    setError("");
-  }
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
       {/* Background ambient lighting */}
@@ -119,29 +113,6 @@ export default function AdminLoginPage({ onLoginSuccess }) {
               )}
             </button>
           </form>
-
-          {/* Quick Super Admin shortcut pill */}
-          <div className="mt-6 pt-5 border-t border-slate-800">
-            <div className="rounded-2xl bg-emerald-950/40 border border-emerald-500/20 p-3.5">
-              <div className="flex items-center justify-between text-xs mb-2">
-                <span className="font-semibold text-emerald-400 flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Configured Super Admin:
-                </span>
-                <button
-                  type="button"
-                  onClick={handleQuickFillSuperAdmin}
-                  className="font-bold text-emerald-300 hover:text-white underline underline-offset-2 transition-colors"
-                >
-                  Auto Fill
-                </button>
-              </div>
-              <div className="text-[11px] font-mono text-slate-300 space-y-0.5">
-                <div>ID: <span className="text-white font-bold">superadmin</span></div>
-                <div>Pass: <span className="text-white font-bold">Admin@123</span></div>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Footer links */}

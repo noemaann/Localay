@@ -87,12 +87,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
           </button>
         </div>
 
-        {isDemo && (
-          <div className="my-3 rounded-lg bg-turmeric-400/15 border border-turmeric-400/30 p-2.5 text-xs text-monsoon-900">
-            <strong>Demo Mode:</strong> Clicking any button instantly logs you in with a demo contributor profile.
-          </div>
-        )}
-
         {error && (
           <div className="my-3 rounded-lg bg-rose-50 border border-rose-200 p-2.5 text-xs font-medium text-rose-700">
             {error}

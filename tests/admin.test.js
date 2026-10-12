@@ -25,7 +25,7 @@ describe("Admin Subsystem & Credentials Provisioning", () => {
     // Login as superadmin first
     await adminAuthService.login("superadmin", "Admin@123");
 
-    const newAdmin = adminAuthService.addAdmin({
+    const newAdmin = await adminAuthService.addAdmin({
       username: "malappuram_lead",
       password: "SecretPassword123",
       name: "Rahul C.",
@@ -44,7 +44,7 @@ describe("Admin Subsystem & Credentials Provisioning", () => {
   it("prevents non-superadmin from adding admin accounts", async () => {
     // Login as superadmin, create normal admin
     await adminAuthService.login("superadmin", "Admin@123");
-    adminAuthService.addAdmin({
+    await adminAuthService.addAdmin({
       username: "staff_moderator",
       password: "StaffPassword123",
       name: "Staff",
@@ -55,24 +55,24 @@ describe("Admin Subsystem & Credentials Provisioning", () => {
     await adminAuthService.login("staff_moderator", "StaffPassword123");
 
     // Attempt to create another admin should fail
-    expect(() =>
+    await expect(
       adminAuthService.addAdmin({
         username: "hacker_admin",
         password: "Secret123",
         name: "Hacker",
       })
-    ).toThrow(/Unauthorized/);
+    ).rejects.toThrow(/Unauthorized/);
   });
 
   it("super admin can deactivate and reactivate an admin account", async () => {
     await adminAuthService.login("superadmin", "Admin@123");
-    adminAuthService.addAdmin({
+    await adminAuthService.addAdmin({
       username: "temp_admin",
       password: "TempPassword123",
       name: "Temp",
     });
 
-    const deactivated = adminAuthService.toggleAdminStatus("temp_admin");
+    const deactivated = await adminAuthService.toggleAdminStatus("temp_admin");
     expect(deactivated.status).toBe("deactivated");
 
     // Login should fail for deactivated admin

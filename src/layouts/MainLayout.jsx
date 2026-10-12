@@ -103,13 +103,6 @@ function SiteHeader() {
               </NavLink>
             </li>
           )}
-          <li>
-            <NavLink to="/admin" className={navLinkClass}>
-              <span className="rounded-full bg-slate-900 px-2.5 py-0.5 text-[11px] font-bold text-emerald-400 border border-slate-700 shadow-xs hover:bg-slate-800 transition-colors">
-                Admin
-              </span>
-            </NavLink>
-          </li>
         </ul>
 
         {/* Right side: location + Auth + mobile toggle */}
@@ -282,22 +275,6 @@ function SiteHeader() {
                 </NavLink>
               </li>
             )}
-            <li>
-              <NavLink
-                to="/admin"
-                className={({ isActive }) =>
-                  `flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold ${
-                    isActive ? "bg-slate-900 text-emerald-400" : "text-slate-800 hover:bg-monsoon-100"
-                  }`
-                }
-                onClick={() => setMenuOpen(false)}
-              >
-                <span>Admin Panel</span>
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-800">
-                  Control
-                </span>
-              </NavLink>
-            </li>
             <li className="pt-2 border-t border-monsoon-200">
               {user ? (
                 <button
@@ -358,13 +335,9 @@ function SiteFooter() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-medium text-monsoon-800/60">
-            <NavLink to="/admin" className="font-semibold text-monsoon-800 hover:text-monsoon-950 hover:underline">
-              Admin Portal
-            </NavLink>
-            <span>•</span>
-            <span>&copy; {new Date().getFullYear()} LOCALAY • Minimal Discovery</span>
-          </div>
+          <p className="text-xs font-medium text-monsoon-800/40">
+            &copy; {new Date().getFullYear()} LOCALAY • Minimal Discovery
+          </p>
         </div>
       </div>
     </footer>
