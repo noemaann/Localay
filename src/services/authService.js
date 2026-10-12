@@ -97,7 +97,7 @@ export function onAuthStateChanged(callback) {
  * @returns {Promise<Object>}
  */
 export async function signInWithGoogle() {
-  if (isDemoMode || !auth) {
+  if (import.meta.env?.MODE === "test" && !auth) {
     demoCurrentUser = {
       uid: "user_demo_google",
       displayName: "Google Demo User",
@@ -106,13 +106,12 @@ export async function signInWithGoogle() {
       role: "community_member",
       isDemo: true,
     };
-    try {
-      if (typeof window !== "undefined" && window.localStorage) {
-        localStorage.setItem("localay_user_session", JSON.stringify(demoCurrentUser));
-      }
-    } catch (_) {}
     notifyDemoListeners();
     return Promise.resolve(demoCurrentUser);
+  }
+
+  if (!auth) {
+    throw new Error("Firebase Authentication is not available. Please verify your connection or try again.");
   }
 
   try {
@@ -141,7 +140,7 @@ export async function signInWithGoogle() {
  * @returns {Promise<Object>}
  */
 export async function signInWithEmail(email, password) {
-  if (isDemoMode || !auth) {
+  if (import.meta.env?.MODE === "test" && !auth) {
     demoCurrentUser = {
       uid: `user_demo_${Date.now()}`,
       displayName: email.split("@")[0] || "Community Member",
@@ -150,13 +149,12 @@ export async function signInWithEmail(email, password) {
       role: "community_member",
       isDemo: true,
     };
-    try {
-      if (typeof window !== "undefined" && window.localStorage) {
-        localStorage.setItem("localay_user_session", JSON.stringify(demoCurrentUser));
-      }
-    } catch (_) {}
     notifyDemoListeners();
     return Promise.resolve(demoCurrentUser);
+  }
+
+  if (!auth) {
+    throw new Error("Firebase Authentication is not available. Please verify your connection.");
   }
 
   try {
@@ -183,7 +181,7 @@ export async function signInWithEmail(email, password) {
  * @returns {Promise<Object>}
  */
 export async function signUpWithEmail(email, password, displayName = "") {
-  if (isDemoMode || !auth) {
+  if (import.meta.env?.MODE === "test" && !auth) {
     demoCurrentUser = {
       uid: `user_demo_${Date.now()}`,
       displayName: displayName || email.split("@")[0],
@@ -192,13 +190,12 @@ export async function signUpWithEmail(email, password, displayName = "") {
       role: "community_member",
       isDemo: true,
     };
-    try {
-      if (typeof window !== "undefined" && window.localStorage) {
-        localStorage.setItem("localay_user_session", JSON.stringify(demoCurrentUser));
-      }
-    } catch (_) {}
     notifyDemoListeners();
     return Promise.resolve(demoCurrentUser);
+  }
+
+  if (!auth) {
+    throw new Error("Firebase Authentication is not available. Please verify your connection.");
   }
 
   try {
@@ -209,7 +206,7 @@ export async function signUpWithEmail(email, password, displayName = "") {
       uid: user.uid,
       displayName: displayName || user.email?.split("@")[0],
       email: user.email,
-      photoURL: "",
+      photoURL: user.photoURL || "",
       isDemo: false,
     };
   } catch (error) {
