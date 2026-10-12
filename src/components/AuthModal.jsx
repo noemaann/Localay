@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import Button from "./Button.jsx";
 
@@ -57,10 +58,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
     }
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
-        className="w-full max-w-md rounded-2xl border border-monsoon-100 bg-white p-6 shadow-xl"
+        className="relative my-auto w-full max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-monsoon-100 bg-white p-6 shadow-xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="auth-modal-title"
@@ -192,4 +198,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
       </div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 }

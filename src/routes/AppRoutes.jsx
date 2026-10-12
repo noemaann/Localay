@@ -7,10 +7,30 @@ import MyContributionsPage from "../pages/MyContributionsPage.jsx";
 import ModerationPage from "../pages/ModerationPage.jsx";
 import PlaceDetailPage from "../pages/PlaceDetailPage.jsx";
 import AutoFarePage from "../pages/AutoFarePage.jsx";
+import AdminPortal from "../pages/admin/AdminPortal.jsx";
 
 export default function AppRoutes() {
+  const isHostAdmin =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "admin.localay" ||
+      window.location.hostname.startsWith("admin."));
+
+  // If accessed directly through admin.localay subdomain, render AdminPortal
+  if (isHostAdmin) {
+    return (
+      <Routes>
+        <Route path="*" element={<AdminPortal />} />
+      </Routes>
+    );
+  }
+
   return (
     <Routes>
+      {/* Dedicated Admin Portal Routes */}
+      <Route path="admin" element={<AdminPortal />} />
+      <Route path="admin/*" element={<AdminPortal />} />
+
+      {/* Main Consumer App Routes */}
       <Route element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path="discover" element={<DiscoverPage />} />
