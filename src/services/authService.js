@@ -18,14 +18,17 @@ import {
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
-let demoCurrentUser = {
-  uid: MOCK_USERS[0].id,
-  displayName: MOCK_USERS[0].displayName,
-  email: MOCK_USERS[0].email,
-  photoURL: MOCK_USERS[0].photoURL,
-  role: MOCK_USERS[0].role,
-  isDemo: true,
-};
+function loadStoredUserSession() {
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const stored = localStorage.getItem("localay_user_session");
+      if (stored) return JSON.parse(stored);
+    }
+  } catch (_) {}
+  return null;
+}
+
+let demoCurrentUser = loadStoredUserSession();
 
 const authListeners = new Set();
 
@@ -103,6 +106,11 @@ export async function signInWithGoogle() {
       role: "community_member",
       isDemo: true,
     };
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("localay_user_session", JSON.stringify(demoCurrentUser));
+      }
+    } catch (_) {}
     notifyDemoListeners();
     return Promise.resolve(demoCurrentUser);
   }
@@ -136,12 +144,17 @@ export async function signInWithEmail(email, password) {
   if (isDemoMode || !auth) {
     demoCurrentUser = {
       uid: `user_demo_${Date.now()}`,
-      displayName: email.split("@")[0] || "Demo User",
+      displayName: email.split("@")[0] || "Community Member",
       email: email,
       photoURL: "",
       role: "community_member",
       isDemo: true,
     };
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("localay_user_session", JSON.stringify(demoCurrentUser));
+      }
+    } catch (_) {}
     notifyDemoListeners();
     return Promise.resolve(demoCurrentUser);
   }
@@ -179,6 +192,11 @@ export async function signUpWithEmail(email, password, displayName = "") {
       role: "community_member",
       isDemo: true,
     };
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("localay_user_session", JSON.stringify(demoCurrentUser));
+      }
+    } catch (_) {}
     notifyDemoListeners();
     return Promise.resolve(demoCurrentUser);
   }
@@ -205,6 +223,13 @@ export async function signUpWithEmail(email, password, displayName = "") {
  * @returns {Promise<void>}
  */
 export async function signOutUser() {
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      localStorage.removeItem("localay_user_session");
+      localStorage.removeItem("localay_dev_role");
+    }
+  } catch (_) {}
+
   if (isDemoMode || !auth) {
     demoCurrentUser = null;
     notifyDemoListeners();

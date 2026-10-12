@@ -23,9 +23,9 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  const activeRole = devRoleOverride || user?.role || (isDemoMode ? "admin" : "community_member");
-  const isModerator = activeRole === "admin" || activeRole === "moderator" || isDemoMode;
-  const isAdmin = activeRole === "admin" || isDemoMode;
+  const activeRole = devRoleOverride || user?.role || "community_member";
+  const isModerator = Boolean(user && (activeRole === "admin" || activeRole === "moderator"));
+  const isAdmin = Boolean(user && activeRole === "admin");
 
   const toggleDevRole = (role) => {
     setDevRoleOverride(role);
@@ -60,8 +60,8 @@ export function useAuth() {
       user: null,
       loading: false,
       isDemo: isDemoMode,
-      isModerator: isDemoMode,
-      isAdmin: isDemoMode,
+      isModerator: false,
+      isAdmin: false,
       toggleDevRole: () => {},
       signInWithGoogle: () => Promise.resolve(),
       signInWithEmail: () => Promise.resolve(),

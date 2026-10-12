@@ -212,20 +212,18 @@ describe("Firebase & Service Layer Architecture (Demo Mode & Contracts)", () => 
   });
 
   describe("authService", () => {
-    it("provides current user in demo mode", () => {
+    it("starts with null user initially when unauthenticated", () => {
       const user = authService.getCurrentUser();
-      expect(user).not.toBeNull();
-      expect(user.isDemo).toBe(true);
+      expect(user).toBeNull();
     });
 
-    it("notifies listeners on auth state changes", async () => {
-      let activeUser = null;
+    it("notifies listeners with null when unauthenticated", async () => {
+      let activeUser = undefined;
       const unsubscribe = authService.onAuthStateChanged((u) => {
         activeUser = u;
       });
 
-      expect(activeUser).not.toBeNull();
-      expect(activeUser.isDemo).toBe(true);
+      expect(activeUser).toBeNull();
       unsubscribe();
     });
 
