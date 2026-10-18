@@ -467,22 +467,24 @@ function InfoSection({ icon, title, items }) {
   if (validItems.length === 0) return null;
 
   return (
-    <div className="rounded-2xl bg-white p-5 border border-monsoon-200/70 shadow-xs">
-      <h2 className="mb-4 text-sm font-bold text-monsoon-900">
-        {title}
-      </h2>
-      <dl className="flex flex-col gap-3">
-        {validItems.map((item) => (
-          <div key={item.label}>
-            <dt className="text-[10px] font-mono font-semibold uppercase tracking-wider text-monsoon-800/60">
-              {item.label}
-            </dt>
-            <dd className={`mt-0.5 text-sm text-monsoon-900 ${item.valueClass ?? ""}`}>
-              {item.value}
-            </dd>
-          </div>
-        ))}
-      </dl>
+    <div className="h-full rounded-2xl bg-white p-5 border border-monsoon-200/80 shadow-xs flex flex-col justify-between">
+      <div>
+        <h2 className="mb-4 text-sm font-bold text-monsoon-900 border-b border-monsoon-100 pb-2">
+          {title}
+        </h2>
+        <dl className="flex flex-col gap-3">
+          {validItems.map((item) => (
+            <div key={item.label}>
+              <dt className="text-[10px] font-mono font-semibold uppercase tracking-wider text-monsoon-800/60">
+                {item.label}
+              </dt>
+              <dd className={`mt-0.5 text-sm font-medium text-monsoon-900 ${item.valueClass ?? ""}`}>
+                {item.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
     </div>
   );
 }

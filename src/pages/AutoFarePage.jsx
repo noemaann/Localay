@@ -120,7 +120,7 @@ export default function AutoFarePage() {
             </h2>
 
             <div>
-              <label htmlFor="calc-pickup-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+              <label htmlFor="calc-pickup-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                 Pickup Stand / Location
               </label>
               <input
@@ -129,12 +129,12 @@ export default function AutoFarePage() {
                 value={origin}
                 onChange={(e) => setOrigin(e.target.value)}
                 placeholder="e.g. Kottakkal Stand"
-                className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none"
+                className="input-control"
               />
             </div>
 
             <div>
-              <label htmlFor="calc-dropoff-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+              <label htmlFor="calc-dropoff-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                 Drop-off Destination
               </label>
               <input
@@ -143,12 +143,12 @@ export default function AutoFarePage() {
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 placeholder="e.g. Changuvetty"
-                className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none"
+                className="input-control"
               />
             </div>
 
             <div>
-              <label htmlFor="calc-distance-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+              <label htmlFor="calc-distance-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                 Distance (km)
               </label>
               <input
@@ -158,20 +158,20 @@ export default function AutoFarePage() {
                 min="0.1"
                 value={distanceKm}
                 onChange={(e) => setDistanceKm(e.target.value)}
-                className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none"
+                className="input-control font-mono"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               <div>
-                <label htmlFor="calc-time-select" className="block text-xs font-semibold text-monsoon-800 mb-1">
+                <label htmlFor="calc-time-select" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                   Time Period
                 </label>
                 <select
                   id="calc-time-select"
                   value={timeOfDay}
                   onChange={(e) => setTimeOfDay(e.target.value)}
-                  className="w-full rounded-lg border border-monsoon-200 px-2.5 py-2 text-xs focus:border-monsoon-600 focus:outline-none bg-white"
+                  className="input-control bg-white"
                 >
                   <option value="day">Day Time</option>
                   <option value="night">Night Time</option>
@@ -180,14 +180,14 @@ export default function AutoFarePage() {
               </div>
 
               <div>
-                <label htmlFor="calc-triptype-select" className="block text-xs font-semibold text-monsoon-800 mb-1">
+                <label htmlFor="calc-triptype-select" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                   Trip Type
                 </label>
                 <select
                   id="calc-triptype-select"
                   value={tripType}
                   onChange={(e) => setTripType(e.target.value)}
-                  className="w-full rounded-lg border border-monsoon-200 px-2.5 py-2 text-xs focus:border-monsoon-600 focus:outline-none bg-white"
+                  className="input-control bg-white"
                 >
                   <option value="one_way">One-Way</option>
                   <option value="round_trip">Round-Trip</option>
@@ -196,7 +196,7 @@ export default function AutoFarePage() {
             </div>
 
             <div className="pt-2 border-t border-monsoon-100">
-              <label htmlFor="calc-quote-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+              <label htmlFor="calc-quote-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                 Quoted / Proposed Fare (Optional ₹)
               </label>
               <input
@@ -206,7 +206,7 @@ export default function AutoFarePage() {
                 value={queryFareAmount}
                 onChange={(e) => setQueryFareAmount(e.target.value)}
                 placeholder="Check if ₹ quote is fair…"
-                className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none"
+                className="input-control font-mono"
               />
             </div>
           </div>

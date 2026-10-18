@@ -369,7 +369,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Place Name */}
         <div>
-          <label htmlFor="place-name-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+          <label htmlFor="place-name-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
             Place Name <span className="text-rose-500">*</span>
           </label>
           <input
@@ -379,22 +379,22 @@ export default function SubmitPlaceForm({ onSubmitted }) {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="e.g. Koduvally Sunset Viewpoint, Rahmaniya Biriyani"
-            className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none"
+            className="input-control"
           />
-          {errors.name && <p className="mt-1 text-xs text-rose-600">{errors.name}</p>}
+          {errors.name && <p className="mt-1 text-xs text-rose-600 font-semibold">{errors.name}</p>}
         </div>
 
         {/* Category & Region with Internet Search */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="place-category-select" className="block text-xs font-semibold text-monsoon-800 mb-1">
+            <label htmlFor="place-category-select" className="block text-xs font-bold text-monsoon-900 mb-1.5">
               Category <span className="text-rose-500">*</span>
             </label>
             <select
               id="place-category-select"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none bg-white"
+              className="input-control bg-white cursor-pointer"
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat.id} value={cat.id}>
@@ -406,11 +406,11 @@ export default function SubmitPlaceForm({ onSubmitted }) {
 
           {/* Region Search from Internet */}
           <div ref={regionRef} className="relative">
-            <div className="flex items-center justify-between mb-1">
-              <label htmlFor="place-region-select" className="block text-xs font-semibold text-monsoon-800">
+            <div className="flex items-center justify-between mb-1.5">
+              <label htmlFor="place-region-select" className="block text-xs font-bold text-monsoon-900">
                 Region / District <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[10px] text-monsoon-600 font-medium">Internet Search</span>
+              <span className="text-[10px] text-monsoon-600 font-semibold bg-monsoon-100 px-2 py-0.5 rounded-full">Live Search</span>
             </div>
 
             <div className="relative">
@@ -430,10 +430,10 @@ export default function SubmitPlaceForm({ onSubmitted }) {
                   setShowRegionResults(true);
                 }}
                 placeholder="Type district or city (e.g. Malappuram, Wayanad)..."
-                className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none bg-white"
+                className="input-control bg-white"
               />
               {searchingRegion && (
-                <span className="absolute right-2.5 top-2.5 text-xs animate-spin text-monsoon-600">…</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs animate-spin text-monsoon-600">…</span>
               )}
             </div>
 
@@ -514,10 +514,10 @@ export default function SubmitPlaceForm({ onSubmitted }) {
                 setShowTownResults(true);
               }}
               placeholder="Search town, junction, or village (e.g. Kottakkal, Nilambur, Tirur)..."
-              className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none"
+              className="input-control"
             />
             {searchingTown && (
-              <span className="absolute right-2.5 top-2.5 text-xs animate-spin text-monsoon-600">…</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs animate-spin text-monsoon-600">…</span>
             )}
           </div>
 
@@ -551,12 +551,12 @@ export default function SubmitPlaceForm({ onSubmitted }) {
               ))}
             </div>
           )}
-          {errors.townId && <p className="mt-1 text-xs text-rose-600">{errors.townId}</p>}
+          {errors.townId && <p className="mt-1 text-xs text-rose-600 font-semibold">{errors.townId}</p>}
         </div>
 
         {/* Description */}
         <div>
-          <label htmlFor="place-desc-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+          <label htmlFor="place-desc-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
             Description <span className="text-rose-500">*</span>
           </label>
           <textarea
@@ -566,16 +566,16 @@ export default function SubmitPlaceForm({ onSubmitted }) {
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             placeholder="Describe what makes this spot special, best time to visit, signature food or view..."
-            className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none resize-none"
+            className="input-control resize-none"
           />
           {errors.description && (
-            <p className="mt-1 text-xs text-rose-600">{errors.description}</p>
+            <p className="mt-1 text-xs text-rose-600 font-semibold">{errors.description}</p>
           )}
         </div>
 
         {/* Address / Landmark */}
         <div>
-          <label htmlFor="place-address-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+          <label htmlFor="place-address-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
             Address / Landmark / Directions (Optional)
           </label>
           <input
@@ -584,7 +584,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
             value={formData.address}
             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             placeholder="e.g. Near KSRTC Stand, opposite Juma Masjid, Hilltop road"
-            className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none"
+            className="input-control"
           />
         </div>
 
@@ -657,14 +657,14 @@ export default function SubmitPlaceForm({ onSubmitted }) {
         {/* Road Condition & Image */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="place-road-select" className="block text-xs font-semibold text-monsoon-800 mb-1">
+            <label htmlFor="place-road-select" className="block text-xs font-bold text-monsoon-900 mb-1.5">
               Road Condition & Access
             </label>
             <select
               id="place-road-select"
               value={formData.roadCondition}
               onChange={(e) => setFormData({ ...formData, roadCondition: e.target.value })}
-              className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none bg-white"
+              className="input-control bg-white cursor-pointer"
             >
               <option value="Paved Road">Paved Road (Easy Access)</option>
               <option value="Gravel / Dirt Road">Gravel / Dirt Road</option>
@@ -675,7 +675,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
           </div>
 
           <div>
-            <label htmlFor="place-image-file" className="block text-xs font-semibold text-monsoon-800 mb-1">
+            <label htmlFor="place-image-file" className="block text-xs font-bold text-monsoon-900 mb-1.5">
               Cover Image (Optional)
             </label>
             <input
@@ -683,12 +683,12 @@ export default function SubmitPlaceForm({ onSubmitted }) {
               type="file"
               accept="image/jpeg,image/png,image/webp"
               onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-              className="w-full text-xs text-monsoon-800 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-monsoon-100 file:text-monsoon-800 hover:file:bg-monsoon-200"
+              className="input-control file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-monsoon-100 file:text-monsoon-900 hover:file:bg-monsoon-200 cursor-pointer"
             />
           </div>
         </div>
 
-        <Button type="submit" disabled={submitting} className="w-full mt-4">
+        <Button type="submit" disabled={submitting} size="md" className="w-full mt-4">
           {submitting ? "Submitting Proposal…" : "Submit Proposal"}
         </Button>
       </form>

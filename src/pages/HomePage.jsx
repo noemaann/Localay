@@ -27,9 +27,12 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
     >
       <div className="mx-auto max-w-5xl px-4 pt-16 pb-16 sm:px-6 sm:pt-24 sm:pb-24">
         {/* Subtle regional label */}
-        <p className="mb-4 text-xs font-mono font-semibold uppercase tracking-widest text-monsoon-600">
-          Now in {region.label}
-        </p>
+        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-monsoon-200 bg-monsoon-100/50 px-3 py-1 shadow-2xs">
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-monsoon-800">
+            Now in {region.label}
+          </span>
+        </div>
 
         {/* Heading */}
         <h1
@@ -64,8 +67,8 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
         </form>
 
         {/* Quick suggestion pills */}
-        <div className="mt-6 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-monsoon-800/60 mr-1">
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-monsoon-800/60 mr-1 select-none">
             Popular:
           </span>
           {["Biriyani", "Waterfalls", "Sunset viewpoints", "Local treks"].map(
@@ -76,11 +79,11 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
                 aria-label={`Search for ${term}`}
                 onClick={() => onSuggestion(term)}
                 className={[
-                  "rounded-lg border border-monsoon-200 bg-monsoon-50 px-3 py-1",
-                  "text-xs font-medium text-monsoon-800",
-                  "hover:border-monsoon-900 hover:text-monsoon-900 hover:bg-white",
+                  "rounded-xl border border-monsoon-200/90 bg-white px-3 py-1.5",
+                  "text-xs font-semibold text-monsoon-800 shadow-2xs",
+                  "hover:border-monsoon-900 hover:text-monsoon-900 hover:bg-monsoon-50",
                   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600",
-                  "transition-all duration-150",
+                  "transition-all duration-150 active:scale-95",
                 ].join(" ")}
               >
                 {term}
@@ -104,7 +107,7 @@ function CategorySection() {
       aria-labelledby="categories-heading"
       className="mx-auto max-w-5xl px-4 pb-20 sm:px-6"
     >
-      <div className="mb-8 flex items-end justify-between">
+      <div className="mb-6 flex items-end justify-between border-b border-monsoon-200/60 pb-4">
         <div>
           <h2
             id="categories-heading"
@@ -112,7 +115,7 @@ function CategorySection() {
           >
             Explore {region.name}
           </h2>
-          <p className="mt-1 text-sm text-monsoon-800/70">
+          <p className="mt-1 text-xs sm:text-sm text-monsoon-800/70">
             Pick a category to start discovering
           </p>
         </div>
@@ -129,27 +132,29 @@ function CommunityBanner() {
   return (
     <section
       aria-label="Community contribution"
-      className="border-b border-monsoon-200/60 bg-monsoon-50/50"
+      className="mx-auto max-w-5xl px-4 py-8 sm:px-6"
     >
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-        <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-monsoon-900">
-              Know a hidden gem?
-            </h2>
-            <p className="mt-1 text-sm leading-relaxed text-monsoon-800/70 max-w-lg">
-              LOCALAY is built by the community. Add places, share reviews, report dish prices, and
-              help others discover what makes your town special.
-            </p>
+      <div className="rounded-3xl border border-monsoon-200/80 bg-gradient-to-r from-monsoon-100/70 via-white to-monsoon-50 p-6 sm:p-8 shadow-xs flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-monsoon-200/60 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-monsoon-800 mb-2">
+            Community-Powered
           </div>
-          <div className="shrink-0">
-            <Link
-              to="/contribute"
-              className="inline-flex items-center rounded-xl bg-monsoon-900 px-5 py-2.5 text-xs font-semibold tracking-wide text-white hover:bg-monsoon-800 transition-all shadow-xs active:scale-[0.98]"
-            >
-              Add a place & review →
-            </Link>
-          </div>
+          <h2 className="text-xl font-bold tracking-tight text-monsoon-900">
+            Know a hidden gem?
+          </h2>
+          <p className="mt-1 text-xs sm:text-sm leading-relaxed text-monsoon-800/80 max-w-lg">
+            LOCALAY is built by the community. Add places, share reviews, report dish prices, and
+            help others discover what makes your town special.
+          </p>
+        </div>
+        <div className="shrink-0">
+          <Link
+            to="/contribute"
+            className="inline-flex items-center gap-2 rounded-xl bg-monsoon-900 px-5 py-2.5 text-xs font-semibold tracking-wide text-white hover:bg-monsoon-800 transition-all shadow-xs active:scale-[0.98]"
+          >
+            <span>Add a place & review</span>
+            <span>→</span>
+          </Link>
         </div>
       </div>
     </section>

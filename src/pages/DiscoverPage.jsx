@@ -175,9 +175,9 @@ export default function DiscoverPage() {
       </div>
 
       {/* Demo data notice */}
-      <div className="mb-6 rounded-2xl border border-turmeric-200 bg-turmeric-100/60 px-4 py-3 text-xs text-turmeric-600 font-medium flex items-start gap-2.5">
-        <span aria-hidden="true" className="shrink-0 font-bold">INFO</span>
-        <span>
+      <div className="mb-6 rounded-2xl border border-amber-200/90 bg-amber-50/80 px-4 py-3 text-xs text-amber-900 font-medium flex items-start gap-2.5 shadow-2xs">
+        <span aria-hidden="true" className="shrink-0 rounded bg-amber-200 px-1.5 py-0.5 text-[10px] font-bold text-amber-900 uppercase">INFO</span>
+        <span className="leading-relaxed">
           All places shown are <strong>illustrative demo content only</strong> — not
           verified, not sourced from community reviews, and not guaranteed to be
           accurate. Community submissions will replace this data in a future release.

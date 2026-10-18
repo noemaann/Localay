@@ -19,47 +19,47 @@ export default function PlaceCard({ place }) {
   return (
     <Link
       to={`/place/${place.id}`}
-      className="group block rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600 focus-visible:outline-offset-2"
+      className="group flex flex-col h-full rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600 focus-visible:outline-offset-2"
       aria-label={`View details for ${place.name}`}
     >
       <Card
         interactive
-        className="h-full flex flex-col overflow-hidden border border-monsoon-200/70 hover:border-monsoon-900 transition-all duration-200"
+        className="h-full flex flex-col justify-between overflow-hidden border border-monsoon-200/80 hover:border-monsoon-900 transition-all duration-200 rounded-2xl shadow-xs hover:shadow-card-hover hover:-translate-y-0.5"
       >
         {/* Thin category color accent */}
         <div
           aria-hidden="true"
-          className={`h-1 w-full ${category ? getCategoryBandClass(category.id) : "bg-monsoon-200"}`}
+          className={`h-1.5 w-full ${category ? getCategoryBandClass(category.id) : "bg-monsoon-200"}`}
         />
 
-        <div className="flex flex-col gap-3.5 p-5 flex-1">
-          {/* Top row: category badge + demo badge */}
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            {category && (
-              <Badge className={`shrink-0 ${category.accent}`}>
-                <span aria-hidden="true">{category.icon}</span>
-                {category.label}
-              </Badge>
-            )}
-            {place._demo && (
-              <span className="shrink-0 rounded-full border border-monsoon-200 px-2 py-0.5 text-[10px] font-medium text-monsoon-800/50 select-none">
-                Demo
-              </span>
-            )}
-          </div>
+        <div className="flex flex-col gap-3.5 p-5 flex-1 justify-between">
+          <div>
+            {/* Top row: category badge + demo badge */}
+            <div className="flex items-center justify-between gap-2 flex-wrap mb-3">
+              {category && (
+                <Badge className={`shrink-0 ${category.accent}`}>
+                  <span aria-hidden="true">{category.icon}</span>
+                  {category.label}
+                </Badge>
+              )}
+              {place._demo && (
+                <span className="shrink-0 rounded-full border border-monsoon-200 bg-monsoon-50 px-2.5 py-0.5 text-[10px] font-bold text-monsoon-800/60 select-none uppercase tracking-wider">
+                  Demo
+                </span>
+              )}
+            </div>
 
-          {/* Name + tagline */}
-          <div className="flex-1">
-            <h3 className="text-base font-bold leading-snug text-monsoon-900 group-hover:text-monsoon-600 transition-colors duration-150">
+            {/* Name + tagline */}
+            <h3 className="text-base font-bold leading-snug text-monsoon-900 group-hover:text-monsoon-600 transition-colors duration-150 line-clamp-1">
               {place.name}
             </h3>
-            <p className="mt-1.5 text-xs leading-relaxed text-monsoon-800/70 line-clamp-2">
-              {place.tagline}
+            <p className="mt-1.5 text-xs leading-relaxed text-monsoon-800/70 line-clamp-2 min-h-[2.25rem]">
+              {place.tagline || place.description}
             </p>
           </div>
 
           {/* Footer: location + difficulty */}
-          <div className="mt-auto flex items-center justify-between gap-2 pt-3.5 border-t border-monsoon-100/80">
+          <div className="mt-auto flex items-center justify-between gap-2 pt-3.5 border-t border-monsoon-100">
             <div className="flex items-center gap-1.5 min-w-0">
               <svg
                 aria-hidden="true"
@@ -77,7 +77,7 @@ export default function PlaceCard({ place }) {
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
                 <circle cx="12" cy="9" r="2.5" />
               </svg>
-              <span className="text-xs font-medium text-monsoon-800/80 truncate">
+              <span className="text-xs font-semibold text-monsoon-800 truncate">
                 {place.location?.town ?? "Unknown location"}
               </span>
             </div>

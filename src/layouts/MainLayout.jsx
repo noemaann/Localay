@@ -28,11 +28,11 @@ function SiteHeader() {
 
   const navLinkClass = ({ isActive }) =>
     [
-      "text-xs font-semibold tracking-wide transition-all duration-150 focus-visible:outline",
-      "focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded-lg px-2.5 py-1",
+      "inline-flex items-center text-xs font-semibold tracking-wide transition-all duration-150 focus-visible:outline",
+      "focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded-lg px-3 py-1.5",
       isActive
-        ? "text-monsoon-900 font-bold underline underline-offset-4 decoration-2 decoration-monsoon-900"
-        : "text-monsoon-800/80 hover:text-monsoon-900",
+        ? "bg-monsoon-100 text-monsoon-900 font-bold shadow-2xs"
+        : "text-monsoon-800 hover:text-monsoon-900 hover:bg-monsoon-50",
     ].join(" ");
 
   return (
@@ -41,18 +41,18 @@ function SiteHeader() {
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
       />
-      <header className="sticky top-0 z-40 border-b border-monsoon-200/60 bg-white/80 backdrop-blur-md transition-all">
+      <header className="sticky top-0 z-40 border-b border-monsoon-200/60 bg-white/90 backdrop-blur-md transition-all shadow-[0_1px_2px_0_rgba(15,23,42,0.02)]">
 
       <nav
         ref={navRef}
         aria-label="Main navigation"
-        className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6"
+        className="mx-auto flex max-w-6xl items-center justify-between px-4 h-16 sm:px-6"
       >
         {/* Brand */}
         <NavLink
           to="/"
           aria-label="LOCALAY home"
-          className="shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded-xl group flex items-center gap-2"
+          className="shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded-xl group flex items-center gap-2.5 py-1"
           onClick={() => setMenuOpen(false)}
         >
           <img
@@ -66,7 +66,7 @@ function SiteHeader() {
         </NavLink>
 
         {/* Desktop nav links */}
-        <ul className="hidden sm:flex items-center gap-6" role="list">
+        <ul className="hidden sm:flex items-center gap-1.5" role="list">
           <li>
             <NavLink to="/" end className={navLinkClass}>
               Home
@@ -111,8 +111,8 @@ function SiteHeader() {
 
           {/* User Auth Pill */}
           {user ? (
-            <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-monsoon-200/70">
-              <span className="text-xs font-semibold text-monsoon-900 max-w-[100px] truncate">
+            <div className="hidden sm:flex items-center gap-2.5 pl-2.5 border-l border-monsoon-200/70 h-8">
+              <span className="text-xs font-semibold text-monsoon-900 max-w-[110px] truncate">
                 {user.displayName || user.email?.split("@")[0]}
               </span>
               <button
@@ -128,7 +128,7 @@ function SiteHeader() {
             <button
               type="button"
               onClick={() => setAuthModalOpen(true)}
-              className="hidden sm:inline-flex items-center rounded-full bg-monsoon-900 px-4 py-1.5 text-xs font-semibold text-white hover:bg-monsoon-800 transition-all shadow-xs active:scale-95"
+              className="hidden sm:inline-flex items-center justify-center rounded-xl bg-monsoon-900 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-monsoon-800 transition-all shadow-xs active:scale-95 h-8.5"
             >
               Sign In
             </button>

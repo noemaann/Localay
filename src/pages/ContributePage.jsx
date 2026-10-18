@@ -44,7 +44,7 @@ export default function ContributePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-monsoon-200/70 pb-3 mb-6">
+      <div className="flex flex-wrap gap-2 border-b border-monsoon-200/70 pb-3.5 mb-6">
         {[
           { id: "new_place", label: "Propose New Place" },
           { id: "review", label: "Write Review" },
@@ -60,7 +60,7 @@ export default function ContributePage() {
               "rounded-xl px-4 py-2 text-xs font-semibold tracking-wide transition-all duration-150",
               activeTab === tab.id
                 ? "bg-monsoon-900 text-white shadow-xs border border-monsoon-900"
-                : "bg-white border border-monsoon-200 text-monsoon-800 hover:border-monsoon-900 hover:text-monsoon-900",
+                : "bg-white border border-monsoon-200/90 text-monsoon-800 hover:border-monsoon-900 hover:text-monsoon-900 shadow-2xs",
             ].join(" ")}
           >
             {tab.label}
@@ -70,14 +70,14 @@ export default function ContributePage() {
 
       {/* Selector for existing place when not submitting a new place */}
       {activeTab !== "new_place" && (
-        <div className="mb-6 rounded-xl bg-white border border-monsoon-200 p-4 shadow-sm">
-          <label className="block text-xs font-semibold text-monsoon-800 mb-1">
+        <div className="mb-6 rounded-2xl bg-white border border-monsoon-200/80 p-5 shadow-xs">
+          <label className="block text-xs font-bold text-monsoon-900 mb-1.5">
             Select Existing Spot in {region.name}:
           </label>
           <select
             value={selectedPlaceId}
             onChange={(e) => setSelectedPlaceId(e.target.value)}
-            className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none bg-white"
+            className="input-control bg-white cursor-pointer"
           >
             {places.map((p) => (
               <option key={p.id} value={p.id}>
