@@ -78,9 +78,6 @@ export default function AutoFarePage() {
           <span className="rounded-full bg-monsoon-800 border border-monsoon-700/80 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-wider text-monsoon-200 shadow-2xs">
             AutoFare • {region.name}
           </span>
-          <span className="rounded-full bg-emerald-500/20 border border-emerald-400/30 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-300">
-            Kerala MVD Regulated
-          </span>
         </div>
         <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white max-w-3xl">
           Community Auto-Rickshaw Fare Finder
@@ -89,7 +86,7 @@ export default function AutoFarePage() {
           A transparent, community-reported guide to local auto-rickshaw fares in <strong className="text-white">{region.label}</strong> based on actual trip entries logged by locals.
         </p>
 
-        {/* Quick Kerala MVD Rule Ticker */}
+        {/* Standard Tariff Guidelines */}
         <div className="pt-4 mt-2 border-t border-monsoon-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-monsoon-200">
           <div>
             <span className="text-[10px] uppercase font-mono text-monsoon-400 block">Min Fare (1.5 km)</span>

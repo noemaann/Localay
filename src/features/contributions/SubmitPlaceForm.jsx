@@ -9,6 +9,7 @@ import {
   locationSearchService,
 } from "../../services";
 import SubmissionStatusBadge from "../../components/SubmissionStatusBadge.jsx";
+import CategoryIcon from "../../components/CategoryIcon.jsx";
 import Button from "../../components/Button.jsx";
 import AuthModal from "../../components/AuthModal.jsx";
 
@@ -34,9 +35,26 @@ export default function SubmitPlaceForm({ onSubmitted }) {
   });
 
   const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [successSubmission, setSuccessSubmission] = useState(null);
+
+  function handleImageChange(file) {
+    if (!file) {
+      setImageFile(null);
+      setImagePreview(null);
+      return;
+    }
+    setImageFile(file);
+    if (typeof FileReader !== "undefined") {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   // Region search state
   const [regionQuery, setRegionQuery] = useState(activeRegion.name || "");
@@ -398,7 +416,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.icon} {cat.label}
+                  {cat.label}
                 </option>
               ))}
             </select>
@@ -410,7 +428,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
               <label htmlFor="place-region-select" className="block text-xs font-bold text-monsoon-900">
                 Region / District <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[10px] text-monsoon-600 font-semibold bg-monsoon-100 px-2 py-0.5 rounded-full">Live Search</span>
+              <span className="text-[10px] text-monsoon-600 font-semibold bg-monsoon-100 px-2 py-0.5 rounded-full">Search Map</span>
             </div>
 
             <div className="relative">
@@ -675,16 +693,57 @@ export default function SubmitPlaceForm({ onSubmitted }) {
           </div>
 
           <div>
-            <label htmlFor="place-image-file" className="block text-xs font-bold text-monsoon-900 mb-1.5">
-              Cover Image (Optional)
-            </label>
-            <input
-              id="place-image-file"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-              className="input-control file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-monsoon-100 file:text-monsoon-900 hover:file:bg-monsoon-200 cursor-pointer"
-            />
+            <div className="flex items-center justify-between mb-1.5">
+              <label htmlFor="place-image-file" className="block text-xs font-bold text-monsoon-900">
+                Spot Photo (Optional)
+              </label>
+              <span className="text-[10px] text-monsoon-600 font-medium">User Upload</span>
+            </div>
+
+            {!imagePreview ? (
+              <label
+                htmlFor="place-image-file"
+                className="flex flex-col items-center justify-center border border-dashed border-monsoon-300 hover:border-monsoon-700 rounded-xl p-3.5 bg-monsoon-50/60 hover:bg-monsoon-50 cursor-pointer transition-colors text-center"
+              >
+                <svg className="w-5 h-5 text-monsoon-600 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                <span className="text-xs font-semibold text-monsoon-900">Upload spot photo</span>
+                <span className="text-[10px] text-monsoon-700 mt-0.5">JPEG, PNG or WebP</span>
+                <input
+                  id="place-image-file"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(e) => handleImageChange(e.target.files?.[0] || null)}
+                  className="sr-only"
+                />
+              </label>
+            ) : (
+              <div className="rounded-xl border border-monsoon-200 overflow-hidden bg-monsoon-50/80 p-2.5 flex items-center gap-3">
+                <img
+                  src={imagePreview}
+                  alt="Spot preview"
+                  className="h-14 w-16 object-cover rounded-lg ring-1 ring-black/10 shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <span className="text-xs font-semibold text-monsoon-900 block truncate">
+                    {imageFile?.name || "Uploaded Photo"}
+                  </span>
+                  <span className="text-[10px] text-emerald-700 font-medium block">
+                    ✓ Photo ready to attach
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleImageChange(null)}
+                  className="text-xs text-rose-600 hover:text-rose-800 font-semibold px-2 py-1 rounded-md hover:bg-rose-50 transition-colors"
+                >
+                  Remove
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

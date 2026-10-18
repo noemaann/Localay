@@ -41,10 +41,10 @@ export default function AdminAutoFarePage() {
       {/* Header */}
       <div className="border-b border-slate-800 pb-5">
         <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-          AutoFare Regulatory Rates & Community Reports
+          AutoFare Rates & Community Reports
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Government-notified Motor Vehicle Department (MVD) auto-rickshaw meter rates for Kerala & Malappuram.
+          Standard auto-rickshaw meter rates and community fare guidelines for Kerala & Malappuram.
         </p>
       </div>
 
@@ -59,7 +59,13 @@ export default function AdminAutoFarePage() {
         {/* Rate settings */}
         <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl space-y-4">
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <span>🚖 Kerala MVD Official Tariff Parameters</span>
+            <svg className="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+              <circle cx="7" cy="17" r="2" />
+              <path d="M9 17h6" />
+              <circle cx="17" cy="17" r="2" />
+            </svg>
+            <span>Auto-Rickshaw Tariff Parameters</span>
           </h2>
 
           <form onSubmit={handleSaveRates} className="space-y-4">
@@ -118,7 +124,12 @@ export default function AdminAutoFarePage() {
         <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl space-y-4 flex flex-col justify-between">
           <div>
             <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              <span>📊 Crowdsourced Fare Reports & Overcharging Flags</span>
+              <svg className="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
+              <span>Crowdsourced Fare Reports & Overcharging Flags</span>
             </h2>
             <p className="text-xs text-slate-400 mt-1">
               Real passenger feedback on whether drivers use meters or demand flat excess rates at major hubs (Kottakkal, Tirur Railway Station, Kottakunnu).

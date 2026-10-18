@@ -346,8 +346,7 @@ function SiteFooter() {
               live here. Zero paid promotions, zero sponsored rankings.
             </p>
             <div className="inline-flex items-center gap-1.5 rounded-full border border-monsoon-200 bg-monsoon-50 px-2.5 py-1 text-[11px] font-mono text-monsoon-800">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              <span>Active in <strong>{region.label}</strong></span>
+              <span>Region: <strong>{region.label}</strong></span>
             </div>
           </div>
 
@@ -361,7 +360,7 @@ function SiteFooter() {
               <li><NavLink to="/discover?category=viewpoints" className="hover:text-monsoon-900 transition-colors">Hilltops & Viewpoints</NavLink></li>
               <li><NavLink to="/discover?category=nature" className="hover:text-monsoon-900 transition-colors">Paddy Fields & Nature</NavLink></li>
               <li><NavLink to="/discover?category=waterfalls" className="hover:text-monsoon-900 transition-colors">Waterfalls</NavLink></li>
-              <li><NavLink to="/autofare" className="hover:text-monsoon-900 transition-colors">Kerala Auto Meter Rates</NavLink></li>
+              <li><NavLink to="/autofare" className="hover:text-monsoon-900 transition-colors">Auto Fare Finder</NavLink></li>
             </ul>
           </div>
 

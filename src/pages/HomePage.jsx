@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchInput from "../components/SearchInput.jsx";
 import CategoryGrid from "../components/CategoryGrid.jsx";
+import CategoryIcon from "../components/CategoryIcon.jsx";
 import Badge from "../components/Badge.jsx";
 import { useLocation } from "../context/LocationContext.jsx";
 
@@ -36,30 +37,30 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
   const showcaseGems = [
     {
       name: "Mini Ooty (Arimbra Hills)",
+      categoryId: "viewpoints",
       category: "Viewpoints",
       rating: "4.8",
       highlight: "Misty tea slopes & sunrise clouds",
       link: "/discover?category=viewpoints",
       tag: "Free Access",
-      image: "/images/mini_ooty_hills.jpg",
     },
     {
       name: "Rahmath Biriyani & Sulaimani",
+      categoryId: "food",
       category: "Food & Eats",
       rating: "4.9",
       highlight: "Small-grain Kaima dum & black tea",
       link: "/discover?category=food",
       tag: "Iconic Spot",
-      image: "/images/malabar_biriyani.jpg",
     },
     {
       name: "Riverbank Grove & Bamboo",
+      categoryId: "nature",
       category: "Nature",
       rating: "4.7",
       highlight: "Sunset river breeze & peaceful trails",
       link: "/discover?category=nature",
       tag: "Peaceful",
-      image: "/images/kerala_riverbank.jpg",
     },
   ];
 
@@ -72,13 +73,13 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           {/* Left Column: Heading, Subhead, Search & Quick Pills */}
           <div className="lg:col-span-7 flex flex-col items-start">
-            {/* Live region badge */}
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-monsoon-200 bg-white/90 backdrop-blur-sm px-3.5 py-1.5 shadow-2xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
-              </span>
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-monsoon-800">
+            {/* Region badge (clean, non-blinking) */}
+            <div className="mb-4 inline-flex items-center gap-1.5 rounded-lg border border-monsoon-200 bg-white/90 px-3 py-1 shadow-2xs">
+              <svg className="w-3.5 h-3.5 text-monsoon-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                <circle cx="12" cy="9" r="2.5" />
+              </svg>
+              <span className="text-xs font-medium text-monsoon-800">
                 Now in {region.label}
               </span>
             </div>
@@ -94,7 +95,7 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
             {/* Lede paragraph */}
             <p className="mt-5 max-w-xl text-base sm:text-lg leading-relaxed text-monsoon-800/80 font-normal">
               LOCALAY is a community guide to authentic food stalls, hidden sunset viewpoints,
-              walking trails, and Kerala auto meter rates — mapped by the people who live here, with zero paid placements.
+              walking trails, and local auto fare rates, mapped by the people who live here, with zero paid placements.
             </p>
 
             {/* Search Input */}
@@ -147,7 +148,7 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
                 <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>Kerala MVD Auto Rates</span>
+                <span>Community Rate Guide</span>
               </div>
               <div className="inline-flex items-center gap-2">
                 <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -179,13 +180,8 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
                 to={gem.link}
                 className="group p-3.5 sm:p-4 rounded-2xl bg-white border border-monsoon-200/80 shadow-xs hover:border-monsoon-700 hover:shadow-card-hover transition-[box-shadow,border-color,transform] duration-200 active:scale-[0.98] flex items-center justify-between gap-3.5"
               >
-                <div className="relative h-14 w-14 sm:h-16 sm:w-16 rounded-xl overflow-hidden shrink-0 bg-monsoon-100 ring-1 ring-black/5">
-                  <img
-                    src={gem.image}
-                    alt=""
-                    className="h-full w-full object-cover transition-transform duration-300 ease-spring-out group-hover:scale-110"
-                    loading="lazy"
-                  />
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl shrink-0 bg-monsoon-100/80 text-monsoon-800 border border-monsoon-200/70 shadow-2xs">
+                  <CategoryIcon categoryId={gem.categoryId} className="w-5 h-5 text-monsoon-800" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 mb-1">
@@ -217,23 +213,23 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
             ))}
 
             {/* Quick Auto Fare Teaser Box */}
-            <div className="mt-1 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-white border border-amber-300/60 flex items-center justify-between gap-3 shadow-2xs">
-              <div className="flex items-center gap-3 min-w-0">
+            <div className="mt-1 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-white border border-amber-300/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
                 <div className="h-10 w-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-base shrink-0 shadow-xs">
                   ₹
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-monsoon-900">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-monsoon-900 truncate">
                     Need an Auto in {region.name}?
                   </p>
                   <p className="text-[11px] text-monsoon-800/70 truncate">
-                    Base fare ₹30 for first 1.5 km • Official MVD rates
+                    Estimated baseline ₹30 for first 1.5 km • Local fare index
                   </p>
                 </div>
               </div>
               <Link
                 to="/autofare"
-                className="shrink-0 px-3 py-1.5 rounded-xl bg-monsoon-900 hover:bg-monsoon-800 text-white text-xs font-semibold transition-all shadow-xs active:scale-95"
+                className="shrink-0 px-3.5 py-1.5 rounded-xl bg-monsoon-900 hover:bg-monsoon-800 text-white text-xs font-semibold transition-[background-color,transform] shadow-xs active:scale-95"
               >
                 Estimate Fare
               </Link>

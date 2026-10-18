@@ -82,8 +82,12 @@ export default function AdminPlacesPage() {
                   </span>
                 </div>
 
-                <div className="text-xs text-slate-400 mt-1">
-                  📍 {p.town || "Malappuram"}
+                <div className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                    <circle cx="12" cy="9" r="2.5" />
+                  </svg>
+                  <span>{p.town || "Malappuram"}</span>
                 </div>
 
                 <p className="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">
@@ -92,8 +96,12 @@ export default function AdminPlacesPage() {
               </div>
 
               <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                <span>
-                  Rating: <strong className="text-amber-400">★ {p.rating || "4.5"}</strong>
+                <span className="flex items-center gap-1">
+                  <span>Rating:</span>
+                  <svg className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" viewBox="0 0 24 24">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                  <strong className="text-amber-400">{p.rating || "4.5"}</strong>
                 </span>
                 <span className="text-slate-500 font-mono">
                   ID: {p.id.substring(0, 8)}

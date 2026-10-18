@@ -134,7 +134,11 @@ export default function AdminLayout({
               <div className="text-xs font-bold text-white flex items-center gap-1 justify-end">
                 {currentAdmin?.name || currentAdmin?.username}
                 {isSuperAdmin && (
-                  <span title="Super Administrator" className="text-amber-400">👑</span>
+                  <span title="Super Administrator" className="text-amber-400 inline-flex items-center">
+                    <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="12 2 15 8 22 9 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9 9 8 12 2" />
+                    </svg>
+                  </span>
                 )}
               </div>
               <div className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">

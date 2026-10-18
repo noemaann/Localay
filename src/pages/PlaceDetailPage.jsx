@@ -10,18 +10,20 @@ import MapPlaceholder from "../features/discovery/MapPlaceholder.jsx";
 import Badge from "../components/Badge.jsx";
 import LoadingState from "../components/LoadingState.jsx";
 import SubmissionStatusBadge from "../components/SubmissionStatusBadge.jsx";
+import CategoryIcon from "../components/CategoryIcon.jsx";
 import { CATEGORIES } from "../data/categories.js";
-import { difficultyClass, formatDifficulty, difficultyIcon } from "../utils/format.js";
+import { difficultyClass, formatDifficulty } from "../utils/format.js";
 import AddReviewForm from "../features/contributions/AddReviewForm.jsx";
 import AddDishPriceForm from "../features/contributions/AddDishPriceForm.jsx";
 import AccessUpdateForm from "../features/contributions/AccessUpdateForm.jsx";
 import CorrectionRequestForm from "../features/contributions/CorrectionRequestForm.jsx";
+import UploadPlacePhotoForm from "../features/contributions/UploadPlacePhotoForm.jsx";
 
 /**
  * PlaceDetailPage — full detail view for a single place.
  *
  * Supports both discovery features (access details, tags, map stub)
- * and community-contributed features (reviews, dish prices, road updates).
+ * and community-contributed features (reviews, dish prices, road updates, user photos).
  */
 export default function PlaceDetailPage() {
   const { placeId } = useParams();
@@ -31,6 +33,7 @@ export default function PlaceDetailPage() {
   const [reviews, setReviews] = useState([]);
   const [dishPrices, setDishPrices] = useState([]);
   const [updates, setUpdates] = useState([]);
+  const [photos, setPhotos] = useState([]);
   const [activeActionTab, setActiveActionTab] = useState("review");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -54,16 +57,18 @@ export default function PlaceDetailPage() {
         setPlace(placeData);
 
         // Fetch auxiliary community data in parallel safely
-        const [revList, priceList, updList] = await Promise.all([
+        const [revList, priceList, updList, photoList] = await Promise.all([
           reviewService.getReviewsForPlace(placeId).catch(() => []),
           dishPriceService.getDishPricesForPlace(placeId).catch(() => []),
           placeUpdateService.getPlaceUpdates(placeId).catch(() => []),
+          placeService.getPlacePhotos(placeId).catch(() => []),
         ]);
 
         if (!cancelled) {
           setReviews(revList || []);
           setDishPrices(priceList || []);
           setUpdates(updList || []);
+          setPhotos(photoList || []);
         }
       } catch (err) {
         if (!cancelled) {
@@ -181,8 +186,8 @@ export default function PlaceDetailPage() {
           <div className="flex flex-wrap items-center gap-2">
             {category && (
               <Badge className={category.accent}>
-                <span aria-hidden="true">{category.icon}</span>
-                {category.label}
+                <CategoryIcon categoryId={category.id} className="w-3.5 h-3.5 shrink-0" />
+                <span>{category.label}</span>
               </Badge>
             )}
             {place.status && <SubmissionStatusBadge status={place.status} />}
@@ -419,14 +424,68 @@ export default function PlaceDetailPage() {
               </div>
             )}
           </div>
+
+          {/* Community Photos Gallery */}
+          <div className="rounded-2xl border border-monsoon-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <h2 className="text-lg font-bold text-monsoon-900 flex items-center gap-2">
+                <span>Community Spot Photos</span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-monsoon-100 text-monsoon-800">
+                  {photos.length}
+                </span>
+              </h2>
+              <button
+                type="button"
+                onClick={() => setActiveActionTab("photo")}
+                className="text-xs font-semibold text-monsoon-700 hover:text-monsoon-900 hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                + Upload Photo
+              </button>
+            </div>
+
+            {photos.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-monsoon-200 p-6 text-center bg-monsoon-50/40 space-y-2">
+                <p className="text-xs text-monsoon-800/80">
+                  No community photos shared for {place.name} yet.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setActiveActionTab("photo")}
+                  className="rounded-xl bg-monsoon-900 text-white px-3.5 py-1.5 text-xs font-semibold hover:bg-monsoon-800 transition-colors shadow-2xs"
+                >
+                  Be the first to share a photo
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {photos.map((ph) => (
+                  <div key={ph.id} className="group relative rounded-xl overflow-hidden border border-monsoon-200 bg-monsoon-100/50 aspect-4/3">
+                    <img
+                      src={ph.photoUrl}
+                      alt={ph.caption || place.name}
+                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    {ph.caption && (
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 text-white">
+                        <p className="text-[11px] font-medium leading-tight truncate">{ph.caption}</p>
+                        <span className="text-[9px] text-white/70 block mt-0.5">by {ph.uploaderName}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Col: Contribution Actions */}
         <div className="space-y-4">
-          <div className="flex rounded-xl bg-monsoon-100 p-1 text-xs font-semibold gap-1">
+          <div className="flex flex-wrap rounded-xl bg-monsoon-100 p-1 text-xs font-semibold gap-1">
             {[
               { id: "review", label: "Review" },
               { id: "dish", label: "Dish Price" },
+              { id: "photo", label: "Add Photo" },
               { id: "access", label: "Road Access" },
               { id: "correct", label: "Correction" },
             ].map((tab) => (
@@ -435,7 +494,7 @@ export default function PlaceDetailPage() {
                 type="button"
                 onClick={() => setActiveActionTab(tab.id)}
                 className={[
-                  "flex-1 rounded-lg py-2 text-center transition-[background-color,color,transform] duration-150 select-none active:scale-[0.97]",
+                  "flex-1 min-w-[70px] rounded-lg py-2 text-center transition-[background-color,color,transform] duration-150 select-none active:scale-[0.97]",
                   activeActionTab === tab.id
                     ? "bg-white text-monsoon-900 shadow-2xs font-bold"
                     : "text-monsoon-800 hover:text-monsoon-900 hover:bg-white/50",
@@ -459,6 +518,18 @@ export default function PlaceDetailPage() {
                 placeId={place.id}
                 placeName={place.name}
                 onPriceAdded={(newPrice) => setDishPrices((prev) => [newPrice, ...prev])}
+              />
+            )}
+            {activeActionTab === "photo" && (
+              <UploadPlacePhotoForm
+                placeId={place.id}
+                placeName={place.name}
+                onPhotoUploaded={(newPhoto) => {
+                  setPhotos((prev) => [newPhoto, ...prev]);
+                  if (!place.coverImage) {
+                    setPlace((prev) => ({ ...prev, coverImage: newPhoto.photoUrl }));
+                  }
+                }}
               />
             )}
             {activeActionTab === "access" && (

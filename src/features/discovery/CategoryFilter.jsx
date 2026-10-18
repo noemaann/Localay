@@ -1,4 +1,5 @@
 import { CATEGORIES } from "../../data/categories.js";
+import CategoryIcon from "../../components/CategoryIcon.jsx";
 
 /**
  * CategoryFilter — a horizontal pill-strip filter for discovery categories.
@@ -44,6 +45,12 @@ export default function CategoryFilter({ selected, onChange, resultCounts = {} }
                 : "bg-white text-monsoon-800 border border-monsoon-200/90 hover:border-monsoon-900 hover:text-monsoon-900 shadow-2xs",
             ].join(" ")}
           >
+            {cat.id && (
+              <CategoryIcon
+                categoryId={cat.id}
+                className={`w-3.5 h-3.5 shrink-0 ${isSelected ? "text-white" : "text-monsoon-700"}`}
+              />
+            )}
             <span>{cat.label}</span>
             {count !== undefined && (
               <span

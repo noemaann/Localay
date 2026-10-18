@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Card from "./Card.jsx";
+import CategoryIcon from "./CategoryIcon.jsx";
 import { CATEGORIES } from "../data/categories.js";
 
 /**
@@ -114,7 +115,7 @@ export default function CategoryGrid({ onSelect, className = "" }) {
                 aria-hidden="true"
                 className={`flex h-12 w-12 items-center justify-center rounded-xl shadow-2xs ${cat.accent} transition-transform duration-200 group-hover:scale-105`}
               >
-                {CATEGORY_SVGS[cat.id] || cat.icon}
+                <CategoryIcon categoryId={cat.id} className="w-5 h-5 shrink-0" />
               </span>
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-monsoon-50 text-monsoon-600 group-hover:bg-monsoon-900 group-hover:text-white transition-colors duration-150 shadow-2xs">
                 <svg

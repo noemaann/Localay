@@ -110,8 +110,11 @@ export default function AdminAccountsPage({ currentAdmin }) {
   if (!isSuperAdmin) {
     return (
       <div className="max-w-4xl mx-auto py-12 px-4 text-center">
-        <div className="h-16 w-16 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-3xl mb-4">
-          🔒
+        <div className="h-16 w-16 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4">
+          <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
         </div>
         <h2 className="text-xl font-bold text-white mb-2">Super Admin Access Required</h2>
         <p className="text-sm text-slate-400 max-w-md mx-auto">
@@ -158,12 +161,20 @@ export default function AdminAccountsPage({ currentAdmin }) {
       {/* Notifications */}
       {error && (
         <div className="rounded-xl bg-rose-500/10 border border-rose-500/30 p-3.5 text-xs sm:text-sm text-rose-300 flex items-center gap-2">
-          <span>⚠️ {error}</span>
+          <svg className="w-4 h-4 text-rose-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>{error}</span>
         </div>
       )}
       {success && (
         <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3.5 text-xs sm:text-sm text-emerald-300 flex items-center gap-2">
-          <span>✓ {success}</span>
+          <svg className="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span>{success}</span>
         </div>
       )}
 
@@ -199,7 +210,11 @@ export default function AdminAccountsPage({ currentAdmin }) {
                     <td className="py-3.5 px-4 font-mono font-bold text-white flex items-center gap-2">
                       {adm.username}
                       {isRoot && (
-                        <span title="Master Super Admin" className="text-amber-400 text-xs">👑</span>
+                        <span title="Master Super Admin" className="text-amber-400 flex items-center">
+                          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="12 2 15 8 22 9 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9 9 8 12 2" />
+                          </svg>
+                        </span>
                       )}
                     </td>
                     <td className="py-3.5 px-4 font-medium">{adm.name}</td>
@@ -287,7 +302,10 @@ export default function AdminAccountsPage({ currentAdmin }) {
                 onClick={() => setShowAddModal(false)}
                 className="text-slate-400 hover:text-white p-1"
               >
-                ✕
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             </div>
 

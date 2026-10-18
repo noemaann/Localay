@@ -90,8 +90,11 @@ export default function AdminSubmissionsPage({ currentAdmin, onSubmissionsUpdate
           }`}
         >
           <span>{notification.message}</span>
-          <button type="button" onClick={() => setNotification(null)} className="text-slate-400 hover:text-white">
-            ✕
+          <button type="button" onClick={() => setNotification(null)} className="text-slate-400 hover:text-white p-1">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
       )}
@@ -136,12 +139,24 @@ export default function AdminSubmissionsPage({ currentAdmin, onSubmissionsUpdate
                     </div>
 
                     <div className="text-xs text-slate-400 flex flex-wrap items-center gap-3 mt-1.5">
-                      <span>📍 Town: <strong className="text-slate-300">{sub.town || sub.locality || "Malappuram"}</strong></span>
+                      <span className="flex items-center gap-1">
+                        <svg className="w-3.5 h-3.5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                          <circle cx="12" cy="9" r="2.5" />
+                        </svg>
+                        <span>Town: <strong className="text-slate-300">{sub.town || sub.locality || "Malappuram"}</strong></span>
+                      </span>
                       <span>Category: <strong className="text-slate-300">{sub.category || "General"}</strong></span>
                       {sub.contributorName && (
                         <span>Contributor: <strong className="text-slate-300">{sub.contributorName}</strong></span>
                       )}
-                      <span>🕒 {new Date(sub.createdAt).toLocaleDateString()}</span>
+                      <span className="flex items-center gap-1">
+                        <svg className="w-3.5 h-3.5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span>{new Date(sub.createdAt).toLocaleDateString()}</span>
+                      </span>
                     </div>
                   </div>
 
@@ -151,9 +166,12 @@ export default function AdminSubmissionsPage({ currentAdmin, onSubmissionsUpdate
                       type="button"
                       disabled={processingId === sub.id}
                       onClick={() => handleModerate(sub.id, "verified")}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-sm transition-all active:scale-95 disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-sm transition-all active:scale-95 disabled:opacity-50"
                     >
-                      ✓ Verify & Publish
+                      <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      <span>Verify & Publish</span>
                     </button>
                     <button
                       type="button"
