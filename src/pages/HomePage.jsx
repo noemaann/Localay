@@ -213,23 +213,23 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
             ))}
 
             {/* Quick Auto Fare Teaser Box */}
-            <div className="mt-1 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-white border border-amber-300/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="h-10 w-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-base shrink-0 shadow-xs">
+            <div className="mt-1 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-white border border-amber-300/60 flex flex-col gap-3 shadow-2xs">
+              <div className="flex items-start gap-3 min-w-0">
+                <div className="h-10 w-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-base shrink-0 shadow-xs mt-0.5">
                   ₹
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-monsoon-900 truncate">
+                  <p className="text-xs font-bold text-monsoon-900">
                     Need an Auto in {region.name}?
                   </p>
-                  <p className="text-[11px] text-monsoon-800/70 truncate">
+                  <p className="text-[11px] text-monsoon-800/70 mt-0.5 leading-relaxed">
                     Estimated baseline ₹30 for first 1.5 km • Local fare index
                   </p>
                 </div>
               </div>
               <Link
                 to="/autofare"
-                className="shrink-0 px-3.5 py-1.5 rounded-xl bg-monsoon-900 hover:bg-monsoon-800 text-white text-xs font-semibold transition-[background-color,transform] shadow-xs active:scale-95"
+                className="w-full text-center py-2 px-4 rounded-xl bg-monsoon-900 hover:bg-monsoon-800 text-white text-xs font-semibold transition-[background-color,transform] shadow-xs active:scale-95"
               >
                 Estimate Fare
               </Link>
@@ -289,8 +289,8 @@ function CommunityBanner() {
       aria-label="Community contribution"
       className="mx-auto max-w-6xl px-4 py-8 sm:px-6"
     >
-      <div className="rounded-3xl border border-monsoon-200/90 bg-gradient-to-r from-monsoon-100/80 via-white to-amber-50/40 p-6 sm:p-10 shadow-xs flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="max-w-2xl">
+      <div className="rounded-3xl border border-monsoon-200/90 bg-gradient-to-r from-monsoon-100/80 via-white to-amber-50/40 p-6 sm:p-10 shadow-xs flex flex-col items-start gap-6">
+        <div className="max-w-3xl">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-monsoon-200/70 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-monsoon-900 mb-2.5">
             Community-Powered
           </div>
@@ -302,7 +302,7 @@ function CommunityBanner() {
             report current dish prices, and help your neighbors discover what makes your town special.
           </p>
         </div>
-        <div className="shrink-0 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
           <Link
             to="/contribute"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-monsoon-900 px-6 py-3 text-xs font-semibold tracking-wide text-white hover:bg-monsoon-800 transition-all shadow-xs active:scale-[0.98]"

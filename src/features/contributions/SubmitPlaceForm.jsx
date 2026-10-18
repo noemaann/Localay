@@ -402,25 +402,54 @@ export default function SubmitPlaceForm({ onSubmitted }) {
           {errors.name && <p className="mt-1 text-xs text-rose-600 font-semibold">{errors.name}</p>}
         </div>
 
-        {/* Category & Region with Internet Search */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="place-category-select" className="block text-xs font-bold text-monsoon-900 mb-1.5">
-              Category <span className="text-rose-500">*</span>
-            </label>
-            <select
-              id="place-category-select"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="input-control bg-white cursor-pointer"
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.label}
-                </option>
-              ))}
-            </select>
+        {/* Category Selection with Logos */}
+        <div>
+          <label className="block text-xs font-bold text-monsoon-900 mb-2">
+            Category <span className="text-rose-500">*</span>
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2" role="radiogroup" aria-label="Select category">
+            {CATEGORIES.map((cat) => {
+              const isSelected = formData.category === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => setFormData({ ...formData, category: cat.id })}
+                  className={[
+                    "flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-150 active:scale-[0.98]",
+                    isSelected
+                      ? "bg-monsoon-900 text-white border-monsoon-900 shadow-xs ring-1 ring-monsoon-900"
+                      : "bg-white text-monsoon-800 border-monsoon-200 hover:border-monsoon-400 hover:bg-monsoon-50 shadow-2xs",
+                  ].join(" ")}
+                >
+                  <span className={`flex h-8 w-8 items-center justify-center rounded-lg mb-1.5 transition-transform ${isSelected ? "bg-white/20 text-white" : "bg-monsoon-100 text-monsoon-800"}`}>
+                    <CategoryIcon categoryId={cat.id} className="w-4 h-4 shrink-0" />
+                  </span>
+                  <span className="text-xs font-semibold leading-tight">{cat.label}</span>
+                </button>
+              );
+            })}
           </div>
+          <select
+            id="place-category-select"
+            value={formData.category}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            className="sr-only"
+            tabIndex={-1}
+            aria-hidden="true"
+          >
+            {CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Region Search from Internet */}
+        <div className="grid grid-cols-1 gap-4">
 
           {/* Region Search from Internet */}
           <div ref={regionRef} className="relative">

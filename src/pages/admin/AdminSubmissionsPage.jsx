@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { submissionService } from "../../services";
+import CategoryIcon from "../../components/CategoryIcon.jsx";
 
 export default function AdminSubmissionsPage({ currentAdmin, onSubmissionsUpdated }) {
   const [submissions, setSubmissions] = useState([]);
@@ -146,7 +147,11 @@ export default function AdminSubmissionsPage({ currentAdmin, onSubmissionsUpdate
                         </svg>
                         <span>Town: <strong className="text-slate-300">{sub.town || sub.locality || "Malappuram"}</strong></span>
                       </span>
-                      <span>Category: <strong className="text-slate-300">{sub.category || "General"}</strong></span>
+                      <span className="flex items-center gap-1">
+                        <span>Category:</span>
+                        <CategoryIcon categoryId={sub.category || sub.categoryId} className="w-3 h-3 text-emerald-400" />
+                        <strong className="text-slate-300 capitalize">{sub.category || "General"}</strong>
+                      </span>
                       {sub.contributorName && (
                         <span>Contributor: <strong className="text-slate-300">{sub.contributorName}</strong></span>
                       )}

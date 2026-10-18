@@ -6,6 +6,7 @@ import AccessUpdateForm from "../features/contributions/AccessUpdateForm.jsx";
 import CorrectionRequestForm from "../features/contributions/CorrectionRequestForm.jsx";
 import { placeService } from "../services";
 import { useLocation } from "../context/LocationContext.jsx";
+import CategoryIcon from "../components/CategoryIcon.jsx";
 
 export default function ContributePage() {
   const { region } = useLocation();
@@ -70,8 +71,8 @@ export default function ContributePage() {
 
       {/* Selector for existing place when not submitting a new place */}
       {activeTab !== "new_place" && (
-        <div className="mb-6 rounded-2xl bg-white border border-monsoon-200/80 p-5 shadow-xs">
-          <label className="block text-xs font-bold text-monsoon-900 mb-1.5">
+        <div className="mb-6 rounded-2xl bg-white border border-monsoon-200/80 p-5 shadow-xs space-y-3">
+          <label className="block text-xs font-bold text-monsoon-900">
             Select Existing Spot in {region.name}:
           </label>
           <select
@@ -85,6 +86,17 @@ export default function ContributePage() {
               </option>
             ))}
           </select>
+          {selectedPlace && (
+            <div className="flex items-center gap-2 pt-1 text-xs">
+              <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-semibold bg-monsoon-100 text-monsoon-800 border border-monsoon-200/60">
+                <CategoryIcon categoryId={selectedPlace.categoryId || selectedPlace.category} className="w-3.5 h-3.5" />
+                <span className="capitalize">{selectedPlace.category || selectedPlace.categoryId}</span>
+              </span>
+              <span className="text-monsoon-600 font-medium">
+                {selectedPlace.townId || selectedPlace.location?.town || "Local spot"}
+              </span>
+            </div>
+          )}
         </div>
       )}
 

@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { CATEGORIES } from "../../data/categories.js";
 import { buildItinerary } from "../../services/itineraryService.js";
 import Button from "../../components/Button.jsx";
+import CategoryIcon from "../../components/CategoryIcon.jsx";
 
 export default function ItineraryPlanner({ places = [], regionName = "Malappuram", onClose }) {
   // 1. Filter Preferences
@@ -133,6 +134,7 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
                         : "bg-monsoon-50 text-monsoon-800 hover:bg-monsoon-100 border border-monsoon-200"
                     }`}
                   >
+                    <CategoryIcon categoryId={cat.id} className={`w-3.5 h-3.5 ${isSelected ? "text-white" : "text-monsoon-700"}`} />
                     <span>{cat.label}</span>
                   </button>
                 );
@@ -383,8 +385,9 @@ export default function ItineraryPlanner({ places = [], regionName = "Malappuram
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <div className="flex items-center gap-2">
-                                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-monsoon-100 text-monsoon-800">
-                                  {catObj?.label || place.category}
+                                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-monsoon-100 text-monsoon-800 flex items-center gap-1.5">
+                                  <CategoryIcon categoryId={place.category || place.categoryId} className="w-3.5 h-3.5" />
+                                  <span>{catObj?.label || place.category}</span>
                                 </span>
                                 <h3 className="text-base font-bold text-monsoon-900 truncate">
                                   {place.name}

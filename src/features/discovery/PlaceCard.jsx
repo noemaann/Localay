@@ -1,41 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
+import CategoryIcon from "../../components/CategoryIcon.jsx";
 import { CATEGORIES } from "../../data/categories.js";
 import { difficultyClass, formatDifficulty } from "../../utils/format.js";
-
-const CATEGORY_ICONS = {
-  food: (
-    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 8h1a4 4 0 0 1 0 8h-1" /><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
-    </svg>
-  ),
-  nature: (
-    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-    </svg>
-  ),
-  viewpoints: (
-    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
-    </svg>
-  ),
-  waterfalls: (
-    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-    </svg>
-  ),
-  treks: (
-    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="5" r="2" /><path d="m9 20 3-6 3 2 3-5" />
-    </svg>
-  ),
-  experiences: (
-    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m12 3 2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6z" />
-    </svg>
-  ),
-};
 
 /**
  * PlaceCard — a summary card for a single place, used in the discovery grid.
@@ -47,7 +16,8 @@ const CATEGORY_ICONS = {
  * @param {{ place: import('../../data/mockPlaces.js').Place }} props
  */
 export default function PlaceCard({ place }) {
-  const category = CATEGORIES.find((c) => c.id === place.categoryId);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const category = CATEGORIES.find((c) => c.id === (place.categoryId || place.category));
 
   return (
     <Link
@@ -62,13 +32,43 @@ export default function PlaceCard({ place }) {
         {/* Image header or Category accent band */}
         {place.coverImage ? (
           <div className="relative h-36 w-full overflow-hidden bg-monsoon-100 ring-1 ring-black/5">
+            {/* Image Skeleton while loading */}
+            {!imageLoaded && (
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-monsoon-200/70 animate-pulse flex items-center justify-center text-monsoon-400"
+              >
+                <svg
+                  className="w-8 h-8 opacity-40"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                  />
+                </svg>
+              </div>
+            )}
             <img
               src={place.coverImage}
               alt=""
-              className="h-full w-full object-cover transition-transform duration-300 ease-spring-out group-hover:scale-105"
+              onLoad={() => setImageLoaded(true)}
+              className={`h-full w-full object-cover transition-[transform,opacity] duration-300 ease-spring-out group-hover:scale-105 ${
+                imageLoaded ? "opacity-100" : "opacity-0"
+              }`}
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute bottom-2 left-2 pointer-events-none">
+              <span className="text-[10px] font-medium bg-black/60 text-white/90 backdrop-blur-xs px-2 py-0.5 rounded-md">
+                Contributor Photo
+              </span>
+            </div>
             <div
               aria-hidden="true"
               className={`absolute top-0 inset-x-0 h-1.5 ${category ? getCategoryBandClass(category.id) : "bg-monsoon-200"}`}
@@ -87,7 +87,7 @@ export default function PlaceCard({ place }) {
             <div className="flex items-center justify-between gap-2 flex-wrap mb-3">
               {category && (
                 <span className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold ${category.accent} shadow-2xs`}>
-                  <span aria-hidden="true">{CATEGORY_ICONS[category.id] || category.icon}</span>
+                  <CategoryIcon categoryId={category.id} className="w-3.5 h-3.5 shrink-0" />
                   <span>{category.label}</span>
                 </span>
               )}

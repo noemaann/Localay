@@ -9,6 +9,7 @@ import {
 import MapPlaceholder from "../features/discovery/MapPlaceholder.jsx";
 import Badge from "../components/Badge.jsx";
 import LoadingState from "../components/LoadingState.jsx";
+import { PlaceDetailSkeleton } from "../components/Skeleton.jsx";
 import SubmissionStatusBadge from "../components/SubmissionStatusBadge.jsx";
 import CategoryIcon from "../components/CategoryIcon.jsx";
 import { CATEGORIES } from "../data/categories.js";
@@ -87,11 +88,7 @@ export default function PlaceDetailPage() {
   }, [placeId]);
 
   if (loading) {
-    return (
-      <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-        <LoadingState message="Loading place details…" />
-      </div>
-    );
+    return <PlaceDetailSkeleton />;
   }
 
   if (error === "not_found" || !place) {
@@ -189,6 +186,15 @@ export default function PlaceDetailPage() {
                 <CategoryIcon categoryId={category.id} className="w-3.5 h-3.5 shrink-0" />
                 <span>{category.label}</span>
               </Badge>
+            )}
+            {place.coverImage && (
+              <span className="rounded-full border border-emerald-400/30 bg-emerald-950/50 text-emerald-200 px-2.5 py-0.5 text-xs font-semibold backdrop-blur-xs flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Community Photo</span>
+              </span>
             )}
             {place.status && <SubmissionStatusBadge status={place.status} />}
             {place._demo && (

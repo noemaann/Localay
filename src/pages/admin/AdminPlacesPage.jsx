@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { placeService } from "../../services";
+import CategoryIcon from "../../components/CategoryIcon.jsx";
 
 export default function AdminPlacesPage() {
   const [places, setPlaces] = useState([]);
@@ -77,8 +78,9 @@ export default function AdminPlacesPage() {
                   <h3 className="text-sm font-bold text-white line-clamp-1">
                     {p.name}
                   </h3>
-                  <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-emerald-400 uppercase border border-slate-700">
-                    {p.category}
+                  <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-emerald-400 uppercase border border-slate-700 flex items-center gap-1 shrink-0">
+                    <CategoryIcon categoryId={p.category || p.categoryId} className="w-3 h-3 text-emerald-400" />
+                    <span>{p.category}</span>
                   </span>
                 </div>
 
