@@ -4,7 +4,7 @@ import { buildItinerary } from "../../services/itineraryService.js";
 import Button from "../../components/Button.jsx";
 import CategoryIcon from "../../components/CategoryIcon.jsx";
 
-export default function ItineraryPlanner({ places = [], regionName = "Malappuram", onClose }) {
+export default function ItineraryPlanner({ places = [], regionName = "Local Area", onClose }) {
   // 1. Filter Preferences
   const [selectedCategories, setSelectedCategories] = useState([
     "food",

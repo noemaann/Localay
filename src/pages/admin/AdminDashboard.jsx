@@ -71,8 +71,7 @@ export default function AdminDashboard({ onNavigateTab, currentAdmin }) {
               Welcome back, {currentAdmin?.name || currentAdmin?.username}
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl">
-              Localay Kerala Discovery Platform. Currently governing region:{" "}
-              <strong className="text-slate-200">Malappuram District (Kerala)</strong>.
+              Community Local Discovery Platform. Multi-region governance and moderation active.
             </p>
           </div>
 
@@ -199,7 +198,7 @@ export default function AdminDashboard({ onNavigateTab, currentAdmin }) {
                 {stats.pendingApplications} Community Member{stats.pendingApplications > 1 ? "s" : ""} Applied for Moderator Access
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                Local volunteers in Malappuram, Tirur, and Perinthalmanna are waiting for your approval to verify spots.
+                Local community volunteers and contributors are waiting for your approval to verify spots.
               </p>
             </div>
           </div>
@@ -231,8 +230,8 @@ export default function AdminDashboard({ onNavigateTab, currentAdmin }) {
               <span className="font-mono text-emerald-400 font-semibold">admin.localay / /admin</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-slate-800">
-              <span className="text-slate-400">Primary Region Coverage:</span>
-              <span className="text-slate-200 font-semibold">Malappuram District (12+ Municipalities)</span>
+              <span className="text-slate-400">Regional Governance:</span>
+              <span className="text-slate-200 font-semibold">Multi-Region Extensible Architecture</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-slate-800">
               <span className="text-slate-400">Super Admin Authentication:</span>

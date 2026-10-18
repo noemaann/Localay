@@ -44,7 +44,7 @@ export default function AdminAutoFarePage() {
           AutoFare Rates & Community Reports
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Standard auto-rickshaw meter rates and community fare guidelines for Kerala & Malappuram.
+          Standard auto-rickshaw meter baseline rates and regional community fare guidelines.
         </p>
       </div>
 

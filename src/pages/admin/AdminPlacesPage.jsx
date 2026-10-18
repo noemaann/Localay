@@ -12,7 +12,7 @@ export default function AdminPlacesPage() {
     async function loadPlaces() {
       setLoading(true);
       try {
-        const list = await placeService.getPlaces({ regionId: "malappuram" });
+        const list = await placeService.getPlaces();
         setPlaces(list || []);
       } catch (err) {
         console.error("Error loading places:", err);
@@ -42,7 +42,7 @@ export default function AdminPlacesPage() {
             Places Directory & Registry
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Browse and inspect active spots in the Malappuram database. Total: {places.length} places.
+            Browse and inspect active spots in the community database. Total: {places.length} places.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export default function AdminPlacesPage() {
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
                     <circle cx="12" cy="9" r="2.5" />
                   </svg>
-                  <span>{p.town || "Malappuram"}</span>
+                  <span>{p.town || p.districtId || p.regionName || "Local Area"}</span>
                 </div>
 
                 <p className="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">

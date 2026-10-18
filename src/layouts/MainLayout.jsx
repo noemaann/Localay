@@ -380,13 +380,13 @@ function SiteFooter() {
           {/* Column 4: Local Commitment */}
           <div className="space-y-2.5">
             <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-monsoon-900">
-              Kerala Craft
+              Community Guides
             </h4>
             <p className="text-xs text-monsoon-800/70 leading-relaxed">
-              Designed for travelers and residents exploring Malappuram, Kozhikode, Wayanad, and beyond.
+              Designed for travelers and residents exploring authentic local food, viewpoints, and neighborhood transit rates everywhere.
             </p>
             <div className="pt-2 text-[11px] font-mono text-monsoon-800/60">
-              GPS calibrated • Open Data
+              GPS Calibrated • Open Data
             </div>
           </div>
         </div>
@@ -394,7 +394,7 @@ function SiteFooter() {
         {/* Bottom copyright */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-monsoon-800/60">
           <p>
-            &copy; {new Date().getFullYear()} LOCALAY • Handcrafted for Kerala's neighborhood explorers.
+            &copy; {new Date().getFullYear()} LOCALAY • Handcrafted for neighborhood explorers.
           </p>
           <div className="flex items-center gap-4">
             <NavLink to="/discover" className="hover:text-monsoon-900 transition-colors">Directory</NavLink>

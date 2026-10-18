@@ -22,8 +22,8 @@ export default function SubmitPlaceForm({ onSubmitted }) {
     name: "",
     category: "food",
     regionId: activeRegion.id,
-    regionName: activeRegion.name || "Malappuram",
-    districtId: activeRegion.districtId || activeRegion.name || "malappuram",
+    regionName: activeRegion.name || "Local Area",
+    districtId: activeRegion.districtId || activeRegion.name || "local",
     townId: "",
     description: "",
     address: "",
@@ -476,7 +476,7 @@ export default function SubmitPlaceForm({ onSubmitted }) {
                   }));
                   setShowRegionResults(true);
                 }}
-                placeholder="Type district or city (e.g. Malappuram, Wayanad)..."
+                placeholder="Type district or city (e.g. Kozhikode, Wayanad, Bengaluru)..."
                 className="input-control bg-white"
               />
               {searchingRegion && (

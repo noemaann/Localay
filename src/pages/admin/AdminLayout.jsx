@@ -217,8 +217,8 @@ export default function AdminLayout({
           {/* Quick status footer in sidebar */}
           <div className="p-4 border-t border-slate-800 text-[11px] text-slate-400 space-y-1.5 bg-slate-950/40">
             <div className="flex items-center justify-between">
-              <span>Active Region:</span>
-              <span className="font-semibold text-slate-200">Malappuram (MLP)</span>
+              <span>Active Scope:</span>
+              <span className="font-semibold text-slate-200">All Regions (Live)</span>
             </div>
             <div className="flex items-center justify-between">
               <span>System Status:</span>

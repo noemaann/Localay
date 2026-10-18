@@ -37,7 +37,23 @@ export const REGIONS = [
     state: "Kerala",
     country: "India",
     label: "Kozhikode, Kerala",
-    available: false,
+    available: true,
+  },
+  {
+    id: "wayanad-kerala",
+    name: "Wayanad",
+    state: "Kerala",
+    country: "India",
+    label: "Wayanad, Kerala",
+    available: true,
+  },
+  {
+    id: "kochi-kerala",
+    name: "Kochi",
+    state: "Kerala",
+    country: "India",
+    label: "Kochi, Kerala",
+    available: true,
   },
   {
     id: "thrissur-kerala",
@@ -45,7 +61,15 @@ export const REGIONS = [
     state: "Kerala",
     country: "India",
     label: "Thrissur, Kerala",
-    available: false,
+    available: true,
+  },
+  {
+    id: "bengaluru-karnataka",
+    name: "Bengaluru",
+    state: "Karnataka",
+    country: "India",
+    label: "Bengaluru, Karnataka",
+    available: true,
   },
 ];
 

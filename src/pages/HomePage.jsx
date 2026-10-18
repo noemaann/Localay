@@ -220,7 +220,7 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-bold text-monsoon-900">
-                    Need an Auto in {region.name}?
+                    Need a Local Auto?
                   </p>
                   <p className="text-[11px] text-monsoon-800/70 mt-0.5 leading-relaxed">
                     Estimated baseline ₹30 for first 1.5 km • Local fare index
