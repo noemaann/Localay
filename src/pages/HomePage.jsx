@@ -35,12 +35,13 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
 
   const showcaseGems = [
     {
-      name: "Mini Ooty (Arimbra)",
+      name: "Mini Ooty (Arimbra Hills)",
       category: "Viewpoints",
       rating: "4.8",
       highlight: "Misty tea slopes & sunrise clouds",
       link: "/discover?category=viewpoints",
       tag: "Free Access",
+      image: "/images/mini_ooty_hills.jpg",
     },
     {
       name: "Rahmath Biriyani & Sulaimani",
@@ -49,14 +50,16 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
       highlight: "Small-grain Kaima dum & black tea",
       link: "/discover?category=food",
       tag: "Iconic Spot",
+      image: "/images/malabar_biriyani.jpg",
     },
     {
-      name: "Kottakkunnu Hilltop Park",
+      name: "Riverbank Grove & Bamboo",
       category: "Nature",
       rating: "4.7",
-      highlight: "Sunset amphitheater & valley breeze",
+      highlight: "Sunset river breeze & peaceful trails",
       link: "/discover?category=nature",
-      tag: "Family Favorite",
+      tag: "Peaceful",
+      image: "/images/kerala_riverbank.jpg",
     },
   ];
 
@@ -170,15 +173,23 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
               </Link>
             </div>
 
-            {showcaseGems.map((gem, idx) => (
+            {showcaseGems.map((gem) => (
               <Link
                 key={gem.name}
                 to={gem.link}
-                className="group p-4 rounded-2xl bg-white border border-monsoon-200/80 shadow-xs hover:border-monsoon-700 hover:shadow-card-hover transition-all duration-200 active:scale-[0.98] flex items-center justify-between gap-4"
+                className="group p-3.5 sm:p-4 rounded-2xl bg-white border border-monsoon-200/80 shadow-xs hover:border-monsoon-700 hover:shadow-card-hover transition-[box-shadow,border-color,transform] duration-200 active:scale-[0.98] flex items-center justify-between gap-3.5"
               >
+                <div className="relative h-14 w-14 sm:h-16 sm:w-16 rounded-xl overflow-hidden shrink-0 bg-monsoon-100 ring-1 ring-black/5">
+                  <img
+                    src={gem.image}
+                    alt=""
+                    className="h-full w-full object-cover transition-transform duration-300 ease-spring-out group-hover:scale-110"
+                    loading="lazy"
+                  />
+                </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-monsoon-100/70 text-monsoon-800">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-monsoon-100/80 text-monsoon-800">
                       {gem.category}
                     </span>
                     <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
@@ -193,8 +204,8 @@ function HeroSection({ searchValue, onSearchChange, onSearchClear, onSearchSubmi
                   </p>
                 </div>
 
-                <div className="flex flex-col items-end shrink-0 gap-1">
-                  <span className="inline-flex items-center gap-1 text-xs font-bold font-mono text-monsoon-900 bg-monsoon-50 px-2 py-1 rounded-lg border border-monsoon-200">
+                <div className="flex flex-col items-end shrink-0 gap-1 pl-1">
+                  <span className="inline-flex items-center gap-1 text-xs font-bold tabular-nums text-monsoon-900 bg-monsoon-50 px-2 py-1 rounded-lg border border-monsoon-200">
                     <span className="text-amber-500">★</span>
                     <span>{gem.rating}</span>
                   </span>

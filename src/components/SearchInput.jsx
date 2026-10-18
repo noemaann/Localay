@@ -62,8 +62,8 @@ export default function SearchInput({
           autoComplete="off"
           className={[
             "w-full rounded-2xl border border-monsoon-200/90 bg-white py-3.5 pl-12 pr-12",
-            "text-sm text-monsoon-900 placeholder:text-monsoon-800/40 font-medium",
-            "shadow-[0_2px_10px_-2px_rgba(15,23,42,0.04)] transition-all duration-200",
+            "text-base sm:text-sm text-monsoon-900 placeholder:text-monsoon-800/40 font-medium",
+            "shadow-[0_2px_10px_-2px_rgba(15,23,42,0.04)] transition-[border-color,box-shadow] duration-150",
             "focus:border-monsoon-900 focus:outline-none focus:ring-2 focus:ring-monsoon-900/10",
             "hover:border-monsoon-400",
           ].join(" ")}

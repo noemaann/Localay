@@ -166,13 +166,16 @@ export default function PlaceDetailPage() {
       )}
 
       {/* Hero Header */}
-      <header className="relative rounded-3xl overflow-hidden bg-monsoon-900 text-white p-7 sm:p-12 shadow-md">
+      <header className="relative rounded-3xl overflow-hidden bg-monsoon-900 text-white p-7 sm:p-12 shadow-card-hover border border-monsoon-800">
         {place.coverImage && (
-          <img
-            src={place.coverImage}
-            alt={place.name}
-            className="absolute inset-0 w-full h-full object-cover opacity-25"
-          />
+          <>
+            <img
+              src={place.coverImage}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-40 scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-monsoon-950/95 via-monsoon-950/80 to-monsoon-950/40" />
+          </>
         )}
         <div className="relative z-10 max-w-2xl space-y-3.5">
           <div className="flex flex-wrap items-center gap-2">
@@ -184,7 +187,7 @@ export default function PlaceDetailPage() {
             )}
             {place.status && <SubmissionStatusBadge status={place.status} />}
             {place._demo && (
-              <span className="rounded-full border border-white/20 px-2.5 py-0.5 text-xs font-semibold text-white/80 select-none">
+              <span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-xs font-semibold text-white/90 select-none backdrop-blur-xs">
                 Demo data
               </span>
             )}
@@ -192,7 +195,7 @@ export default function PlaceDetailPage() {
 
           <h1
             id="place-name"
-            className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight"
+            className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight"
           >
             {place.name}
           </h1>

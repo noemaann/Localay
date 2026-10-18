@@ -28,7 +28,7 @@ function SiteHeader() {
 
   const navLinkClass = ({ isActive }) =>
     [
-      "inline-flex items-center text-xs font-semibold tracking-wide transition-all duration-150 focus-visible:outline",
+      "inline-flex items-center text-xs font-semibold tracking-wide transition-[background-color,color] duration-150 focus-visible:outline",
       "focus-visible:outline-2 focus-visible:outline-monsoon-600 rounded-lg px-3 py-1.5",
       isActive
         ? "bg-monsoon-100 text-monsoon-900 font-bold shadow-2xs"
@@ -41,7 +41,7 @@ function SiteHeader() {
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
       />
-      <header className="sticky top-0 z-40 border-b border-monsoon-200/60 bg-white/90 backdrop-blur-md transition-all shadow-[0_1px_2px_0_rgba(15,23,42,0.02)]">
+      <header className="sticky top-0 z-40 border-b border-monsoon-200/60 bg-white/90 backdrop-blur-md shadow-[0_1px_2px_0_rgba(15,23,42,0.02)]">
 
       <nav
         ref={navRef}
@@ -140,7 +140,7 @@ function SiteHeader() {
             <button
               type="button"
               onClick={() => setAuthModalOpen(true)}
-              className="hidden sm:inline-flex items-center justify-center rounded-xl border border-monsoon-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-monsoon-900 hover:bg-monsoon-50 transition-all shadow-2xs active:scale-95 h-8.5"
+              className="hidden sm:inline-flex items-center justify-center rounded-xl border border-monsoon-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-monsoon-900 hover:bg-monsoon-50 transition-[background-color,transform] duration-150 ease-spring-out shadow-2xs active:scale-[0.97] h-8.5"
             >
               Sign In
             </button>

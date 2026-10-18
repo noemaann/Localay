@@ -18,7 +18,7 @@
   /* Skip-to-content link for keyboard users */
   .skip-link {
     @apply absolute -top-full left-4 z-50 rounded-b-xl bg-monsoon-900 px-4 py-2 text-xs font-semibold text-white shadow-lg;
-    @apply focus:top-0 transition-all duration-200;
+    @apply focus:top-0 transition-[top,opacity] duration-200;
   }
 
   :focus-visible {
@@ -63,7 +63,7 @@
   }
   .link-underline::after {
     content: "";
-    @apply absolute bottom-0 left-0 h-0.5 w-0 bg-monsoon-600 transition-all duration-200 rounded-full;
+    @apply absolute bottom-0 left-0 h-0.5 w-0 bg-monsoon-600 transition-[width] duration-200 rounded-full;
   }
   .link-underline:hover::after {
     @apply w-full;

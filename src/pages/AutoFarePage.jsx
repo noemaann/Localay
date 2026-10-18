@@ -82,7 +82,7 @@ export default function AutoFarePage() {
             Kerala MVD Regulated
           </span>
         </div>
-        <h1 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-white max-w-2xl">
+        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white max-w-3xl">
           Community Auto-Rickshaw Fare Finder
         </h1>
         <p className="text-xs sm:text-sm text-monsoon-200/90 leading-relaxed max-w-2xl">

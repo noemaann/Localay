@@ -59,11 +59,27 @@ export default function PlaceCard({ place }) {
         interactive
         className="h-full flex flex-col justify-between overflow-hidden border border-monsoon-200/80 hover:border-monsoon-700 transition-[box-shadow,border-color,transform] duration-200 rounded-2xl bg-white shadow-xs hover:shadow-card-hover active:scale-[0.98]"
       >
-        {/* Subtle category accent band */}
-        <div
-          aria-hidden="true"
-          className={`h-1.5 w-full ${category ? getCategoryBandClass(category.id) : "bg-monsoon-200"}`}
-        />
+        {/* Image header or Category accent band */}
+        {place.coverImage ? (
+          <div className="relative h-36 w-full overflow-hidden bg-monsoon-100 ring-1 ring-black/5">
+            <img
+              src={place.coverImage}
+              alt=""
+              className="h-full w-full object-cover transition-transform duration-300 ease-spring-out group-hover:scale-105"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+            <div
+              aria-hidden="true"
+              className={`absolute top-0 inset-x-0 h-1.5 ${category ? getCategoryBandClass(category.id) : "bg-monsoon-200"}`}
+            />
+          </div>
+        ) : (
+          <div
+            aria-hidden="true"
+            className={`h-1.5 w-full ${category ? getCategoryBandClass(category.id) : "bg-monsoon-200"}`}
+          />
+        )}
 
         <div className="flex flex-col gap-3.5 p-5 sm:p-5.5 flex-1 justify-between">
           <div>

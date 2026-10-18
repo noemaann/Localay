@@ -11,19 +11,19 @@
 
 const BASE =
   "inline-flex items-center justify-center gap-2 rounded-xl font-semibold " +
-  "transition-all duration-150 focus-visible:outline focus-visible:outline-2 " +
-  "focus-visible:outline-offset-2 focus-visible:outline-monsoon-600 " +
+  "transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-spring-out " +
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-monsoon-600 " +
   "disabled:pointer-events-none disabled:opacity-50 select-none";
 
 const VARIANTS = {
   primary:
-    "bg-monsoon-900 text-white hover:bg-monsoon-800 active:scale-[0.98] shadow-xs border border-monsoon-900",
+    "bg-monsoon-900 text-white hover:bg-monsoon-800 active:scale-[0.97] shadow-xs border border-monsoon-900",
   secondary:
-    "border border-monsoon-900 text-monsoon-900 hover:bg-monsoon-900 hover:text-white active:scale-[0.98]",
+    "border border-monsoon-900 text-monsoon-900 hover:bg-monsoon-900 hover:text-white active:scale-[0.97]",
   outline:
-    "border border-monsoon-200 text-monsoon-800 hover:bg-monsoon-100 hover:text-monsoon-900 active:scale-[0.98]",
+    "border border-monsoon-200 text-monsoon-800 hover:bg-monsoon-100 hover:text-monsoon-900 active:scale-[0.97]",
   ghost:
-    "text-monsoon-800 hover:bg-monsoon-100/70 hover:text-monsoon-900 active:scale-[0.98]",
+    "text-monsoon-800 hover:bg-monsoon-100/70 hover:text-monsoon-900 active:scale-[0.97]",
 };
 
 const SIZES = {
