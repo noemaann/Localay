@@ -4,6 +4,39 @@ import Badge from "../../components/Badge.jsx";
 import { CATEGORIES } from "../../data/categories.js";
 import { difficultyClass, formatDifficulty } from "../../utils/format.js";
 
+const CATEGORY_ICONS = {
+  food: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8h1a4 4 0 0 1 0 8h-1" /><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+    </svg>
+  ),
+  nature: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+    </svg>
+  ),
+  viewpoints: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
+    </svg>
+  ),
+  waterfalls: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+    </svg>
+  ),
+  treks: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="5" r="2" /><path d="m9 20 3-6 3 2 3-5" />
+    </svg>
+  ),
+  experiences: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m12 3 2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6z" />
+    </svg>
+  ),
+};
+
 /**
  * PlaceCard — a summary card for a single place, used in the discovery grid.
  *
@@ -24,42 +57,56 @@ export default function PlaceCard({ place }) {
     >
       <Card
         interactive
-        className="h-full flex flex-col justify-between overflow-hidden border border-monsoon-200/80 hover:border-monsoon-900 transition-all duration-200 rounded-2xl shadow-xs hover:shadow-card-hover hover:-translate-y-0.5"
+        className="h-full flex flex-col justify-between overflow-hidden border border-monsoon-200/80 hover:border-monsoon-700 transition-[box-shadow,border-color,transform] duration-200 rounded-2xl bg-white shadow-xs hover:shadow-card-hover active:scale-[0.98]"
       >
-        {/* Thin category color accent */}
+        {/* Subtle category accent band */}
         <div
           aria-hidden="true"
           className={`h-1.5 w-full ${category ? getCategoryBandClass(category.id) : "bg-monsoon-200"}`}
         />
 
-        <div className="flex flex-col gap-3.5 p-5 flex-1 justify-between">
+        <div className="flex flex-col gap-3.5 p-5 sm:p-5.5 flex-1 justify-between">
           <div>
             {/* Top row: category badge + demo badge */}
             <div className="flex items-center justify-between gap-2 flex-wrap mb-3">
               {category && (
-                <Badge className={`shrink-0 ${category.accent}`}>
-                  <span aria-hidden="true">{category.icon}</span>
-                  {category.label}
-                </Badge>
+                <span className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold ${category.accent} shadow-2xs`}>
+                  <span aria-hidden="true">{CATEGORY_ICONS[category.id] || category.icon}</span>
+                  <span>{category.label}</span>
+                </span>
               )}
               {place._demo && (
-                <span className="shrink-0 rounded-full border border-monsoon-200 bg-monsoon-50 px-2.5 py-0.5 text-[10px] font-bold text-monsoon-800/60 select-none uppercase tracking-wider">
+                <span className="shrink-0 rounded-md border border-monsoon-200/90 bg-monsoon-100/60 px-2 py-0.5 text-[10px] font-mono font-bold text-monsoon-800/70 select-none uppercase tracking-wider">
                   Demo
                 </span>
               )}
             </div>
 
             {/* Name + tagline */}
-            <h3 className="text-base font-bold leading-snug text-monsoon-900 group-hover:text-monsoon-600 transition-colors duration-150 line-clamp-1">
+            <h3 className="text-base font-bold leading-snug text-monsoon-900 group-hover:text-monsoon-700 transition-colors duration-150 line-clamp-1">
               {place.name}
             </h3>
             <p className="mt-1.5 text-xs leading-relaxed text-monsoon-800/70 line-clamp-2 min-h-[2.25rem]">
               {place.tagline || place.description}
             </p>
+
+            {/* Tags preview if present */}
+            {place.tags && place.tags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {place.tags.slice(0, 2).map((t) => (
+                  <span
+                    key={t}
+                    className="text-[10px] font-medium text-monsoon-700 bg-monsoon-50 px-2 py-0.5 rounded-md border border-monsoon-200/60"
+                  >
+                    #{t}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Footer: location + difficulty */}
-          <div className="mt-auto flex items-center justify-between gap-2 pt-3.5 border-t border-monsoon-100">
+          {/* Footer: location + difficulty + details arrow */}
+          <div className="mt-auto flex items-center justify-between gap-2 pt-3.5 border-t border-monsoon-100/80">
             <div className="flex items-center gap-1.5 min-w-0">
               <svg
                 aria-hidden="true"
@@ -82,13 +129,18 @@ export default function PlaceCard({ place }) {
               </span>
             </div>
 
-            {place.access?.difficulty && (
-              <span
-                className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${difficultyClass(place.access.difficulty)}`}
-              >
-                {formatDifficulty(place.access.difficulty)}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {place.access?.difficulty && (
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${difficultyClass(place.access.difficulty)}`}
+                >
+                  {formatDifficulty(place.access.difficulty)}
+                </span>
+              )}
+              <span className="text-monsoon-400 group-hover:text-monsoon-900 group-hover:translate-x-0.5 transition-all text-xs">
+                →
               </span>
-            )}
+            </div>
           </div>
         </div>
       </Card>
@@ -100,9 +152,9 @@ export default function PlaceCard({ place }) {
 function getCategoryBandClass(id) {
   const map = {
     food: "bg-amber-400",
-    nature: "bg-green-500",
+    nature: "bg-emerald-500",
     viewpoints: "bg-sky-400",
-    waterfalls: "bg-blue-500",
+    waterfalls: "bg-teal-500",
     treks: "bg-orange-400",
     experiences: "bg-purple-400",
   };

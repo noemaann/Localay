@@ -73,18 +73,41 @@ export default function AutoFarePage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 space-y-8">
       {/* Header Banner */}
-      <div className="rounded-3xl bg-monsoon-900 text-white p-7 sm:p-12 shadow-md space-y-3">
+      <div className="rounded-3xl bg-monsoon-900 text-white p-7 sm:p-10 shadow-md space-y-3 relative overflow-hidden">
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-monsoon-800 border border-monsoon-700 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-monsoon-200">
+          <span className="rounded-full bg-monsoon-800 border border-monsoon-700/80 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-wider text-monsoon-200 shadow-2xs">
             AutoFare • {region.name}
           </span>
+          <span className="rounded-full bg-emerald-500/20 border border-emerald-400/30 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-300">
+            Kerala MVD Regulated
+          </span>
         </div>
-        <h1 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+        <h1 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-white max-w-2xl">
           Community Auto-Rickshaw Fare Finder
         </h1>
-        <p className="text-sm sm:text-base text-monsoon-200/90 leading-relaxed max-w-2xl">
+        <p className="text-xs sm:text-sm text-monsoon-200/90 leading-relaxed max-w-2xl">
           A transparent, community-reported guide to local auto-rickshaw fares in <strong className="text-white">{region.label}</strong> based on actual trip entries logged by locals.
         </p>
+
+        {/* Quick Kerala MVD Rule Ticker */}
+        <div className="pt-4 mt-2 border-t border-monsoon-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-monsoon-200">
+          <div>
+            <span className="text-[10px] uppercase font-mono text-monsoon-400 block">Min Fare (1.5 km)</span>
+            <span className="font-bold text-white font-mono text-sm">₹30</span>
+          </div>
+          <div>
+            <span className="text-[10px] uppercase font-mono text-monsoon-400 block">Per Additional km</span>
+            <span className="font-bold text-white font-mono text-sm">₹15/km</span>
+          </div>
+          <div>
+            <span className="text-[10px] uppercase font-mono text-monsoon-400 block">Night Surcharge</span>
+            <span className="font-bold text-white font-mono text-sm">+50% (10pm-5am)</span>
+          </div>
+          <div>
+            <span className="text-[10px] uppercase font-mono text-monsoon-400 block">Waiting Charge</span>
+            <span className="font-bold text-white font-mono text-sm">₹10 / 15 min</span>
+          </div>
+        </div>
       </div>
 
       {/* Mode Tabs */}
@@ -99,10 +122,10 @@ export default function AutoFarePage() {
             type="button"
             onClick={() => setActiveTab(tab.id)}
             className={[
-              "rounded-xl px-4 py-2 text-xs font-semibold tracking-wide transition-all duration-150",
+              "rounded-xl px-4 py-2 text-xs font-semibold tracking-wide transition-[background-color,border-color,color,transform] duration-150 select-none active:scale-[0.97]",
               activeTab === tab.id
                 ? "bg-monsoon-900 text-white shadow-xs border border-monsoon-900"
-                : "bg-white border border-monsoon-200 text-monsoon-800 hover:border-monsoon-900 hover:text-monsoon-900",
+                : "bg-white border border-monsoon-200 text-monsoon-800 hover:border-monsoon-900 hover:text-monsoon-900 shadow-2xs",
             ].join(" ")}
           >
             {tab.label}

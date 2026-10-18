@@ -31,10 +31,28 @@
     outline: none;
   }
 
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
   /* Smooth scrollbar on Webkit & Firefox */
   * {
     scrollbar-color: #cfdcd3 transparent;
     scrollbar-width: thin;
+  }
+
+  /* Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -53,17 +71,22 @@
 
   /* Glass card utility */
   .glass-card {
-    @apply bg-white/70 backdrop-blur-md border border-zinc-200/80 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.03)];
+    @apply bg-white/80 backdrop-blur-md border border-monsoon-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)];
   }
 
   /* Standardized form input styling */
   .input-control {
-    @apply w-full rounded-xl border border-monsoon-200 bg-white px-3.5 py-2.5 text-xs sm:text-sm text-monsoon-900 placeholder:text-monsoon-800/40 font-medium transition-all duration-150 focus:border-monsoon-700 focus:outline-none focus:ring-2 focus:ring-monsoon-700/10 shadow-xs hover:border-monsoon-300;
+    @apply w-full rounded-xl border border-monsoon-200 bg-white px-3.5 py-2.5 text-xs sm:text-sm text-monsoon-900 placeholder:text-monsoon-800/40 font-medium transition-[border-color,box-shadow] duration-150 focus:border-monsoon-700 focus:outline-none focus:ring-2 focus:ring-monsoon-700/10 shadow-xs hover:border-monsoon-300;
   }
 
   /* Refined elevated card surface */
   .card-elevated {
-    @apply rounded-2xl bg-white border border-monsoon-200/70 shadow-[0_1px_3px_0_rgba(15,23,42,0.03)] hover:shadow-[0_8px_20px_-4px_rgba(15,23,42,0.06)] hover:border-monsoon-300 transition-all duration-200;
+    @apply rounded-2xl bg-white border border-monsoon-200/70 shadow-card hover:shadow-card-hover hover:border-monsoon-300 transition-[box-shadow,border-color,transform] duration-200;
+  }
+
+  /* Tactile interactive button press */
+  .btn-press {
+    @apply transition-transform duration-150 ease-spring-out active:scale-[0.97];
   }
 }
 

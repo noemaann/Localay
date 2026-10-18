@@ -378,8 +378,26 @@ export default function PlaceDetailPage() {
                   >
                     <div className="flex justify-between items-start gap-2">
                       <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs">{"⭐".repeat(rev.rating)}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-0.5 text-amber-500" aria-label={`${rev.rating} out of 5 stars`}>
+                            {Array.from({ length: 5 }, (_, i) => (
+                              <svg
+                                key={i}
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill={i < rev.rating ? "currentColor" : "none"}
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className={i < rev.rating ? "text-amber-500" : "text-monsoon-200"}
+                              >
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                              </svg>
+                            ))}
+                          </div>
                           <span className="font-bold text-monsoon-900 text-sm">
                             {rev.title || "Local Review"}
                           </span>
@@ -402,7 +420,7 @@ export default function PlaceDetailPage() {
 
         {/* Right Col: Contribution Actions */}
         <div className="space-y-4">
-          <div className="flex rounded-xl bg-monsoon-100 p-1 text-xs font-semibold">
+          <div className="flex rounded-xl bg-monsoon-100 p-1 text-xs font-semibold gap-1">
             {[
               { id: "review", label: "Review" },
               { id: "dish", label: "Dish Price" },
@@ -414,10 +432,10 @@ export default function PlaceDetailPage() {
                 type="button"
                 onClick={() => setActiveActionTab(tab.id)}
                 className={[
-                  "flex-1 rounded-lg py-1.5 text-center transition-all",
+                  "flex-1 rounded-lg py-2 text-center transition-[background-color,color,transform] duration-150 select-none active:scale-[0.97]",
                   activeActionTab === tab.id
-                    ? "bg-white text-monsoon-900 shadow-sm"
-                    : "text-monsoon-800 hover:text-monsoon-900",
+                    ? "bg-white text-monsoon-900 shadow-2xs font-bold"
+                    : "text-monsoon-800 hover:text-monsoon-900 hover:bg-white/50",
                 ].join(" ")}
               >
                 {tab.label}

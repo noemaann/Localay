@@ -37,18 +37,18 @@ export default function CategoryFilter({ selected, onChange, resultCounts = {} }
             onClick={() => onChange(cat.id)}
             className={[
               "inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2",
-              "text-xs font-semibold tracking-wide transition-all duration-150 select-none",
+              "text-xs font-semibold tracking-wide transition-[background-color,border-color,color,transform] duration-150 select-none active:scale-[0.96]",
               "focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600",
               isSelected
                 ? "bg-monsoon-900 text-white shadow-xs border border-monsoon-900"
-                : "bg-white text-monsoon-800 border border-monsoon-200/80 hover:border-monsoon-900 hover:text-monsoon-900",
+                : "bg-white text-monsoon-800 border border-monsoon-200/90 hover:border-monsoon-900 hover:text-monsoon-900 shadow-2xs",
             ].join(" ")}
           >
             <span>{cat.label}</span>
             {count !== undefined && (
               <span
-                className={`ml-0.5 rounded-full px-1.5 text-xs font-semibold ${
-                  isSelected ? "bg-white/20 text-white" : "bg-monsoon-100 text-monsoon-800"
+                className={`ml-0.5 rounded-full px-2 py-0.2 text-[11px] font-mono font-bold ${
+                  isSelected ? "bg-white/20 text-white" : "bg-monsoon-100 text-monsoon-700"
                 }`}
               >
                 {count}

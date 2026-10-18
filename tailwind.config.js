@@ -26,8 +26,13 @@ export default {
         },
       },
       fontFamily: {
-        display: ['"Plus Jakarta Sans"', '"Fraunces"', "sans-serif"],
+        display: ['"Plus Jakarta Sans"', '"Inter"', "system-ui", "sans-serif"],
+        serif: ['"Fraunces"', "Georgia", "serif"],
         sans: ['"Plus Jakarta Sans"', '"Inter"', "system-ui", "sans-serif"],
+      },
+      transitionTimingFunction: {
+        "spring-out": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "drawer": "cubic-bezier(0.32, 0.72, 0, 1)",
       },
       animation: {
         "fade-in": "fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -49,6 +54,8 @@ export default {
         card: "0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02)",
         "card-hover":
           "0 12px 32px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04)",
+        "card-elevated":
+          "0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03)",
       },
     },
   },
