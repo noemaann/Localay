@@ -44,6 +44,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
       console.error("Google sign in error:", err);
       if (err.code === "auth/popup-closed-by-user") {
         setError("Sign-in popup was closed before completing.");
+      } else if (err.code === "auth/popup-blocked") {
+        setError("Sign-in popup was blocked by your browser. Please allow popups for localhost:5173.");
       } else if (err.code === "auth/operation-not-allowed") {
         setError("Google Sign-In is not enabled yet in your Firebase Console. Please go to Firebase Console > Authentication > Sign-in method and enable Google.");
       } else if (err.code === "auth/unauthorized-domain") {

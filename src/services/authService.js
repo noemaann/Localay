@@ -6,9 +6,10 @@
  * Supports full authentication simulation in Demo Mode.
  */
 
-import { auth, db, isDemoMode } from "./config";
-import { MOCK_USERS } from "./mockData";
+import { auth, db, isDemoMode, firebaseApp, firebaseConfig } from "./config";
+import { getApps, initializeApp } from "firebase/app";
 import {
+  getAuth,
   onAuthStateChanged as firebaseOnAuthStateChanged,
   signInWithPopup,
   GoogleAuthProvider,
@@ -17,6 +18,22 @@ import {
   signOut as firebaseSignOut,
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+
+function getActiveAuth() {
+  if (auth) return auth;
+  try {
+    const apps = getApps();
+    if (apps.length > 0) return getAuth(apps[0]);
+    if (firebaseApp) return getAuth(firebaseApp);
+    if (firebaseConfig?.apiKey) {
+      const app = initializeApp(firebaseConfig);
+      return getAuth(app);
+    }
+  } catch (err) {
+    console.warn("Could not retrieve active Firebase Auth:", err);
+  }
+  return null;
+}
 
 function loadStoredUserSession() {
   try {
@@ -41,10 +58,11 @@ function notifyDemoListeners() {
  * @returns {Object|null}
  */
 export function getCurrentUser() {
-  if (isDemoMode || !auth) {
+  const activeAuth = getActiveAuth();
+  if (isDemoMode || !activeAuth) {
     return demoCurrentUser;
   }
-  const user = auth.currentUser;
+  const user = activeAuth.currentUser;
   if (!user) return null;
   return {
     uid: user.uid,
@@ -61,13 +79,14 @@ export function getCurrentUser() {
  * @returns {Function} Unsubscribe function
  */
 export function onAuthStateChanged(callback) {
-  if (isDemoMode || !auth) {
+  const activeAuth = getActiveAuth();
+  if (isDemoMode || !activeAuth) {
     authListeners.add(callback);
     callback(demoCurrentUser);
     return () => authListeners.delete(callback);
   }
 
-  return firebaseOnAuthStateChanged(auth, async (firebaseUser) => {
+  return firebaseOnAuthStateChanged(activeAuth, async (firebaseUser) => {
     if (!firebaseUser) {
       callback(null);
       return;
@@ -97,7 +116,8 @@ export function onAuthStateChanged(callback) {
  * @returns {Promise<Object>}
  */
 export async function signInWithGoogle() {
-  if (import.meta.env?.MODE === "test" && !auth) {
+  const activeAuth = getActiveAuth();
+  if (isDemoMode || import.meta.env?.MODE === "test") {
     demoCurrentUser = {
       uid: "user_demo_google",
       displayName: "Google Demo User",
@@ -110,14 +130,14 @@ export async function signInWithGoogle() {
     return Promise.resolve(demoCurrentUser);
   }
 
-  if (!auth) {
+  if (!activeAuth) {
     throw new Error("Firebase Authentication is not available. Please verify your connection or try again.");
   }
 
   try {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
-    const result = await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(activeAuth, provider);
     const user = result.user;
     await syncUserProfileDoc(user);
     return {
@@ -140,7 +160,8 @@ export async function signInWithGoogle() {
  * @returns {Promise<Object>}
  */
 export async function signInWithEmail(email, password) {
-  if (import.meta.env?.MODE === "test" && !auth) {
+  const activeAuth = getActiveAuth();
+  if (isDemoMode || import.meta.env?.MODE === "test") {
     demoCurrentUser = {
       uid: `user_demo_${Date.now()}`,
       displayName: email.split("@")[0] || "Community Member",
@@ -153,12 +174,12 @@ export async function signInWithEmail(email, password) {
     return Promise.resolve(demoCurrentUser);
   }
 
-  if (!auth) {
+  if (!activeAuth) {
     throw new Error("Firebase Authentication is not available. Please verify your connection.");
   }
 
   try {
-    const result = await signInWithEmailAndPassword(auth, email, password);
+    const result = await signInWithEmailAndPassword(activeAuth, email, password);
     const user = result.user;
     return {
       uid: user.uid,
@@ -181,7 +202,8 @@ export async function signInWithEmail(email, password) {
  * @returns {Promise<Object>}
  */
 export async function signUpWithEmail(email, password, displayName = "") {
-  if (import.meta.env?.MODE === "test" && !auth) {
+  const activeAuth = getActiveAuth();
+  if (isDemoMode || import.meta.env?.MODE === "test") {
     demoCurrentUser = {
       uid: `user_demo_${Date.now()}`,
       displayName: displayName || email.split("@")[0],
@@ -194,12 +216,12 @@ export async function signUpWithEmail(email, password, displayName = "") {
     return Promise.resolve(demoCurrentUser);
   }
 
-  if (!auth) {
+  if (!activeAuth) {
     throw new Error("Firebase Authentication is not available. Please verify your connection.");
   }
 
   try {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
+    const result = await createUserWithEmailAndPassword(activeAuth, email, password);
     const user = result.user;
     await syncUserProfileDoc({ ...user, displayName: displayName || user.displayName });
     return {
@@ -227,14 +249,15 @@ export async function signOutUser() {
     }
   } catch (_) {}
 
-  if (isDemoMode || !auth) {
+  const activeAuth = getActiveAuth();
+  if (isDemoMode || !activeAuth) {
     demoCurrentUser = null;
     notifyDemoListeners();
     return Promise.resolve();
   }
 
   try {
-    await firebaseSignOut(auth);
+    await firebaseSignOut(activeAuth);
   } catch (error) {
     console.error("Error signing out:", error);
     throw error;
