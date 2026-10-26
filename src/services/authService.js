@@ -16,6 +16,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
+  updateProfile,
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
@@ -88,6 +89,11 @@ export function onAuthStateChanged(callback) {
 
   return firebaseOnAuthStateChanged(activeAuth, async (firebaseUser) => {
     if (!firebaseUser) {
+      try {
+        if (typeof window !== "undefined" && window.localStorage) {
+          localStorage.removeItem("localay_user_session");
+        }
+      } catch (_) {}
       callback(null);
       return;
     }
@@ -107,6 +113,11 @@ export function onAuthStateChanged(callback) {
       role,
       isDemo: false,
     };
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("localay_user_session", JSON.stringify(formattedUser));
+      }
+    } catch (_) {}
     callback(formattedUser);
   });
 }
@@ -126,6 +137,11 @@ export async function signInWithGoogle() {
       role: "community_member",
       isDemo: true,
     };
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("localay_user_session", JSON.stringify(demoCurrentUser));
+      }
+    } catch (_) {}
     notifyDemoListeners();
     return Promise.resolve(demoCurrentUser);
   }
@@ -140,13 +156,19 @@ export async function signInWithGoogle() {
     const result = await signInWithPopup(activeAuth, provider);
     const user = result.user;
     await syncUserProfileDoc(user);
-    return {
+    const formattedUser = {
       uid: user.uid,
       displayName: user.displayName || user.email?.split("@")[0] || "User",
       email: user.email,
       photoURL: user.photoURL || "",
       isDemo: false,
     };
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("localay_user_session", JSON.stringify(formattedUser));
+      }
+    } catch (_) {}
+    return formattedUser;
   } catch (error) {
     console.error("Error signing in with Google:", error);
     throw error;
@@ -170,6 +192,11 @@ export async function signInWithEmail(email, password) {
       role: "community_member",
       isDemo: true,
     };
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("localay_user_session", JSON.stringify(demoCurrentUser));
+      }
+    } catch (_) {}
     notifyDemoListeners();
     return Promise.resolve(demoCurrentUser);
   }
@@ -181,13 +208,19 @@ export async function signInWithEmail(email, password) {
   try {
     const result = await signInWithEmailAndPassword(activeAuth, email, password);
     const user = result.user;
-    return {
+    const formattedUser = {
       uid: user.uid,
       displayName: user.displayName || user.email?.split("@")[0],
       email: user.email,
       photoURL: user.photoURL || "",
       isDemo: false,
     };
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("localay_user_session", JSON.stringify(formattedUser));
+      }
+    } catch (_) {}
+    return formattedUser;
   } catch (error) {
     console.error("Error signing in with Email:", error);
     throw error;
@@ -212,6 +245,11 @@ export async function signUpWithEmail(email, password, displayName = "") {
       role: "community_member",
       isDemo: true,
     };
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("localay_user_session", JSON.stringify(demoCurrentUser));
+      }
+    } catch (_) {}
     notifyDemoListeners();
     return Promise.resolve(demoCurrentUser);
   }
@@ -223,14 +261,27 @@ export async function signUpWithEmail(email, password, displayName = "") {
   try {
     const result = await createUserWithEmailAndPassword(activeAuth, email, password);
     const user = result.user;
-    await syncUserProfileDoc({ ...user, displayName: displayName || user.displayName });
-    return {
+    if (displayName) {
+      try {
+        await updateProfile(user, { displayName });
+      } catch (profErr) {
+        console.warn("Could not update Firebase user displayName:", profErr);
+      }
+    }
+    const formattedUser = {
       uid: user.uid,
-      displayName: displayName || user.email?.split("@")[0],
+      displayName: displayName || user.displayName || user.email?.split("@")[0],
       email: user.email,
       photoURL: user.photoURL || "",
       isDemo: false,
     };
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("localay_user_session", JSON.stringify(formattedUser));
+      }
+    } catch (_) {}
+    await syncUserProfileDoc({ ...user, displayName: displayName || user.displayName });
+    return formattedUser;
   } catch (error) {
     console.error("Error registering user with Email:", error);
     throw error;

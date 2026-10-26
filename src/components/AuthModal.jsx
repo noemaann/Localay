@@ -27,7 +27,28 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
       onSuccess?.();
       onClose();
     } catch (err) {
-      setError(err.message || "Authentication failed.");
+      console.error("Auth submit error:", err);
+      if (err.code === "auth/email-already-in-use") {
+        setError("This email is already registered. Please switch to Sign In.");
+      } else if (err.code === "auth/weak-password") {
+        setError("Password is too weak. Please use at least 6 characters.");
+      } else if (err.code === "auth/invalid-email") {
+        setError("Please enter a valid email address.");
+      } else if (
+        err.code === "auth/user-not-found" ||
+        err.code === "auth/wrong-password" ||
+        err.code === "auth/invalid-credential"
+      ) {
+        setError("Incorrect email or password. Please check your credentials.");
+      } else if (err.code === "auth/operation-not-allowed") {
+        setError("Email/Password sign-in is not enabled in Firebase Console. Enable it in Authentication > Sign-in method.");
+      } else if (err.code === "auth/too-many-requests") {
+        setError("Too many attempts. Please try again after a few moments.");
+      } else if (err.code === "auth/network-request-failed") {
+        setError("Network error. Please check your internet connection.");
+      } else {
+        setError(err.message || "Authentication failed. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -42,14 +63,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
       onClose();
     } catch (err) {
       console.error("Google sign in error:", err);
+      const currentHost = typeof window !== "undefined" ? window.location.hostname : "your domain";
       if (err.code === "auth/popup-closed-by-user") {
         setError("Sign-in popup was closed before completing.");
       } else if (err.code === "auth/popup-blocked") {
-        setError("Sign-in popup was blocked by your browser. Please allow popups for localhost:5173.");
+        setError(`Sign-in popup was blocked by your browser. Please allow popups for ${currentHost}.`);
       } else if (err.code === "auth/operation-not-allowed") {
         setError("Google Sign-In is not enabled yet in your Firebase Console. Please go to Firebase Console > Authentication > Sign-in method and enable Google.");
       } else if (err.code === "auth/unauthorized-domain") {
-        setError("This domain is not authorized in Firebase Console > Authentication > Settings > Authorized domains.");
+        setError(`Domain "${currentHost}" is not authorized. Please add "${currentHost}" in Firebase Console > Authentication > Settings > Authorized domains.`);
       } else if (err.code === "auth/cancelled-popup-request") {
         setError("Only one sign-in popup allowed at a time.");
       } else {
