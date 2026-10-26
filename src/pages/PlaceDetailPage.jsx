@@ -9,19 +9,22 @@ import {
 import MapPlaceholder from "../features/discovery/MapPlaceholder.jsx";
 import Badge from "../components/Badge.jsx";
 import LoadingState from "../components/LoadingState.jsx";
+import { PlaceDetailSkeleton } from "../components/Skeleton.jsx";
 import SubmissionStatusBadge from "../components/SubmissionStatusBadge.jsx";
+import CategoryIcon from "../components/CategoryIcon.jsx";
 import { CATEGORIES } from "../data/categories.js";
-import { difficultyClass, formatDifficulty, difficultyIcon } from "../utils/format.js";
+import { difficultyClass, formatDifficulty } from "../utils/format.js";
 import AddReviewForm from "../features/contributions/AddReviewForm.jsx";
 import AddDishPriceForm from "../features/contributions/AddDishPriceForm.jsx";
 import AccessUpdateForm from "../features/contributions/AccessUpdateForm.jsx";
 import CorrectionRequestForm from "../features/contributions/CorrectionRequestForm.jsx";
+import UploadPlacePhotoForm from "../features/contributions/UploadPlacePhotoForm.jsx";
 
 /**
  * PlaceDetailPage — full detail view for a single place.
  *
  * Supports both discovery features (access details, tags, map stub)
- * and community-contributed features (reviews, dish prices, road updates).
+ * and community-contributed features (reviews, dish prices, road updates, user photos).
  */
 export default function PlaceDetailPage() {
   const { placeId } = useParams();
@@ -31,6 +34,7 @@ export default function PlaceDetailPage() {
   const [reviews, setReviews] = useState([]);
   const [dishPrices, setDishPrices] = useState([]);
   const [updates, setUpdates] = useState([]);
+  const [photos, setPhotos] = useState([]);
   const [activeActionTab, setActiveActionTab] = useState("review");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -54,16 +58,18 @@ export default function PlaceDetailPage() {
         setPlace(placeData);
 
         // Fetch auxiliary community data in parallel safely
-        const [revList, priceList, updList] = await Promise.all([
+        const [revList, priceList, updList, photoList] = await Promise.all([
           reviewService.getReviewsForPlace(placeId).catch(() => []),
           dishPriceService.getDishPricesForPlace(placeId).catch(() => []),
           placeUpdateService.getPlaceUpdates(placeId).catch(() => []),
+          placeService.getPlacePhotos(placeId).catch(() => []),
         ]);
 
         if (!cancelled) {
           setReviews(revList || []);
           setDishPrices(priceList || []);
           setUpdates(updList || []);
+          setPhotos(photoList || []);
         }
       } catch (err) {
         if (!cancelled) {
@@ -82,11 +88,7 @@ export default function PlaceDetailPage() {
   }, [placeId]);
 
   if (loading) {
-    return (
-      <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-        <LoadingState message="Loading place details…" />
-      </div>
-    );
+    return <PlaceDetailSkeleton />;
   }
 
   if (error === "not_found" || !place) {
@@ -166,25 +168,37 @@ export default function PlaceDetailPage() {
       )}
 
       {/* Hero Header */}
-      <header className="relative rounded-3xl overflow-hidden bg-monsoon-900 text-white p-7 sm:p-12 shadow-md">
+      <header className="relative rounded-3xl overflow-hidden bg-monsoon-900 text-white p-7 sm:p-12 shadow-card-hover border border-monsoon-800">
         {place.coverImage && (
-          <img
-            src={place.coverImage}
-            alt={place.name}
-            className="absolute inset-0 w-full h-full object-cover opacity-25"
-          />
+          <>
+            <img
+              src={place.coverImage}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-40 scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-monsoon-950/95 via-monsoon-950/80 to-monsoon-950/40" />
+          </>
         )}
         <div className="relative z-10 max-w-2xl space-y-3.5">
           <div className="flex flex-wrap items-center gap-2">
             {category && (
               <Badge className={category.accent}>
-                <span aria-hidden="true">{category.icon}</span>
-                {category.label}
+                <CategoryIcon categoryId={category.id} className="w-3.5 h-3.5 shrink-0" />
+                <span>{category.label}</span>
               </Badge>
+            )}
+            {place.coverImage && (
+              <span className="rounded-full border border-emerald-400/30 bg-emerald-950/50 text-emerald-200 px-2.5 py-0.5 text-xs font-semibold backdrop-blur-xs flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Community Photo</span>
+              </span>
             )}
             {place.status && <SubmissionStatusBadge status={place.status} />}
             {place._demo && (
-              <span className="rounded-full border border-white/20 px-2.5 py-0.5 text-xs font-semibold text-white/80 select-none">
+              <span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-xs font-semibold text-white/90 select-none backdrop-blur-xs">
                 Demo data
               </span>
             )}
@@ -192,7 +206,7 @@ export default function PlaceDetailPage() {
 
           <h1
             id="place-name"
-            className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight"
+            className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight"
           >
             {place.name}
           </h1>
@@ -378,8 +392,26 @@ export default function PlaceDetailPage() {
                   >
                     <div className="flex justify-between items-start gap-2">
                       <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs">{"⭐".repeat(rev.rating)}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-0.5 text-amber-500" aria-label={`${rev.rating} out of 5 stars`}>
+                            {Array.from({ length: 5 }, (_, i) => (
+                              <svg
+                                key={i}
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill={i < rev.rating ? "currentColor" : "none"}
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className={i < rev.rating ? "text-amber-500" : "text-monsoon-200"}
+                              >
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                              </svg>
+                            ))}
+                          </div>
                           <span className="font-bold text-monsoon-900 text-sm">
                             {rev.title || "Local Review"}
                           </span>
@@ -398,14 +430,68 @@ export default function PlaceDetailPage() {
               </div>
             )}
           </div>
+
+          {/* Community Photos Gallery */}
+          <div className="rounded-2xl border border-monsoon-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <h2 className="text-lg font-bold text-monsoon-900 flex items-center gap-2">
+                <span>Community Spot Photos</span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-monsoon-100 text-monsoon-800">
+                  {photos.length}
+                </span>
+              </h2>
+              <button
+                type="button"
+                onClick={() => setActiveActionTab("photo")}
+                className="text-xs font-semibold text-monsoon-700 hover:text-monsoon-900 hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                + Upload Photo
+              </button>
+            </div>
+
+            {photos.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-monsoon-200 p-6 text-center bg-monsoon-50/40 space-y-2">
+                <p className="text-xs text-monsoon-800/80">
+                  No community photos shared for {place.name} yet.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setActiveActionTab("photo")}
+                  className="rounded-xl bg-monsoon-900 text-white px-3.5 py-1.5 text-xs font-semibold hover:bg-monsoon-800 transition-colors shadow-2xs"
+                >
+                  Be the first to share a photo
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {photos.map((ph) => (
+                  <div key={ph.id} className="group relative rounded-xl overflow-hidden border border-monsoon-200 bg-monsoon-100/50 aspect-4/3">
+                    <img
+                      src={ph.photoUrl}
+                      alt={ph.caption || place.name}
+                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    {ph.caption && (
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 text-white">
+                        <p className="text-[11px] font-medium leading-tight truncate">{ph.caption}</p>
+                        <span className="text-[9px] text-white/70 block mt-0.5">by {ph.uploaderName}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Col: Contribution Actions */}
         <div className="space-y-4">
-          <div className="flex rounded-xl bg-monsoon-100 p-1 text-xs font-semibold">
+          <div className="flex flex-wrap rounded-xl bg-monsoon-100 p-1 text-xs font-semibold gap-1">
             {[
               { id: "review", label: "Review" },
               { id: "dish", label: "Dish Price" },
+              { id: "photo", label: "Add Photo" },
               { id: "access", label: "Road Access" },
               { id: "correct", label: "Correction" },
             ].map((tab) => (
@@ -414,10 +500,10 @@ export default function PlaceDetailPage() {
                 type="button"
                 onClick={() => setActiveActionTab(tab.id)}
                 className={[
-                  "flex-1 rounded-lg py-1.5 text-center transition-all",
+                  "flex-1 min-w-[70px] rounded-lg py-2 text-center transition-[background-color,color,transform] duration-150 select-none active:scale-[0.97]",
                   activeActionTab === tab.id
-                    ? "bg-white text-monsoon-900 shadow-sm"
-                    : "text-monsoon-800 hover:text-monsoon-900",
+                    ? "bg-white text-monsoon-900 shadow-2xs font-bold"
+                    : "text-monsoon-800 hover:text-monsoon-900 hover:bg-white/50",
                 ].join(" ")}
               >
                 {tab.label}
@@ -438,6 +524,18 @@ export default function PlaceDetailPage() {
                 placeId={place.id}
                 placeName={place.name}
                 onPriceAdded={(newPrice) => setDishPrices((prev) => [newPrice, ...prev])}
+              />
+            )}
+            {activeActionTab === "photo" && (
+              <UploadPlacePhotoForm
+                placeId={place.id}
+                placeName={place.name}
+                onPhotoUploaded={(newPhoto) => {
+                  setPhotos((prev) => [newPhoto, ...prev]);
+                  if (!place.coverImage) {
+                    setPlace((prev) => ({ ...prev, coverImage: newPhoto.photoUrl }));
+                  }
+                }}
               />
             )}
             {activeActionTab === "access" && (
@@ -467,22 +565,24 @@ function InfoSection({ icon, title, items }) {
   if (validItems.length === 0) return null;
 
   return (
-    <div className="rounded-2xl bg-white p-5 border border-monsoon-200/70 shadow-xs">
-      <h2 className="mb-4 text-sm font-bold text-monsoon-900">
-        {title}
-      </h2>
-      <dl className="flex flex-col gap-3">
-        {validItems.map((item) => (
-          <div key={item.label}>
-            <dt className="text-[10px] font-mono font-semibold uppercase tracking-wider text-monsoon-800/60">
-              {item.label}
-            </dt>
-            <dd className={`mt-0.5 text-sm text-monsoon-900 ${item.valueClass ?? ""}`}>
-              {item.value}
-            </dd>
-          </div>
-        ))}
-      </dl>
+    <div className="h-full rounded-2xl bg-white p-5 border border-monsoon-200/80 shadow-xs flex flex-col justify-between">
+      <div>
+        <h2 className="mb-4 text-sm font-bold text-monsoon-900 border-b border-monsoon-100 pb-2">
+          {title}
+        </h2>
+        <dl className="flex flex-col gap-3">
+          {validItems.map((item) => (
+            <div key={item.label}>
+              <dt className="text-[10px] font-mono font-semibold uppercase tracking-wider text-monsoon-800/60">
+                {item.label}
+              </dt>
+              <dd className={`mt-0.5 text-sm font-medium text-monsoon-900 ${item.valueClass ?? ""}`}>
+                {item.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
     </div>
   );
 }

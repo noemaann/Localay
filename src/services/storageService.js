@@ -44,11 +44,28 @@ export async function uploadFile(destinationPath, file, metadata = {}) {
   }
 
   if (isDemoMode || !storage) {
-    // Return a working demo placeholder URL
-    const demoUrl = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
-    return Promise.resolve({
-      downloadUrl: demoUrl,
-      fullPath: `demo/${destinationPath}`,
+    return new Promise((resolve) => {
+      if (typeof FileReader !== "undefined" && file instanceof Blob) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve({
+            downloadUrl: reader.result,
+            fullPath: `demo/${destinationPath}`,
+          });
+        };
+        reader.onerror = () => {
+          resolve({
+            downloadUrl: URL.createObjectURL(file),
+            fullPath: `demo/${destinationPath}`,
+          });
+        };
+        reader.readAsDataURL(file);
+      } else {
+        resolve({
+          downloadUrl: typeof URL !== "undefined" ? URL.createObjectURL(file) : "",
+          fullPath: `demo/${destinationPath}`,
+        });
+      }
     });
   }
 

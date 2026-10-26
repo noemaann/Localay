@@ -5,6 +5,7 @@ import PlaceCard from "../features/discovery/PlaceCard.jsx";
 import CategoryFilter from "../features/discovery/CategoryFilter.jsx";
 import SearchInput from "../components/SearchInput.jsx";
 import LoadingState from "../components/LoadingState.jsx";
+import { PlaceCardSkeleton } from "../components/Skeleton.jsx";
 import EmptyState from "../components/EmptyState.jsx";
 import { useLocation } from "../context/LocationContext.jsx";
 import { CATEGORIES } from "../data/categories.js";
@@ -110,7 +111,7 @@ export default function DiscoverPage() {
       </header>
 
       {/* Itinerary Planner Trigger Banner */}
-      <div className="mb-6 rounded-2xl bg-monsoon-900 p-5 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-monsoon-800">
+      <div className="mb-6 rounded-2xl bg-monsoon-900 p-5 text-white shadow-md flex flex-col items-start gap-4 border border-monsoon-800">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-base sm:text-lg font-bold tracking-tight">
@@ -127,7 +128,7 @@ export default function DiscoverPage() {
         <button
           type="button"
           onClick={() => setShowPlanner((prev) => !prev)}
-          className="px-4 py-2.5 rounded-xl bg-white hover:bg-monsoon-50 text-monsoon-900 font-semibold text-xs shadow-xs transition-all shrink-0"
+          className="px-4 py-2.5 rounded-xl bg-white hover:bg-monsoon-50 text-monsoon-900 font-semibold text-xs shadow-xs transition-all active:scale-95"
         >
           {showPlanner ? "Hide Trip Planner" : "Open Trip Planner"}
         </button>
@@ -175,9 +176,9 @@ export default function DiscoverPage() {
       </div>
 
       {/* Demo data notice */}
-      <div className="mb-6 rounded-2xl border border-turmeric-200 bg-turmeric-100/60 px-4 py-3 text-xs text-turmeric-600 font-medium flex items-start gap-2.5">
-        <span aria-hidden="true" className="shrink-0 font-bold">INFO</span>
-        <span>
+      <div className="mb-6 rounded-2xl border border-amber-200/90 bg-amber-50/80 px-4 py-3 text-xs text-amber-900 font-medium flex items-start gap-2.5 shadow-2xs">
+        <span aria-hidden="true" className="shrink-0 rounded bg-amber-200 px-1.5 py-0.5 text-[10px] font-bold text-amber-900 uppercase">INFO</span>
+        <span className="leading-relaxed">
           All places shown are <strong>illustrative demo content only</strong> — not
           verified, not sourced from community reviews, and not guaranteed to be
           accurate. Community submissions will replace this data in a future release.
@@ -199,7 +200,15 @@ export default function DiscoverPage() {
       {error ? (
         <ErrorState message={error} />
       ) : loading && allLoading ? (
-        <LoadingState message="Finding places…" />
+        <div
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          aria-busy="true"
+          aria-label="Loading places"
+        >
+          {Array.from({ length: 6 }).map((_, i) => (
+            <PlaceCardSkeleton key={i} />
+          ))}
+        </div>
       ) : displayPlaces.length === 0 ? (
         <EmptyState
           title={hasActiveFilters ? "No places match your search" : "No places yet"}

@@ -73,18 +73,38 @@ export default function AutoFarePage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 space-y-8">
       {/* Header Banner */}
-      <div className="rounded-3xl bg-monsoon-900 text-white p-7 sm:p-12 shadow-md space-y-3">
+      <div className="rounded-3xl bg-monsoon-900 text-white p-7 sm:p-10 shadow-md space-y-3 relative overflow-hidden">
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-monsoon-800 border border-monsoon-700 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-monsoon-200">
+          <span className="rounded-full bg-monsoon-800 border border-monsoon-700/80 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-wider text-monsoon-200 shadow-2xs">
             AutoFare • {region.name}
           </span>
         </div>
-        <h1 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white max-w-3xl">
           Community Auto-Rickshaw Fare Finder
         </h1>
-        <p className="text-sm sm:text-base text-monsoon-200/90 leading-relaxed max-w-2xl">
+        <p className="text-xs sm:text-sm text-monsoon-200/90 leading-relaxed max-w-2xl">
           A transparent, community-reported guide to local auto-rickshaw fares in <strong className="text-white">{region.label}</strong> based on actual trip entries logged by locals.
         </p>
+
+        {/* Standard Tariff Guidelines */}
+        <div className="pt-4 mt-2 border-t border-monsoon-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-monsoon-200">
+          <div>
+            <span className="text-[10px] uppercase font-mono text-monsoon-400 block">Min Fare (1.5 km)</span>
+            <span className="font-bold text-white font-mono text-sm">₹30</span>
+          </div>
+          <div>
+            <span className="text-[10px] uppercase font-mono text-monsoon-400 block">Per Additional km</span>
+            <span className="font-bold text-white font-mono text-sm">₹15/km</span>
+          </div>
+          <div>
+            <span className="text-[10px] uppercase font-mono text-monsoon-400 block">Night Surcharge</span>
+            <span className="font-bold text-white font-mono text-sm">+50% (10pm-5am)</span>
+          </div>
+          <div>
+            <span className="text-[10px] uppercase font-mono text-monsoon-400 block">Waiting Charge</span>
+            <span className="font-bold text-white font-mono text-sm">₹10 / 15 min</span>
+          </div>
+        </div>
       </div>
 
       {/* Mode Tabs */}
@@ -99,10 +119,10 @@ export default function AutoFarePage() {
             type="button"
             onClick={() => setActiveTab(tab.id)}
             className={[
-              "rounded-xl px-4 py-2 text-xs font-semibold tracking-wide transition-all duration-150",
+              "rounded-xl px-4 py-2 text-xs font-semibold tracking-wide transition-[background-color,border-color,color,transform] duration-150 select-none active:scale-[0.97]",
               activeTab === tab.id
                 ? "bg-monsoon-900 text-white shadow-xs border border-monsoon-900"
-                : "bg-white border border-monsoon-200 text-monsoon-800 hover:border-monsoon-900 hover:text-monsoon-900",
+                : "bg-white border border-monsoon-200 text-monsoon-800 hover:border-monsoon-900 hover:text-monsoon-900 shadow-2xs",
             ].join(" ")}
           >
             {tab.label}
@@ -120,7 +140,7 @@ export default function AutoFarePage() {
             </h2>
 
             <div>
-              <label htmlFor="calc-pickup-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+              <label htmlFor="calc-pickup-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                 Pickup Stand / Location
               </label>
               <input
@@ -129,12 +149,12 @@ export default function AutoFarePage() {
                 value={origin}
                 onChange={(e) => setOrigin(e.target.value)}
                 placeholder="e.g. Kottakkal Stand"
-                className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none"
+                className="input-control"
               />
             </div>
 
             <div>
-              <label htmlFor="calc-dropoff-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+              <label htmlFor="calc-dropoff-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                 Drop-off Destination
               </label>
               <input
@@ -143,12 +163,12 @@ export default function AutoFarePage() {
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 placeholder="e.g. Changuvetty"
-                className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none"
+                className="input-control"
               />
             </div>
 
             <div>
-              <label htmlFor="calc-distance-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+              <label htmlFor="calc-distance-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                 Distance (km)
               </label>
               <input
@@ -158,20 +178,20 @@ export default function AutoFarePage() {
                 min="0.1"
                 value={distanceKm}
                 onChange={(e) => setDistanceKm(e.target.value)}
-                className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none"
+                className="input-control font-mono"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               <div>
-                <label htmlFor="calc-time-select" className="block text-xs font-semibold text-monsoon-800 mb-1">
+                <label htmlFor="calc-time-select" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                   Time Period
                 </label>
                 <select
                   id="calc-time-select"
                   value={timeOfDay}
                   onChange={(e) => setTimeOfDay(e.target.value)}
-                  className="w-full rounded-lg border border-monsoon-200 px-2.5 py-2 text-xs focus:border-monsoon-600 focus:outline-none bg-white"
+                  className="input-control bg-white"
                 >
                   <option value="day">Day Time</option>
                   <option value="night">Night Time</option>
@@ -180,14 +200,14 @@ export default function AutoFarePage() {
               </div>
 
               <div>
-                <label htmlFor="calc-triptype-select" className="block text-xs font-semibold text-monsoon-800 mb-1">
+                <label htmlFor="calc-triptype-select" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                   Trip Type
                 </label>
                 <select
                   id="calc-triptype-select"
                   value={tripType}
                   onChange={(e) => setTripType(e.target.value)}
-                  className="w-full rounded-lg border border-monsoon-200 px-2.5 py-2 text-xs focus:border-monsoon-600 focus:outline-none bg-white"
+                  className="input-control bg-white"
                 >
                   <option value="one_way">One-Way</option>
                   <option value="round_trip">Round-Trip</option>
@@ -196,7 +216,7 @@ export default function AutoFarePage() {
             </div>
 
             <div className="pt-2 border-t border-monsoon-100">
-              <label htmlFor="calc-quote-input" className="block text-xs font-semibold text-monsoon-800 mb-1">
+              <label htmlFor="calc-quote-input" className="block text-xs font-bold text-monsoon-900 mb-1.5">
                 Quoted / Proposed Fare (Optional ₹)
               </label>
               <input
@@ -206,7 +226,7 @@ export default function AutoFarePage() {
                 value={queryFareAmount}
                 onChange={(e) => setQueryFareAmount(e.target.value)}
                 placeholder="Check if ₹ quote is fair…"
-                className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-xs focus:border-monsoon-600 focus:outline-none"
+                className="input-control font-mono"
               />
             </div>
           </div>

@@ -2,7 +2,7 @@
   "name": "localay",
   "private": true,
   "version": "0.1.0",
-  "description": "Community-powered local discovery platform, launching in Malappuram, Kerala.",
+  "description": "Community-powered local discovery platform for authentic spots and neighborhood rates.",
   "type": "module",
   "scripts": {
     "dev": "vite",

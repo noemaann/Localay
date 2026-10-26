@@ -35,7 +35,7 @@ export default function SearchInput({
         {/* Search icon */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute left-4 text-monsoon-600"
+          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-monsoon-600 flex items-center justify-center"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -61,11 +61,11 @@ export default function SearchInput({
           placeholder={placeholder}
           autoComplete="off"
           className={[
-            "w-full rounded-2xl border border-monsoon-200 bg-white py-3.5 pl-12 pr-12",
-            "text-sm text-monsoon-900 placeholder:text-monsoon-800/40 font-medium",
-            "shadow-[0_2px_8px_-2px_rgba(15,23,42,0.04)] transition-all duration-200",
-            "focus:border-monsoon-900 focus:outline-none focus:ring-1 focus:ring-monsoon-900",
-            "hover:border-monsoon-300",
+            "w-full rounded-2xl border border-monsoon-200/90 bg-white py-3.5 pl-12 pr-12",
+            "text-base sm:text-sm text-monsoon-900 placeholder:text-monsoon-800/40 font-medium",
+            "shadow-[0_2px_10px_-2px_rgba(15,23,42,0.04)] transition-[border-color,box-shadow] duration-150",
+            "focus:border-monsoon-900 focus:outline-none focus:ring-2 focus:ring-monsoon-900/10",
+            "hover:border-monsoon-400",
           ].join(" ")}
         />
 
@@ -76,16 +76,16 @@ export default function SearchInput({
             aria-label="Clear search"
             onClick={onClear}
             className={[
-              "absolute right-4 rounded-full p-0.5 text-monsoon-800/60",
+              "absolute right-3.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-monsoon-800/50",
               "hover:bg-monsoon-100 hover:text-monsoon-900",
               "focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600",
-              "transition-colors duration-100",
+              "transition-colors duration-150 flex items-center justify-center",
             ].join(" ")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
+              width="15"
+              height="15"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"

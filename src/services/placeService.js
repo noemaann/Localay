@@ -341,3 +341,66 @@ export async function createPlace(placeData) {
     throw error;
   }
 }
+
+const PHOTOS_STORAGE_KEY = "localay_spot_photos";
+
+function loadStoredPhotos() {
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const stored = localStorage.getItem(PHOTOS_STORAGE_KEY);
+      if (stored) return JSON.parse(stored);
+    }
+  } catch (_) {}
+  return {};
+}
+
+function saveStoredPhotos(map) {
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      localStorage.setItem(PHOTOS_STORAGE_KEY, JSON.stringify(map));
+    }
+  } catch (_) {}
+}
+
+/**
+ * Get user-submitted community photos for a spot.
+ * @param {string} placeId
+ * @returns {Promise<Array<Object>>}
+ */
+export async function getPlacePhotos(placeId) {
+  if (!placeId) return [];
+  const map = loadStoredPhotos();
+  return map[placeId] || [];
+}
+
+/**
+ * Upload a community photo for a spot.
+ * @param {string} placeId
+ * @param {{ photoUrl: string, caption?: string, uploaderName?: string, userId?: string }} data
+ * @returns {Promise<Object>}
+ */
+export async function uploadPlacePhoto(placeId, { photoUrl, caption, uploaderName, userId }) {
+  if (!placeId || !photoUrl) {
+    throw new Error("Place ID and photo are required.");
+  }
+  const map = loadStoredPhotos();
+  const current = map[placeId] || [];
+  const newPhoto = {
+    id: `photo_${Date.now()}`,
+    placeId,
+    photoUrl,
+    caption: caption?.trim() || "",
+    uploaderName: uploaderName || "Community Member",
+    userId: userId || "anon",
+    uploadedAt: new Date().toISOString(),
+  };
+  map[placeId] = [newPhoto, ...current];
+  saveStoredPhotos(map);
+
+  const place = inMemoryPlaces.find((p) => p.id === placeId);
+  if (place && !place.coverImage) {
+    place.coverImage = photoUrl;
+  }
+  return newPhoto;
+}
+

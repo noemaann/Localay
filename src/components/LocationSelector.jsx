@@ -150,9 +150,9 @@ export default function LocationSelector() {
         aria-label={`Current location: ${region.label}. Change location.`}
         onClick={() => setOpen((o) => !o)}
         className={[
-          "flex items-center gap-1.5 rounded-lg px-3 py-1.5",
-          "text-sm font-medium text-monsoon-800",
-          "border border-transparent hover:border-monsoon-100 hover:bg-monsoon-50",
+          "inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 h-8.5",
+          "text-xs font-semibold text-monsoon-900",
+          "border border-monsoon-200/80 bg-white/70 hover:bg-white hover:border-monsoon-300 shadow-2xs",
           "focus-visible:outline focus-visible:outline-2 focus-visible:outline-monsoon-600",
           "transition-all duration-150 select-none",
         ].join(" ")}

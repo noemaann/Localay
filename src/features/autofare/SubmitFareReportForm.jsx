@@ -240,7 +240,7 @@ export default function SubmitFareReportForm({ onReportSubmitted }) {
               required
               value={formData.townId}
               onChange={(e) => setFormData({ ...formData, townId: e.target.value })}
-              placeholder="e.g. Kottakkal, Malappuram Town, Tirur"
+              placeholder="e.g. Bus Stand, Town Centre, Market Junction"
               className="w-full rounded-lg border border-monsoon-200 px-3 py-2 text-sm focus:border-monsoon-600 focus:outline-none"
             />
             {errors.townId && <p className="mt-1 text-xs text-rose-600">{errors.townId}</p>}
